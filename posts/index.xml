@@ -6,7 +6,7 @@
 VXESS+WS+TLS的Cache Policy
 &lt;/div>
 &lt;/h2>
-&lt;p>&lt;img src="images/Cloudfront-VXESS+WS+TLS.PNG" alt="VXESS+WS+TLS">&lt;/p>
+&lt;p>&lt;img src="https://0x2196f3.github.io/images/Cloudfront-VXESS+WS+TLS.PNG" alt="VXESS+WS+TLS">&lt;/p>
 &lt;h2 id="xhttp的cache-policy" >
 &lt;div>
 &lt;a href="#xhttp%e7%9a%84cache-policy">
@@ -15,7 +15,7 @@ VXESS+WS+TLS的Cache Policy
 XHTTP的Cache Policy
 &lt;/div>
 &lt;/h2>
-&lt;p>&lt;img src="images/Cloudfront-XHTTP.PNG" alt="XHTTP">&lt;/p>
+&lt;p>&lt;img src="https://0x2196f3.github.io/images/Cloudfront-XHTTP.PNG" alt="XHTTP">&lt;/p>
 &lt;ul>
 &lt;li>Cloudfront 可以根据不同的path设置不同的behavior，所以WS和XHTTP节点可以放在同一个CDN链接里（需要节点服务器用nginx分流）&lt;/li>
 &lt;li>&lt;del>Cloudfront 上传按量收费，下载1TB以内免费，所以可以下载走CDN上行走别的&lt;/del>&lt;/li>
