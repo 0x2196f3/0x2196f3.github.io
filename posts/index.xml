@@ -1,29 +1,15 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Wed, 02 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>XHTTP过Cloudfront CDN</title><link>/posts/cloudfront-xhttp-settings/</link><pubDate>Wed, 02 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/cloudfront-xhttp-settings/</guid><description>&lt;h2 id="vxesswstls的cache-policy" >
-&lt;div>
-&lt;a href="#vxesswstls%e7%9a%84cache-policy">
-#
-&lt;/a>
-VXESS+WS+TLS的Cache Policy
-&lt;/div>
-&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>https://0x2196f3.github.io/posts/</link><description>Recent content in Posts on 0x2196f3's blog</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Wed, 02 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://0x2196f3.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>XHTTP过Cloudfront CDN</title><link>https://0x2196f3.github.io/posts/cloudfront-xhttp-settings/</link><pubDate>Wed, 02 Jul 2025 00:00:00 +0000</pubDate><guid>https://0x2196f3.github.io/posts/cloudfront-xhttp-settings/</guid><description>&lt;h2 id="vxesswstls的cache-policy">VXESS+WS+TLS的Cache Policy&lt;/h2>
 &lt;p>&lt;img src="https://0x2196f3.github.io/images/Cloudfront-VXESS+WS+TLS.PNG" alt="VXESS+WS+TLS">&lt;/p>
-&lt;h2 id="xhttp的cache-policy" >
-&lt;div>
-&lt;a href="#xhttp%e7%9a%84cache-policy">
-#
-&lt;/a>
-XHTTP的Cache Policy
-&lt;/div>
-&lt;/h2>
+&lt;h2 id="xhttp的cache-policy">XHTTP的Cache Policy&lt;/h2>
 &lt;p>&lt;img src="https://0x2196f3.github.io/images/Cloudfront-XHTTP.PNG" alt="XHTTP">&lt;/p>
 &lt;ul>
 &lt;li>Cloudfront 可以根据不同的path设置不同的behavior，所以WS和XHTTP节点可以放在同一个CDN链接里（需要节点服务器用nginx分流）&lt;/li>
 &lt;li>&lt;del>Cloudfront 上传按量收费，下载1TB以内免费，所以可以下载走CDN上行走别的&lt;/del>&lt;/li>
-&lt;/ul></description></item><item><title>OpenWrt 修改Kernel Hash安装官方源kmod-ipk</title><link>/posts/openwrt-change-kernel-hash/</link><pubDate>Tue, 01 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-change-kernel-hash/</guid><description>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vi /usr/lib/opkg/status
+&lt;/ul></description></item><item><title>OpenWrt 修改Kernel Hash安装官方源kmod-ipk</title><link>https://0x2196f3.github.io/posts/openwrt-change-kernel-hash/</link><pubDate>Tue, 01 Jul 2025 00:00:00 +0000</pubDate><guid>https://0x2196f3.github.io/posts/openwrt-change-kernel-hash/</guid><description>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vi /usr/lib/opkg/status
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># replace hash_a by hash_b&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>:%s/hash_a/hash_b/g
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>:%s/hash_a/hash_b/g 
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>hash_a 是 /usr/lib/opkg/status 里的hash值&lt;br>
 hash_b 是安装ipk报错时提示的hash值&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># save&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>:wq
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>:wq 
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>
