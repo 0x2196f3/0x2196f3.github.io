@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>翻墙 on 0x2196f3's blog</title><link>/tags/%E7%BF%BB%E5%A2%99/</link><description>0x2196f3's blog (翻墙)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Wed, 02 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/%E7%BF%BB%E5%A2%99/index.xml" rel="self" type="application/rss+xml"/><item><title>XHTTP过Cloudfront CDN</title><link>/posts/cloudfront-xhttp-settings/</link><pubDate>Wed, 02 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/cloudfront-xhttp-settings/</guid><description>&lt;h2 id="vxesswstls的cache-policy" >
+&lt;div>
+&lt;a href="#vxesswstls%e7%9a%84cache-policy">
+#
+&lt;/a>
+VXESS+WS+TLS的Cache Policy
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;img src="images/Cloudfront-VXESS+WS+TLS.PNG" alt="VXESS+WS+TLS">&lt;/p>
+&lt;h2 id="xhttp的cache-policy" >
+&lt;div>
+&lt;a href="#xhttp%e7%9a%84cache-policy">
+#
+&lt;/a>
+XHTTP的Cache Policy
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;img src="images/Cloudfront-XHTTP.PNG" alt="XHTTP">&lt;/p>
+&lt;ul>
+&lt;li>Cloudfront 可以根据不同的path设置不同的behavior，所以WS和XHTTP节点可以放在同一个CDN链接里（需要节点服务器用nginx分流）&lt;/li>
+&lt;li>&lt;del>Cloudfront 上传按量收费，下载1TB以内免费，所以可以下载走CDN上行走别的&lt;/del>&lt;/li>
+&lt;/ul></description></item></channel></rss>
