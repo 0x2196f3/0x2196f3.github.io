@@ -1,7 +1,44 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>翻墙 on 0x2196f3's blog</title><link>https://0x2196f3.github.io/tags/%E7%BF%BB%E5%A2%99/</link><description>Recent content in 翻墙 on 0x2196f3's blog</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Wed, 02 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://0x2196f3.github.io/tags/%E7%BF%BB%E5%A2%99/index.xml" rel="self" type="application/rss+xml"/><item><title>XHTTP过Cloudfront CDN</title><link>https://0x2196f3.github.io/posts/cloudfront-xhttp-settings/</link><pubDate>Wed, 02 Jul 2025 00:00:00 +0000</pubDate><guid>https://0x2196f3.github.io/posts/cloudfront-xhttp-settings/</guid><description>&lt;h2 id="vxesswstls的cache-policy">VXESS+WS+TLS的Cache Policy&lt;/h2>
-&lt;p>&lt;img src="https://0x2196f3.github.io/images/Cloudfront-VXESS+WS+TLS.PNG" alt="VXESS+WS+TLS">&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>翻墙 on 0x2196f3's blog</title><link>https://blog.0x2196f3.top/tags/%E7%BF%BB%E5%A2%99/</link><description>Recent content in 翻墙 on 0x2196f3's blog</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Thu, 03 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://blog.0x2196f3.top/tags/%E7%BF%BB%E5%A2%99/index.xml" rel="self" type="application/rss+xml"/><item><title>搬瓦工VPS配置自定义IPv6地址</title><link>https://blog.0x2196f3.top/posts/bandwagonhost-ipv6-configuration/</link><pubDate>Thu, 03 Jul 2025 00:00:00 +0000</pubDate><guid>https://blog.0x2196f3.top/posts/bandwagonhost-ipv6-configuration/</guid><description>&lt;p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的出口的,公网ipv6地址在&lt;code>ipv6net&lt;/code>上,不是&lt;code>eth0&lt;/code>&lt;/p>
+&lt;ul>
+&lt;li>ipv6直连中国速度比ipv4慢不少&lt;/li>
+&lt;li>删了ipv6重新分配还是原来的那个&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>查看默认分配的ipv6地址&lt;/p>&lt;/blockquote>
+&lt;pre tabindex="0">&lt;code>ip a # 找ipv6net下面的地址
+&lt;/code>&lt;/pre>&lt;blockquote>
+&lt;p>添加临时ipv6地址&lt;/p>&lt;/blockquote>
+&lt;pre tabindex="0">&lt;code>ip addr add [your-ipv6-address]/64 dev ipv6net
+&lt;/code>&lt;/pre>&lt;hr>
+&lt;p>搬瓦工后台通过&lt;code>ipv6net&lt;/code>这个service自动配置6in4隧道,配置脚本在&lt;code>/etc/init_ipv6_tunnel&lt;/code>,但修改这个脚本重启会复原&lt;br>
+需要禁用&lt;code>ipv6net&lt;/code>这个服务,再手动配置&lt;code>/etc/network/interfaces&lt;/code>&lt;/p>
+&lt;blockquote>
+&lt;p>禁用ipv6net服务&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>systemctl stop ipv6net
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>systemctl disable ipv6net
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>reboot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>手动配置ipv6地址(Ubuntu/Debian)&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>nano /etc/network/interfaces
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>添加如下&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>auto ipv6net
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>iface ipv6net inet6 v4tunnel
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> address &lt;span style="color:#f92672">[&lt;/span>your custom ipv6&lt;span style="color:#f92672">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> netmask &lt;span style="color:#ae81ff">64&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> endpoint *.*.*.*
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> local *.*.*.*
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ttl &lt;span style="color:#ae81ff">255&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> gateway &lt;span style="color:#f92672">[&lt;/span>ipv6 gateway&lt;span style="color:#f92672">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> up /sbin/ip -6 addr add &lt;span style="color:#f92672">[&lt;/span>another custom ipv6&lt;span style="color:#f92672">]&lt;/span>/64 dev $IFACE
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> up /sbin/ip -6 addr add &lt;span style="color:#f92672">[&lt;/span>yet another custom ipv6&lt;span style="color:#f92672">]&lt;/span>/64 dev $IFACE
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> down /sbin/ip -6 addr del &lt;span style="color:#f92672">[&lt;/span>another custom ipv6&lt;span style="color:#f92672">]&lt;/span>/64 dev $IFACE
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> down /sbin/ip -6 addr del &lt;span style="color:#f92672">[&lt;/span>yet another custom ipv6&lt;span style="color:#f92672">]&lt;/span>/64 dev $IFACE
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>ip地址根据搬瓦工后台的配置照抄,up和down的ipv6地址一一对应,复制多行可以添加多个自定义ipv6地址&lt;/p></description></item><item><title>XHTTP过Cloudfront CDN</title><link>https://blog.0x2196f3.top/posts/cloudfront-xhttp-settings/</link><pubDate>Wed, 02 Jul 2025 00:00:00 +0000</pubDate><guid>https://blog.0x2196f3.top/posts/cloudfront-xhttp-settings/</guid><description>&lt;h2 id="vxesswstls的cache-policy">VXESS+WS+TLS的Cache Policy&lt;/h2>
+&lt;p>&lt;img src="https://blog.0x2196f3.top/images/Cloudfront-VXESS+WS+TLS.PNG" alt="VXESS+WS+TLS">&lt;/p>
 &lt;h2 id="xhttp的cache-policy">XHTTP的Cache Policy&lt;/h2>
-&lt;p>&lt;img src="https://0x2196f3.github.io/images/Cloudfront-XHTTP.PNG" alt="XHTTP">&lt;/p>
+&lt;p>&lt;img src="https://blog.0x2196f3.top/images/Cloudfront-XHTTP.PNG" alt="XHTTP">&lt;/p>
 &lt;ul>
 &lt;li>Cloudfront 可以根据不同的path设置不同的behavior，所以WS和XHTTP节点可以放在同一个CDN链接里（需要节点服务器用nginx分流）&lt;/li>
 &lt;li>&lt;del>Cloudfront 上传按量收费，下载1TB以内免费，所以可以下载走CDN上行走别的&lt;/del>&lt;/li>
