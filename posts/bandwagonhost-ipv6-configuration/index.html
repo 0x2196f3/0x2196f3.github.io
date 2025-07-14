@@ -1,14 +1,9 @@
-<!doctype html><html lang=zh-CN data-theme><head><meta charset=utf-8><meta name=HandheldFriendly content="True"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=referrer content="no-referrer-when-downgrade"><meta name=theme-name content="Anubis2"><title>搬瓦工VPS配置自定义IPv6地址 - 0x2196f3&rsquo;s blog</title><meta name=description content="搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的出口的,公网ipv6地址在ipv6net上,不是eth0
+<!doctype html><html lang=zh-CN data-theme><head><meta charset=utf-8><meta name=HandheldFriendly content="True"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=referrer content="no-referrer-when-downgrade"><meta name=theme-name content="Anubis2"><title>搬瓦工VPS配置自定义IPv6地址 - 0x2196f3&rsquo;s blog</title><meta name=description content="搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的ipv6出口的,公网ipv6地址在ipv6net上,不是eth0
 
 ipv6直连中国速度比ipv4慢不少
 删了ipv6重新分配还是原来的那个
+可以先用ipv6测试协议会不会被墙，没事再换成ipv4
 
-
-查看默认分配的ipv6地址
-ip a # 找ipv6net下面的地址
-
-添加临时ipv6地址
-ip addr add [your-ipv6-address]/64 dev ipv6net
 
 搬瓦工后台通过ipv6net这个service自动配置6in4隧道,配置脚本在/etc/init_ipv6_tunnel,但修改这个脚本重启会复原
 需要禁用ipv6net这个服务,再手动配置/etc/network/interfaces
@@ -21,6 +16,7 @@ reboot
 手动配置ipv6地址(Ubuntu/Debian)
 nano /etc/network/interfaces
 添加如下
+# 所有ipv6地址都不带中括号'['和']'
 auto ipv6net
 iface ipv6net inet6 v4tunnel
         address [your custom ipv6]
@@ -39,13 +35,12 @@ ip地址根据搬瓦工后台的配置照抄,up和down的ipv6地址一一对应,
 <a href=https://blog.0x2196f3.top/tags/ title>Tags</a>
 <a href=https://blog.0x2196f3.top/posts/ title>Archive</a>
 <a href=https://blog.0x2196f3.top/about/ title>About</a></nav></header><main id=main tabindex=-1><article class="post h-entry"><div class=post-header><header><h1 class="p-name post-title">搬瓦工VPS配置自定义IPv6地址</h1></header><div class="post-info noselect"><div class="post-date dt-published"><time datetime=2025-07-03>2025-07-03</time></div><a class="post-hidden-url u-url" href=/posts/bandwagonhost-ipv6-configuration/>/posts/bandwagonhost-ipv6-configuration/</a>
-<a href=https://blog.0x2196f3.top/ class="p-name p-author post-hidden-author h-card" rel=me></a><div class=post-taxonomies><ul class=post-tags><li><a href=/tags/vps>#vps</a></li><li><a href=/tags/%E7%BF%BB%E5%A2%99>#翻墙</a></li><li><a href=/tags/linux>#linux</a></li></ul></div></div></div><script>var toc=document.querySelector(".toc");toc&&toc.addEventListener("click",function(){event.target.tagName!=="A"&&(event.preventDefault(),this.open?(this.open=!1,this.classList.remove("expanded")):(this.open=!0,this.classList.add("expanded")))})</script><div class="content e-content"><p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的出口的,公网ipv6地址在<code>ipv6net</code>上,不是<code>eth0</code></p><ul><li>ipv6直连中国速度比ipv4慢不少</li><li>删了ipv6重新分配还是原来的那个</li></ul><blockquote><p>查看默认分配的ipv6地址</p></blockquote><pre tabindex=0><code>ip a # 找ipv6net下面的地址
-</code></pre><blockquote><p>添加临时ipv6地址</p></blockquote><pre tabindex=0><code>ip addr add [your-ipv6-address]/64 dev ipv6net
-</code></pre><hr><p>搬瓦工后台通过<code>ipv6net</code>这个service自动配置6in4隧道,配置脚本在<code>/etc/init_ipv6_tunnel</code>,但修改这个脚本重启会复原<br>需要禁用<code>ipv6net</code>这个服务,再手动配置<code>/etc/network/interfaces</code></p><blockquote><p>禁用ipv6net服务</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>systemctl stop ipv6net
+<a href=https://blog.0x2196f3.top/ class="p-name p-author post-hidden-author h-card" rel=me></a><div class=post-taxonomies><ul class=post-tags><li><a href=/tags/vps>#vps</a></li><li><a href=/tags/%E7%BF%BB%E5%A2%99>#翻墙</a></li><li><a href=/tags/linux>#linux</a></li></ul></div></div></div><script>var toc=document.querySelector(".toc");toc&&toc.addEventListener("click",function(){event.target.tagName!=="A"&&(event.preventDefault(),this.open?(this.open=!1,this.classList.remove("expanded")):(this.open=!0,this.classList.add("expanded")))})</script><div class="content e-content"><p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的ipv6出口的,公网ipv6地址在<code>ipv6net</code>上,不是<code>eth0</code></p><ul><li>ipv6直连中国速度比ipv4慢不少</li><li>删了ipv6重新分配还是原来的那个</li><li>可以先用ipv6测试协议会不会被墙，没事再换成ipv4</li></ul><hr><p>搬瓦工后台通过<code>ipv6net</code>这个service自动配置6in4隧道,配置脚本在<code>/etc/init_ipv6_tunnel</code>,但修改这个脚本重启会复原<br>需要禁用<code>ipv6net</code>这个服务,再手动配置<code>/etc/network/interfaces</code></p><blockquote><p>禁用ipv6net服务</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>systemctl stop ipv6net
 </span></span><span style=display:flex><span>systemctl disable ipv6net
 </span></span><span style=display:flex><span>reboot
 </span></span></code></pre></div><blockquote><p>手动配置ipv6地址(Ubuntu/Debian)</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>nano /etc/network/interfaces
-</span></span></code></pre></div><p>添加如下</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>auto ipv6net
+</span></span></code></pre></div><p>添加如下</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 所有ipv6地址都不带中括号&#39;[&#39;和&#39;]&#39;</span>
+</span></span><span style=display:flex><span>auto ipv6net
 </span></span><span style=display:flex><span>iface ipv6net inet6 v4tunnel
 </span></span><span style=display:flex><span>        address <span style=color:#f92672>[</span>your custom ipv6<span style=color:#f92672>]</span>
 </span></span><span style=display:flex><span>        netmask <span style=color:#ae81ff>64</span>
@@ -63,5 +58,5 @@ ip地址根据搬瓦工后台的配置照抄,up和down的ipv6地址一一对应,
 1111:2222:3333:4444::1/64
 # 这是可用的ipv6地址
 1111:2222:3333:4444:abcd:1234:abcd:1234
-</code></pre><p><del>如果我是防火墙,要墙一个ipv6,/64的所有ip就一起墙了</del></p><blockquote><p>重启网络</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>systemctl restart networking
-</span></span></code></pre></div></div></article><h3 class="read-next-title noselect">Read next</h3><ul class="read-next-posts noselect"><li><a href=/posts/cloudfront-xhttp-settings/>XHTTP过Cloudfront CDN</a></li></ul></main><footer class="common-footer noselect"><div class=common-footer-bottom><div style=display:flex;align-items:center;gap:8px>© 2025</div><div style=display:flex;align-items:center;gap:4px></div></div><p class="h-card vcard"><a href=https://blog.0x2196f3.top/ class="p-name u-url url fn" rel=me></a></p></footer></div></body></html>
+</code></pre><blockquote><p>重启网络</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>systemctl restart networking
+</span></span></code></pre></div></div></article><h3 class="read-next-title noselect">Read next</h3><ul class="read-next-posts noselect"><li><a href=/posts/cloudfront-xhttp-settings/>XHTTP过Cloudfront CDN</a></li></ul><script>function detectCurrentScheme2(){const e="auto";return localStorage!==null&&localStorage.getItem("user-color-scheme")?localStorage.getItem("user-color-scheme"):e==="dark"||e==="light"?e:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}let giscusTheme=detectCurrentScheme2(),giscusAttributes={src:"https://giscus.app/client.js","data-repo":"0x2196f3/0x2196f3.github.io","data-repo-id":"R_kgDOPJtijw","data-category":"Announcements","data-category-id":"DIC_kwDOPJtij84Cs6CT","data-mapping":"pathname","data-strict":"0","data-reactions-enabled":"1","data-emit-metadata":"0","data-input-position":"bottom","data-theme":giscusTheme,"data-lang":"en",crossorigin:"anonymous",lazyload:"false",async:!0},main=document.querySelector("main"),giscusScript=document.createElement("script");Object.entries(giscusAttributes).forEach(([e,t])=>giscusScript.setAttribute(e,t)),main.appendChild(giscusScript)</script></main><footer class="common-footer noselect"><div class=common-footer-bottom><div style=display:flex;align-items:center;gap:8px>© 2025</div><div style=display:flex;align-items:center;gap:4px></div></div><p class="h-card vcard"><a href=https://blog.0x2196f3.top/ class="p-name u-url url fn" rel=me></a></p></footer></div></body></html>

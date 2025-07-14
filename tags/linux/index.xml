@@ -1,15 +1,10 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on 0x2196f3's blog</title><link>/tags/linux/</link><description>0x2196f3's blog (Linux)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 03 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>搬瓦工VPS配置自定义IPv6地址</title><link>/posts/bandwagonhost-ipv6-configuration/</link><pubDate>Thu, 03 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/bandwagonhost-ipv6-configuration/</guid><description>&lt;p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的出口的,公网ipv6地址在&lt;code>ipv6net&lt;/code>上,不是&lt;code>eth0&lt;/code>&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on 0x2196f3's blog</title><link>/tags/linux/</link><description>0x2196f3's blog (Linux)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 03 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>搬瓦工VPS配置自定义IPv6地址</title><link>/posts/bandwagonhost-ipv6-configuration/</link><pubDate>Thu, 03 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/bandwagonhost-ipv6-configuration/</guid><description>&lt;p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的ipv6出口的,公网ipv6地址在&lt;code>ipv6net&lt;/code>上,不是&lt;code>eth0&lt;/code>&lt;/p>
 &lt;ul>
 &lt;li>ipv6直连中国速度比ipv4慢不少&lt;/li>
 &lt;li>删了ipv6重新分配还是原来的那个&lt;/li>
+&lt;li>可以先用ipv6测试协议会不会被墙，没事再换成ipv4&lt;/li>
 &lt;/ul>
-&lt;blockquote>
-&lt;p>查看默认分配的ipv6地址&lt;/p>&lt;/blockquote>
-&lt;pre tabindex="0">&lt;code>ip a # 找ipv6net下面的地址
-&lt;/code>&lt;/pre>&lt;blockquote>
-&lt;p>添加临时ipv6地址&lt;/p>&lt;/blockquote>
-&lt;pre tabindex="0">&lt;code>ip addr add [your-ipv6-address]/64 dev ipv6net
-&lt;/code>&lt;/pre>&lt;hr>
+&lt;hr>
 &lt;p>搬瓦工后台通过&lt;code>ipv6net&lt;/code>这个service自动配置6in4隧道,配置脚本在&lt;code>/etc/init_ipv6_tunnel&lt;/code>,但修改这个脚本重启会复原&lt;br>
 需要禁用&lt;code>ipv6net&lt;/code>这个服务,再手动配置&lt;code>/etc/network/interfaces&lt;/code>&lt;/p>
 &lt;blockquote>
@@ -21,7 +16,8 @@
 &lt;p>手动配置ipv6地址(Ubuntu/Debian)&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>nano /etc/network/interfaces
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>添加如下&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>auto ipv6net
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># 所有ipv6地址都不带中括号&amp;#39;[&amp;#39;和&amp;#39;]&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>auto ipv6net
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>iface ipv6net inet6 v4tunnel
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> address &lt;span style="color:#f92672">[&lt;/span>your custom ipv6&lt;span style="color:#f92672">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> netmask &lt;span style="color:#ae81ff">64&lt;/span>
@@ -42,8 +38,7 @@
 1111:2222:3333:4444::1/64
 # 这是可用的ipv6地址
 1111:2222:3333:4444:abcd:1234:abcd:1234
-&lt;/code>&lt;/pre>&lt;p>&lt;del>如果我是防火墙,要墙一个ipv6,/64的所有ip就一起墙了&lt;/del>&lt;/p>
-&lt;blockquote>
+&lt;/code>&lt;/pre>&lt;blockquote>
 &lt;p>重启网络&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>systemctl restart networking
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>
