@@ -1,4 +1,32 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>翻墙 on 0x2196f3's blog</title><link>/tags/%E7%BF%BB%E5%A2%99/</link><description>0x2196f3's blog (翻墙)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 03 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/%E7%BF%BB%E5%A2%99/index.xml" rel="self" type="application/rss+xml"/><item><title>搬瓦工VPS配置自定义IPv6地址</title><link>/posts/bandwagonhost-ipv6-configuration/</link><pubDate>Thu, 03 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/bandwagonhost-ipv6-configuration/</guid><description>&lt;p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的ipv6出口的,公网ipv6地址在&lt;code>ipv6net&lt;/code>上,不是&lt;code>eth0&lt;/code>&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>翻墙 on 0x2196f3's blog</title><link>/tags/%E7%BF%BB%E5%A2%99/</link><description>0x2196f3's blog (翻墙)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 04 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/%E7%BF%BB%E5%A2%99/index.xml" rel="self" type="application/rss+xml"/><item><title>Xray Reality 偷域名经验</title><link>/posts/xray-reality-target/</link><pubDate>Fri, 04 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/xray-reality-target/</guid><description>&lt;blockquote>
+&lt;p>搜索同ASN同地区可用域名&lt;/p>&lt;/blockquote>
+&lt;p>&lt;a href="search.censys.io">search.censys.io&lt;/a>&lt;/p>
+&lt;p>&lt;img src="https://blog.0x2196f3.top/images/censys.gif" alt="censys">&lt;/p>
+&lt;p>搜索框输入以下内容,不登录只能看一页,Per Page选100,Virtual Hosts 选INCLUDE或ONLY&lt;/p>
+&lt;pre tabindex="0">&lt;code># 把ASN换成服务器所在ASN（5位数字）， country换成服务器所在国家
+autonomous_system.asn:00000 and location.country: &amp;#34;United States&amp;#34; and services: (port: 443 and service_name: HTTP and http.response.status_code: 200 and tls.version_selected: TLSv1_3)
+&lt;/code>&lt;/pre>&lt;p>&lt;a href="https://workshop.censys.io/censys-search-questions/">参考censys search语法&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>检查可用性&lt;/p>&lt;/blockquote>
+&lt;ul>
+&lt;li>网页有内容&lt;/li>
+&lt;li>http/2&lt;/li>
+&lt;li>tls v1.3&lt;del>且支持x25519&lt;/del>(基本都支持)&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>检查网站没有使用cdn&lt;/p>&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>https://dns.google/resolve?name=target.domain&lt;/code>&lt;br>
+查询ip是否属于某个cdn,如果有多个ip大概率是cdn的ip&lt;/li>
+&lt;li>&lt;code>https://target.domain/cdn-cgi/trace&lt;/code> 访问这个路径,有内容说明使用了Cloudflare CDN,&lt;strong>绝对不能用&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>网站安全检查&lt;/p>&lt;/blockquote>
+&lt;ul>
+&lt;li>在搜索引擎里搜索网站名称,能搜到这个域名说明至少搜索引擎认为这个网站比较正常.&lt;/li>
+&lt;li>不要用中文网站尤其是有备案号的(有备案号ip肯定在中国),极有可能是黑产网站隐藏在看起来正常的静态网页里.&lt;/li>
+&lt;li>外国大公司能产生大量流量的网站,要么在中国有CDN要么被墙了,所以最好都不要用.&lt;/li>
+&lt;/ul></description></item><item><title>搬瓦工VPS配置自定义IPv6地址</title><link>/posts/bandwagonhost-ipv6-configuration/</link><pubDate>Thu, 03 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/bandwagonhost-ipv6-configuration/</guid><description>&lt;p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的ipv6出口的,公网ipv6地址在&lt;code>ipv6net&lt;/code>上,不是&lt;code>eth0&lt;/code>&lt;/p>
 &lt;ul>
 &lt;li>ipv6直连中国速度比ipv4慢不少&lt;/li>
 &lt;li>删了ipv6重新分配还是原来的那个&lt;/li>
