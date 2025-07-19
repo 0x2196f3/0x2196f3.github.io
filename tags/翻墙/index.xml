@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>翻墙 on 0x2196f3's blog</title><link>/tags/%E7%BF%BB%E5%A2%99/</link><description>0x2196f3's blog (翻墙)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 04 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/%E7%BF%BB%E5%A2%99/index.xml" rel="self" type="application/rss+xml"/><item><title>Xray Reality 偷域名经验</title><link>/posts/xray-reality-target/</link><pubDate>Fri, 04 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/xray-reality-target/</guid><description>&lt;blockquote>
 &lt;p>搜索同ASN同地区可用域名&lt;/p>&lt;/blockquote>
-&lt;p>&lt;a href="search.censys.io">search.censys.io&lt;/a>&lt;/p>
+&lt;p>&lt;a href="https://search.censys.io">search.censys.io&lt;/a>&lt;/p>
 &lt;p>&lt;img src="https://blog.0x2196f3.top/images/censys.gif" alt="censys">&lt;/p>
 &lt;p>搜索框输入以下内容,不登录只能看一页,Per Page选100,Virtual Hosts 选INCLUDE或ONLY&lt;/p>
 &lt;pre tabindex="0">&lt;code># 把ASN换成服务器所在ASN（5位数字）， country换成服务器所在国家
