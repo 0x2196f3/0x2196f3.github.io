@@ -1,4 +1,80 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 10 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Xray Reality 偷域名经验</title><link>/posts/xray-reality-target/</link><pubDate>Fri, 04 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/xray-reality-target/</guid><description>&lt;blockquote>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 10 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Fedora+Windows双系统启动配置</title><link>/posts/fedora-dual-boot-configuration/</link><pubDate>Sat, 05 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/fedora-dual-boot-configuration/</guid><description>&lt;h2 id="1-fedora-自动删除旧内核" >
+&lt;div>
+&lt;a href="#1-fedora-%e8%87%aa%e5%8a%a8%e5%88%a0%e9%99%a4%e6%97%a7%e5%86%85%e6%a0%b8">
+#
+&lt;/a>
+1. Fedora 自动删除旧内核
+&lt;/div>
+&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo nano /etc/dnf/dnf.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>保留最新的2个内核&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">[main]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">installonly_limit&lt;/span>&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">2&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="2-grub2-设置默认启动分区" >
+&lt;div>
+&lt;a href="#2-grub2-%e8%ae%be%e7%bd%ae%e9%bb%98%e8%ae%a4%e5%90%af%e5%8a%a8%e5%88%86%e5%8c%ba">
+#
+&lt;/a>
+2. GRUB2 设置默认启动分区
+&lt;/div>
+&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo nano /etc/default/grub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>三种模式&lt;/p>&lt;/blockquote>
+&lt;ul>
+&lt;li>记忆上次选择的启动项&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>GRUB_DEFAULT&lt;span style="color:#f92672">=&lt;/span>saved
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>GRUB_SAVEDEFAULT&lt;span style="color:#f92672">=&lt;/span>true
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>选择第3个启动项&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>GRUB_DEFAULT&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#ae81ff">2&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>选择该名称的启动项&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>GRUB_DEFAULT&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;Windows Boot Manager (on /dev/sda1)&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>保存&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Gnome 桌面环境美化（持续更新）</title><link>/posts/gnome-beautify/</link><pubDate>Sat, 05 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/gnome-beautify/</guid><description>&lt;h1 id="个人使用的gnome桌面插件" >
+&lt;div>
+&lt;a href="#%e4%b8%aa%e4%ba%ba%e4%bd%bf%e7%94%a8%e7%9a%84gnome%e6%a1%8c%e9%9d%a2%e6%8f%92%e4%bb%b6">
+##
+&lt;/a>
+个人使用的Gnome桌面插件
+&lt;/div>
+&lt;/h1>
+&lt;h2 id="dash-to-dock" >
+&lt;div>
+&lt;a href="#dash-to-dock">
+#
+&lt;/a>
+&lt;a href="https://extensions.gnome.org/extension/307/dash-to-dock/">Dash to Dock&lt;/a>
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;img src="https://blog.0x2196f3.top/images/Dash_to_Dock.jpg" alt="Dash to Dock">&lt;br>
+类似MacOS的dock栏，维护中&lt;/p>
+&lt;h2 id="gtk4-desktop-icons-ng-ding" >
+&lt;div>
+&lt;a href="#gtk4-desktop-icons-ng-ding">
+#
+&lt;/a>
+&lt;a href="https://extensions.gnome.org/extension/5263/gtk4-desktop-icons-ng-ding/">Gtk4 Desktop Icons NG (DING)&lt;/a>
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;img src="https://blog.0x2196f3.top/images/Ding_Desktop_Icon.png" alt="Gtk4 Desktop Icons NG (DING)">&lt;br>
+添加桌面图标，维护中&lt;/p>
+&lt;h2 id="system-monitor" >
+&lt;div>
+&lt;a href="#system-monitor">
+#
+&lt;/a>
+&lt;a href="https://extensions.gnome.org/extension/6807/system-monitor/">System Monitor&lt;/a>
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;img src="https://blog.0x2196f3.top/images/System_Monitor.png" alt="System Monitor">&lt;br>
+在顶栏添加系统状态监控，用来显示实时网速，维护中&lt;/p></description></item><item><title>Xray Reality 偷域名经验</title><link>/posts/xray-reality-target/</link><pubDate>Fri, 04 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/xray-reality-target/</guid><description>&lt;blockquote>
 &lt;p>搜索同ASN同地区可用域名&lt;/p>&lt;/blockquote>
 &lt;p>&lt;a href="https://search.censys.io">search.censys.io&lt;/a>&lt;/p>
 &lt;p>&lt;img src="https://blog.0x2196f3.top/images/censys.gif" alt="censys">&lt;/p>
