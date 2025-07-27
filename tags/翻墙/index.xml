@@ -11,6 +11,7 @@ autonomous_system.asn:00000 and location.country: &amp;#34;United States&amp;#34
 &lt;ul>
 &lt;li>网页有内容&lt;/li>
 &lt;li>http/2&lt;/li>
+&lt;li>路径&lt;code>/&lt;/code>返回200&lt;/li>
 &lt;li>tls v1.3&lt;del>且支持x25519&lt;/del>(基本都支持)&lt;/li>
 &lt;/ul>
 &lt;blockquote>
