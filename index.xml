@@ -1,4 +1,27 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 10 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Fedora+Windows双系统启动配置</title><link>/posts/fedora-dual-boot-configuration/</link><pubDate>Sat, 05 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/fedora-dual-boot-configuration/</guid><description>&lt;h2 id="1-fedora-自动删除旧内核" >
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 10 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Mihomo (Clash Meta) API示例</title><link>/posts/mihomo-api/</link><pubDate>Sun, 06 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/mihomo-api/</guid><description>&lt;p>&lt;a href="https://wiki.metacubex.one/api/">Mihomo官方文档&lt;/a>写的很简略,找示例可以在&lt;a href="https://github.com/MetaCubeX/metacubexd">MedaCubeXD&lt;/a>的源码里找&lt;/p>
+&lt;p>也可以在浏览器的F12里监视MetaCubeXD页面的Network,抄到curl里就能用&lt;/p>
+&lt;h2 id="比如" >
+&lt;div>
+&lt;a href="#%e6%af%94%e5%a6%82">
+#
+&lt;/a>
+比如
+&lt;/div>
+&lt;/h2>
+&lt;blockquote>
+&lt;p>切换节点&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> http://192.168.1.1:9090/proxies/节点所在的组/?force&lt;span style="color:#f92672">=&lt;/span>true -d &lt;span style="color:#e6db74">&amp;#39;{&amp;#34;name&amp;#34;:&amp;#34;要切换到的节点名称&amp;#34;}&amp;#39;&lt;/span> -X PUT
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>打断所有连接&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> http://192.168.1.1:9090/connections -X DELETE
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>测试某个节点延迟&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> &lt;span style="color:#e6db74">&amp;#39;http://192.168.1.1:9090/proxies/节点名称/delay?url=https
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">://gstatic.com/generate_204&amp;amp;timeout=5000&amp;#39;&lt;/span> -X GET
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>获取所有节点信息&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> &lt;span style="color:#e6db74">&amp;#39;http://192.168.1.1:9090/proxies&amp;#39;&lt;/span> -X GET
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Fedora+Windows双系统启动配置</title><link>/posts/fedora-dual-boot-configuration/</link><pubDate>Sat, 05 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/fedora-dual-boot-configuration/</guid><description>&lt;h2 id="1-fedora-自动删除旧内核" >
 &lt;div>
 &lt;a href="#1-fedora-%e8%87%aa%e5%8a%a8%e5%88%a0%e9%99%a4%e6%97%a7%e5%86%85%e6%a0%b8">
 #
