@@ -1,4 +1,45 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 10 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Mihomo (Clash Meta) API示例</title><link>/posts/mihomo-api/</link><pubDate>Sun, 06 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/mihomo-api/</guid><description>&lt;p>&lt;a href="https://wiki.metacubex.one/api/">Mihomo官方文档&lt;/a>写的很简略,找示例可以在&lt;a href="https://github.com/MetaCubeX/metacubexd">MedaCubeXD&lt;/a>的源码里找&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 10 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Cloudflare Zerotrust 使用API删除Access</title><link>/posts/cloudflare-zerotrust-delete-access-via-api/</link><pubDate>Mon, 07 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/cloudflare-zerotrust-delete-access-via-api/</guid><description>&lt;h2 id="个人用户可能用到的zerotrust功能" >
+&lt;div>
+&lt;a href="#%e4%b8%aa%e4%ba%ba%e7%94%a8%e6%88%b7%e5%8f%af%e8%83%bd%e7%94%a8%e5%88%b0%e7%9a%84zerotrust%e5%8a%9f%e8%83%bd">
+#
+&lt;/a>
+个人用户可能用到的ZeroTrust功能
+&lt;/div>
+&lt;/h2>
+&lt;p>1.Tunnel:免费内网穿透(需要域名)&lt;br>
+2.Access:保护内网穿透的NAS和/自用面板/管理后台等(免费但需绑定支付方式)&lt;br>
+3.ZeroTrust VPN(被墙了)&lt;/p>
+&lt;p>Access很好用,没有通过Cloudflare验证的流量根本不会发到自己的服务器上,也许是最安全的鉴权方式.&lt;/p>
+&lt;p>Access不绑定支付方式也能添加,但在添加之后在网页上没法修改/删除,会导致自己被锁在网页外面.&lt;/p>
+&lt;p>以下是用Cloudflare API删除Access的方法&lt;/p>
+&lt;h2 id="linux-curl调用cloudflare-api" >
+&lt;div>
+&lt;a href="#linux-curl%e8%b0%83%e7%94%a8cloudflare-api">
+#
+&lt;/a>
+Linux Curl调用Cloudflare API
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;a href="https://developers.cloudflare.com/api/resources/zero_trust/subresources/access/subresources/applications/methods/delete/">Cloudflare Api Document&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>列出所有Application&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl https://api.cloudflare.com/client/v4/accounts/$CloudflareAccountID/access/apps -H &lt;span style="color:#e6db74">&amp;#34;X-Auth-Email: &lt;/span>$Cloudflare&lt;span style="color:#e6db74"> Email&amp;#34;&lt;/span> -H &lt;span style="color:#e6db74">&amp;#34;X-Auth-Key: &lt;/span>$CloudflareApi&lt;span style="color:#e6db74"> Key&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>删除指定Application&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl https://api.cloudflare.com/client/v4/accounts/$CloudflareAccountID/access/apps/$AppID -X DELETE -H &lt;span style="color:#e6db74">&amp;#34;X-Auth-Email: &lt;/span>$Cloudflare&lt;span style="color:#e6db74"> Email&amp;#34;&lt;/span> -H &lt;span style="color:#e6db74">&amp;#34;X-Auth-Key: &lt;/span>$Cloudflare&lt;span style="color:#e6db74"> Api Key&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>清除bash记录&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>history -c
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>rm ~/.bash_history
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="" >
+&lt;div>
+&lt;a href="#">
+#
+&lt;/a>
+&lt;/div>
+&lt;/h2>
+&lt;p>理论上用Cloudflare API也可以在没有绑定支付方式的情况下添加/修改Access,达到正常使用的目的.&lt;br>
+但不推荐这样做,如果API突然增加限制就会彻底没法修改了.(没付钱Cloudflare人工客服肯定不会理你,删除账号同一个邮箱不能创建新的).&lt;/p></description></item><item><title>Mihomo (Clash Meta) API示例</title><link>/posts/mihomo-api/</link><pubDate>Sun, 06 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/mihomo-api/</guid><description>&lt;p>&lt;a href="https://wiki.metacubex.one/api/">Mihomo官方文档&lt;/a>写的很简略,找示例可以在&lt;a href="https://github.com/MetaCubeX/metacubexd">MedaCubeXD&lt;/a>的源码里找&lt;/p>
 &lt;p>也可以在浏览器的F12里监视MetaCubeXD页面的Network,抄到curl里就能用&lt;/p>
 &lt;h2 id="比如" >
 &lt;div>
