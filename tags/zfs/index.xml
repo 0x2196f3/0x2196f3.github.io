@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Zfs on 0x2196f3's blog</title><link>/tags/zfs/</link><description>0x2196f3's blog (Zfs)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 08 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/zfs/index.xml" rel="self" type="application/rss+xml"/><item><title>ZFS 强制删除dataset</title><link>/posts/zfs-destroy-dataset/</link><pubDate>Tue, 08 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/zfs-destroy-dataset/</guid><description>&lt;p>TrueNAS删除dataset时经常遇到&lt;code>dataset is busy&lt;/code>, -f没用也不说是什么进程占用这个dataset,解决方法是先改名再删除&lt;/p>
+&lt;blockquote>
+&lt;p>rename dataset&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo zfs rename pool/olddataset pool/newdataset
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>destroy dataset&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo zfs destroy -R pool/newdataset
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>

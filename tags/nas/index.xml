@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nas on 0x2196f3's blog</title><link>/tags/nas/</link><description>0x2196f3's blog (Nas)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Wed, 09 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/nas/index.xml" rel="self" type="application/rss+xml"/><item><title>LSI-3008更新固件</title><link>/posts/lsi-3008-update-firmware/</link><pubDate>Wed, 09 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/lsi-3008-update-firmware/</guid><description>&lt;p>&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/">LSI SAS 9300-xx更新固件教程&lt;/a>&lt;br>
+&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/download">固件下载直链&lt;/a>&lt;br>
+TrueNAS自带该阵列卡更新固件的程序,直接在Shell更新,不用做MS-DOS的启动U盘&lt;/p>
+&lt;blockquote>
+&lt;p>刷写固件&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo sas3flash -o -f SAS9300_xx_IT.bin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>

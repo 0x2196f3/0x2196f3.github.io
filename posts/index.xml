@@ -1,4 +1,17 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 10 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Cloudflare Zerotrust 使用API删除Access</title><link>/posts/cloudflare-zerotrust-delete-access-via-api/</link><pubDate>Mon, 07 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/cloudflare-zerotrust-delete-access-via-api/</guid><description>&lt;h2 id="个人用户可能用到的zerotrust功能" >
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 10 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>LSI-3008更新固件</title><link>/posts/lsi-3008-update-firmware/</link><pubDate>Wed, 09 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/lsi-3008-update-firmware/</guid><description>&lt;p>&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/">LSI SAS 9300-xx更新固件教程&lt;/a>&lt;br>
+&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/download">固件下载直链&lt;/a>&lt;br>
+TrueNAS自带该阵列卡更新固件的程序,直接在Shell更新,不用做MS-DOS的启动U盘&lt;/p>
+&lt;blockquote>
+&lt;p>刷写固件&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo sas3flash -o -f SAS9300_xx_IT.bin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>ZFS 强制删除dataset</title><link>/posts/zfs-destroy-dataset/</link><pubDate>Tue, 08 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/zfs-destroy-dataset/</guid><description>&lt;p>TrueNAS删除dataset时经常遇到&lt;code>dataset is busy&lt;/code>, -f没用也不说是什么进程占用这个dataset,解决方法是先改名再删除&lt;/p>
+&lt;blockquote>
+&lt;p>rename dataset&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo zfs rename pool/olddataset pool/newdataset
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>destroy dataset&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo zfs destroy -R pool/newdataset
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Cloudflare Zerotrust 使用API删除Access</title><link>/posts/cloudflare-zerotrust-delete-access-via-api/</link><pubDate>Mon, 07 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/cloudflare-zerotrust-delete-access-via-api/</guid><description>&lt;h2 id="个人用户可能用到的zerotrust功能" >
 &lt;div>
 &lt;a href="#%e4%b8%aa%e4%ba%ba%e7%94%a8%e6%88%b7%e5%8f%af%e8%83%bd%e7%94%a8%e5%88%b0%e7%9a%84zerotrust%e5%8a%9f%e8%83%bd">
 #
