@@ -1,4 +1,96 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 10 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>LSI-3008更新固件</title><link>/posts/lsi-3008-update-firmware/</link><pubDate>Wed, 09 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/lsi-3008-update-firmware/</guid><description>&lt;p>&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/">LSI SAS 9300-xx更新固件教程&lt;/a>&lt;br>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Wed, 10 Sep 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>docker部署llama-swap</title><link>/posts/llama-swap-on-linux/</link><pubDate>Fri, 08 Aug 2025 00:00:00 +0000</pubDate><guid>/posts/llama-swap-on-linux/</guid><description>&lt;p>gpt-oss刚发布，ollama的支持有问题，性能和llama-cpp相比有几倍的差距，但是llama-cpp一个进程只能加载一个gguf模型，api也比较简陋，无法长期使用&lt;/p>
+&lt;p>&lt;del>不过ollama性能问题估计过几天就修复了&lt;/del>&lt;/p>
+&lt;h2 id="ollama-llama-cpp-性能对比" >
+&lt;div>
+&lt;a href="#ollama-llama-cpp-%e6%80%a7%e8%83%bd%e5%af%b9%e6%af%94">
+#
+&lt;/a>
+Ollama Llama-cpp 性能对比
+&lt;/div>
+&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>gpt-oss:20b&lt;/th>
+&lt;th>tokens/s&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>llama-cpp (vulkan)&lt;/td>
+&lt;td>96.52&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>llama-cpp (rocm on Windows)&lt;/td>
+&lt;td>94.11&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ollama (rocm)&lt;/td>
+&lt;td>35.72&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="llama-swap" >
+&lt;div>
+&lt;a href="#llama-swap">
+#
+&lt;/a>
+&lt;a href="https://github.com/mostlygeek/llama-swap">llama-swap&lt;/a>
+&lt;/div>
+&lt;/h2>
+&lt;p>llama-server和llama-swap打包进同一个docker，通过启动多个llama-server进程切换gguf模型，提供一个简单的webui，可以手动加载/卸载模型，也可以在网页上对话&lt;/p>
+&lt;p>由于llama-cpp没有提供Linuxd的ROCM二进制文件，只能使用Vulkan，单卡性能和ROCM基本没有区别&lt;/p>
+&lt;p>Vulkan可以在多张不同品牌的GPU上运行同一个模型，实测一张AMD独显+一张Intel独显能运行，性能可以接受 (16GB+16GB，qwq:32b Q4_K_M 15 token/s)&lt;/p>
+&lt;h2 id="installation" >
+&lt;div>
+&lt;a href="#installation">
+#
+&lt;/a>
+Installation
+&lt;/div>
+&lt;/h2>
+&lt;blockquote>
+&lt;p>AMD显卡安装驱动+ROCM (Ubuntu24)&lt;/p>&lt;/blockquote>
+&lt;p>&lt;a href="https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/quick-start.html">文档&lt;/a>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>cd /tmp
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># insttll driver&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>wget https://repo.radeon.com/amdgpu-install/6.4.2/ubuntu/noble/amdgpu-install_6.4.60402-1_all.deb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install ./amdgpu-install_6.4.60402-1_all.deb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install &lt;span style="color:#e6db74">&amp;#34;linux-headers-&lt;/span>&lt;span style="color:#66d9ef">$(&lt;/span>uname -r&lt;span style="color:#66d9ef">)&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#e6db74">&amp;#34;linux-modules-extra-&lt;/span>&lt;span style="color:#66d9ef">$(&lt;/span>uname -r&lt;span style="color:#66d9ef">)&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install amdgpu-dkms
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#reboot&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo reboot
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># install rocm&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>wget https://repo.radeon.com/amdgpu-install/6.4.2/ubuntu/noble/amdgpu-install_6.4.60402-1_all.deb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install ./amdgpu-install_6.4.60402-1_all.deb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install python3-setuptools python3-wheel
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo usermod -a -G render,video $LOGNAME
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install rocm
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#reboot&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo reboot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>AMD显卡部署llama-swap:vulkan&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># 所有gguf模型和config.yaml 都放在容器 /data&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo docker run -it -d --device /dev/kfd --device /dev/dri -p 8080:8080 -v /path/to/gguf/location:/data --name llama-swap ghcr.io/mostlygeek/llama-swap:vulkan --config /data/config.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>最简config.yaml配置&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">models&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;gpt-oss-20b&amp;#34;&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">cmd&lt;/span>: &lt;span style="color:#ae81ff">/app/llama-server --port ${PORT} -m /data/gpt-oss-20b.gguf -ngl 999&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;qwen3-30b&amp;#34;&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">cmd&lt;/span>: &lt;span style="color:#ae81ff">/app/llama-server --port ${PORT} -m /data/qwen3-30b-q4_K_M.gguf -ngl 999&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>调整&lt;code>-ngl 999&lt;/code>将显存装不下的层卸载到CPU，提高性能&lt;/li>
+&lt;li>&lt;a href="https://github.com/mostlygeek/llama-swap/wiki/Configuration">文档&lt;/a>&lt;/li>
+&lt;li>文档没写的看&lt;a href="https://github.com/mostlygeek/llama-swap/blob/main/docker/llama-swap.Containerfile">Dockerfile&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>LSI-3008更新固件</title><link>/posts/lsi-3008-update-firmware/</link><pubDate>Wed, 09 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/lsi-3008-update-firmware/</guid><description>&lt;p>&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/">LSI SAS 9300-xx更新固件教程&lt;/a>&lt;br>
 &lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/download">固件下载直链&lt;/a>&lt;br>
 TrueNAS自带该阵列卡更新固件的程序,直接在Shell更新,不用做MS-DOS的启动U盘&lt;/p>
 &lt;blockquote>
@@ -70,8 +162,7 @@ Linux Curl调用Cloudflare API
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> http://192.168.1.1:9090/connections -X DELETE
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
 &lt;p>测试某个节点延迟&lt;/p>&lt;/blockquote>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> &lt;span style="color:#e6db74">&amp;#39;http://192.168.1.1:9090/proxies/节点名称/delay?url=https
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">://gstatic.com/generate_204&amp;amp;timeout=5000&amp;#39;&lt;/span> -X GET
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> &lt;span style="color:#e6db74">&amp;#39;http://192.168.1.1:9090/proxies/节点名称/delay?url=https://gstatic.com/generate_204&amp;amp;timeout=5000&amp;#39;&lt;/span> -X GET
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
 &lt;p>获取所有节点信息&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> &lt;span style="color:#e6db74">&amp;#39;http://192.168.1.1:9090/proxies&amp;#39;&lt;/span> -X GET
