@@ -1,4 +1,31 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>翻墙 on 0x2196f3's blog</title><link>/tags/%E7%BF%BB%E5%A2%99/</link><description>0x2196f3's blog (翻墙)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 06 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/%E7%BF%BB%E5%A2%99/index.xml" rel="self" type="application/rss+xml"/><item><title>Mihomo (Clash Meta) API示例</title><link>/posts/mihomo-api/</link><pubDate>Sun, 06 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/mihomo-api/</guid><description>&lt;p>&lt;a href="https://wiki.metacubex.one/api/">Mihomo官方文档&lt;/a>写的很简略,找示例可以在&lt;a href="https://github.com/MetaCubeX/metacubexd">MedaCubeXD&lt;/a>的源码里找&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>翻墙 on 0x2196f3's blog</title><link>/tags/%E7%BF%BB%E5%A2%99/</link><description>0x2196f3's blog (翻墙)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 10 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/%E7%BF%BB%E5%A2%99/index.xml" rel="self" type="application/rss+xml"/><item><title>Gcore CDN域前置翻墙</title><link>/posts/gcore-cdn-proxy/</link><pubDate>Sun, 10 Aug 2025 00:00:00 +0000</pubDate><guid>/posts/gcore-cdn-proxy/</guid><description>&lt;h2 id="域前置" >
+&lt;div>
+&lt;a href="#%e5%9f%9f%e5%89%8d%e7%bd%ae">
+#
+&lt;/a>
+域前置
+&lt;/div>
+&lt;/h2>
+&lt;p>客户端向CDN发起https请求，连接CDN时使用假sni，cdn解开https的加密后发现host和sni不一样，就将请求转发给host域名的源服务器（而不是报错或转发给sni的源服务器），大部分CDN服务商不支持这种操作。&lt;/p>
+&lt;h2 id="配置" >
+&lt;div>
+&lt;a href="#%e9%85%8d%e7%bd%ae">
+#
+&lt;/a>
+配置
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;a href="https://bulianglin.com/archives/ws.html">不良林的教程&lt;/a>
+&lt;a href="https://www.youtube.com/watch?v=FT-O4Xd9gTw">不良林的视频&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>除了tls in tls特征能检测出你在翻墙之外，ip和域名都不是自己的，防火墙封ip封域名不会对翻墙用户造成损失&lt;/li>
+&lt;li>Gcore暂时不会验证host域名的所有者，所以不需要自己有域名&lt;/li>
+&lt;li>没有域名的话源服务器仅支持ipv4地址，可以自定义端口&lt;/li>
+&lt;li>每月免费1TB流量，&lt;strong>需要绑定支付方式&lt;/strong>&lt;/li>
+&lt;li>同样的CDN配置除了vmess+ws也可以过vless+xhttp（vless没有加密，cdn可以看到明文的dns请求和sni）&lt;/li>
+&lt;li>如果已有一个vmess/vless+ws/xhttp过CDN的xray配置，不需要任何修改就能用&lt;/li>
+&lt;li>Gcore的ip被封锁很严重，即使优选ip也不稳定&lt;/li>
+&lt;/ul></description></item><item><title>Mihomo (Clash Meta) API示例</title><link>/posts/mihomo-api/</link><pubDate>Sun, 06 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/mihomo-api/</guid><description>&lt;p>&lt;a href="https://wiki.metacubex.one/api/">Mihomo官方文档&lt;/a>写的很简略,找示例可以在&lt;a href="https://github.com/MetaCubeX/metacubexd">MedaCubeXD&lt;/a>的源码里找&lt;/p>
 &lt;p>也可以在浏览器的F12里监视MetaCubeXD页面的Network,抄到curl里就能用&lt;/p>
 &lt;h2 id="比如" >
 &lt;div>
@@ -20,6 +47,10 @@
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
 &lt;p>获取所有节点信息&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> &lt;span style="color:#e6db74">&amp;#39;http://192.168.1.1:9090/proxies&amp;#39;&lt;/span> -X GET
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这些curl命令可以在openwrt的crontab里直接使用&lt;/p>
+&lt;blockquote>
+&lt;p>凌晨三点切换节点&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">0&lt;/span> &lt;span style="color:#ae81ff">3&lt;/span> * * * curl -H &lt;span style="color:#e6db74">&amp;#39;Authorization: Bearer API密码&amp;#39;&lt;/span> http://127.0.0.1:9090/proxies/Youtube/?force&lt;span style="color:#f92672">=&lt;/span>true -d &lt;span style="color:#e6db74">&amp;#39;{&amp;#34;name&amp;#34;:&amp;#34;HK-xxx&amp;#34;}&amp;#39;&lt;/span> -X PUT
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Xray Reality 偷域名经验</title><link>/posts/xray-reality-target/</link><pubDate>Fri, 04 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/xray-reality-target/</guid><description>&lt;blockquote>
 &lt;p>搜索同ASN同地区可用域名&lt;/p>&lt;/blockquote>
 &lt;p>&lt;a href="https://search.censys.io">search.censys.io&lt;/a>&lt;/p>

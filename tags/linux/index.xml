@@ -90,7 +90,22 @@ Installation
 &lt;li>调整&lt;code>-ngl 999&lt;/code>将显存装不下的层卸载到CPU，提高性能&lt;/li>
 &lt;li>&lt;a href="https://github.com/mostlygeek/llama-swap/wiki/Configuration">文档&lt;/a>&lt;/li>
 &lt;li>文档没写的看&lt;a href="https://github.com/mostlygeek/llama-swap/blob/main/docker/llama-swap.Containerfile">Dockerfile&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>Fedora+Windows双系统启动配置</title><link>/posts/fedora-dual-boot-configuration/</link><pubDate>Sat, 05 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/fedora-dual-boot-configuration/</guid><description>&lt;h2 id="1-fedora-自动删除旧内核" >
+&lt;/ul></description></item><item><title>ZFS Dataset和Directory冲突</title><link>/posts/zfs-dataset-cover-folder/</link><pubDate>Sun, 13 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/zfs-dataset-cover-folder/</guid><description>&lt;p>ZFS Dataset下已有 &lt;code>./a&lt;/code> 目录，&lt;code>zfs create pool/a&lt;/code> 会把数据集挂载到 &lt;code>./a&lt;/code>，原目录及其内容被隐藏（不删除）。&lt;/p>
+&lt;blockquote>
+&lt;p>恢复原目录&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo zfs unmount pool/a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>寻找被 ZFS 挂载而隐藏的目录&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># pwd是一个ZFS Pool/Dataset 挂载点&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo find . -type d -print0 | xargs -0 stat -c &lt;span style="color:#e6db74">&amp;#34;%d %n&amp;#34;&lt;/span> | sort -n | awk &lt;span style="color:#e6db74">&amp;#39;NR==1{p=$1;next} $1!=p{print &amp;#34;ZFS mount at&amp;#34;, $2} {p=$1}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>ZFS 强制删除dataset</title><link>/posts/zfs-destroy-dataset/</link><pubDate>Tue, 08 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/zfs-destroy-dataset/</guid><description>&lt;p>TrueNAS删除dataset时经常遇到&lt;code>dataset is busy&lt;/code>, -f没用也不说是什么进程占用这个dataset,解决方法是先改名再删除&lt;/p>
+&lt;blockquote>
+&lt;p>rename dataset&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo zfs rename pool/olddataset pool/newdataset
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>destroy dataset&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo zfs destroy -R pool/newdataset
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Fedora+Windows双系统启动配置</title><link>/posts/fedora-dual-boot-configuration/</link><pubDate>Sat, 05 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/fedora-dual-boot-configuration/</guid><description>&lt;h2 id="1-fedora-自动删除旧内核" >
 &lt;div>
 &lt;a href="#1-fedora-%e8%87%aa%e5%8a%a8%e5%88%a0%e9%99%a4%e6%97%a7%e5%86%85%e6%a0%b8">
 #
