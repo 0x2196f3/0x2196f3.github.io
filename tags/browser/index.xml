@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Browser on 0x2196f3's blog</title><link>/tags/browser/</link><description>0x2196f3's blog (Browser)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sat, 26 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/browser/index.xml" rel="self" type="application/rss+xml"/><item><title>Firefox关闭Push Services</title><link>/posts/firefox-disable-push-services/</link><pubDate>Sat, 26 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/firefox-disable-push-services/</guid><description>&lt;p>只要Firefox在运行就永远在访问&lt;code>push.services.mozilla.com:443&lt;/code>,不知道在做什么&lt;/p>
+&lt;h2 id="关闭" >
+&lt;div>
+&lt;a href="#%e5%85%b3%e9%97%ad">
+#
+&lt;/a>
+关闭
+&lt;/div>
+&lt;/h2>
+&lt;pre tabindex="0">&lt;code>about:config
+dom.push.enabled = false
+&lt;/code>&lt;/pre></description></item></channel></rss>
