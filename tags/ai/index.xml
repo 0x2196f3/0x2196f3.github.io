@@ -39,7 +39,7 @@ Ollama Llama-cpp 性能对比
 &lt;/div>
 &lt;/h2>
 &lt;p>llama-server和llama-swap打包进同一个docker，通过启动多个llama-server进程切换gguf模型，提供一个简单的webui，可以手动加载/卸载模型，也可以在网页上对话&lt;/p>
-&lt;p>由于llama-cpp没有提供Linuxd的ROCM二进制文件，只能使用Vulkan，单卡性能和ROCM基本没有区别&lt;/p>
+&lt;p>由于llama-cpp没有提供Linux的ROCM二进制文件，只能使用Vulkan，单卡性能和ROCM基本没有区别&lt;/p>
 &lt;p>Vulkan可以在多张不同品牌的GPU上运行同一个模型，实测一张AMD独显+一张Intel独显能运行，性能可以接受 (16GB+16GB，qwq:32b Q4_K_M 15 token/s)&lt;/p>
 &lt;h2 id="installation" >
 &lt;div>
@@ -86,6 +86,12 @@ Installation
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;qwen3-30b&amp;#34;&lt;/span>:
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">cmd&lt;/span>: &lt;span style="color:#ae81ff">/app/llama-server --port ${PORT} -m /data/qwen3-30b-q4_K_M.gguf -ngl 999&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>加载Gemma3的Vision功能&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span> --&lt;span style="color:#ae81ff">mmproj mmproj-gemma3-f16.gguf&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>覆盖模型的Context Length&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span> -&lt;span style="color:#ae81ff">c 131072&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
 &lt;li>调整&lt;code>-ngl 999&lt;/code>将显存装不下的层卸载到CPU，提高性能&lt;/li>
 &lt;li>&lt;a href="https://github.com/mostlygeek/llama-swap/wiki/Configuration">文档&lt;/a>&lt;/li>
