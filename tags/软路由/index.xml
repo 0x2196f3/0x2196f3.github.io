@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Openwrt on 0x2196f3's blog</title><link>/tags/openwrt/</link><description>0x2196f3's blog (Openwrt)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 27 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/openwrt/index.xml" rel="self" type="application/rss+xml"/><item><title>OpenWrt设置usb扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>软路由 on 0x2196f3's blog</title><link>/tags/%E8%BD%AF%E8%B7%AF%E7%94%B1/</link><description>0x2196f3's blog (软路由)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 27 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/%E8%BD%AF%E8%B7%AF%E7%94%B1/index.xml" rel="self" type="application/rss+xml"/><item><title>OpenWrt设置usb扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
 &lt;div>
 &lt;a href="#openwrt%e8%ae%be%e7%bd%aeusb%e6%89%a9%e5%ae%b9">
 ##
@@ -81,11 +81,4 @@ OpenWrt设置usb扩容
 &lt;ul>
 &lt;li>实测直接拔掉U盘重启就会自动使用内置的闪存启动,不需要任何配置&lt;/li>
 &lt;li>安装系统更新不确定会发生什么,最好不要这么做&lt;/li>
-&lt;/ul></description></item><item><title>OpenWrt 修改Kernel Hash安装官方源kmod-ipk</title><link>/posts/openwrt-change-kernel-hash/</link><pubDate>Tue, 01 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-change-kernel-hash/</guid><description>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vi /usr/lib/opkg/status
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># replace hash_a by hash_b&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>:%s/hash_a/hash_b/g
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>hash_a 是 /usr/lib/opkg/status 里的hash值&lt;br>
-hash_b 是安装ipk报错时提示的hash值&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># save&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>:wq
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>
+&lt;/ul></description></item></channel></rss>
