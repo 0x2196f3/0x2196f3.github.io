@@ -1,4 +1,35 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 27 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>OpenWrt设置usb扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 30 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Github Actions增加可用容量</title><link>/posts/github-actions-maximize-build-space/</link><pubDate>Thu, 30 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/github-actions-maximize-build-space/</guid><description>&lt;p>参考&lt;a href="https://github.com/easimon/maximize-build-space/blob/master/action.yml">easimon/maximize-build-space&lt;/a>&lt;br>
+(这个脚本把清理后可用的所有空间建立了一个lvm volume，但挂载在别处，可能和其它脚本不兼容)&lt;/p>
+&lt;p>在steps里添加以下&lt;/p>
+&lt;blockquote>
+&lt;p>删除不需要的软件&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yml" data-lang="yml">&lt;span style="display:flex;">&lt;span>- &lt;span style="color:#f92672">name&lt;/span>: &lt;span style="color:#ae81ff">Maximize Build Space&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">run&lt;/span>: |&lt;span style="color:#e6db74">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> set -eux&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ae81ff">sudo rm -rf /usr/share/dotnet&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ae81ff">sudo rm -rf /usr/local/lib/android&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ae81ff">sudo rm -rf /opt/ghc&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ae81ff">sudo rm -rf /opt/hostedtoolcache/CodeQL&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ae81ff">sudo docker image prune --all --force&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>查看可用容量&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yml" data-lang="yml">&lt;span style="display:flex;">&lt;span>- &lt;span style="color:#f92672">name&lt;/span>: &lt;span style="color:#ae81ff">Check Free Space&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">run&lt;/span>: |&lt;span style="color:#e6db74">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> echo &amp;#34;Free space:&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> df -h&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>输出&lt;/p>&lt;/blockquote>
+&lt;pre tabindex="0">&lt;code>Free space:
+Filesystem Size Used Avail Use% Mounted on
+/dev/root 72G 35G 37G 49% /
+tmpfs 7.9G 84K 7.9G 1% /dev/shm
+tmpfs 3.2G 1.1M 3.2G 1% /run
+tmpfs 5.0M 0 5.0M 0% /run/lock
+/dev/sdb16 881M 60M 760M 8% /boot
+/dev/sdb15 105M 6.2M 99M 6% /boot/efi
+/dev/sda1 74G 4.1G 66G 6% /mnt
+tmpfs 1.6G 12K 1.6G 1% /run/user/1001
+&lt;/code>&lt;/pre>&lt;p>理论上把actions里的脚本挪到/mnt跑已经足够了，但不确定是否每个runner分配的/mnt都有这么大容量，因为&lt;a href="https://github.com/marketplace/actions/maximize-build-disk-space">easimon/maximize-build-space&lt;/a>里说只有14GB&lt;/p></description></item><item><title>OpenWrt设置usb扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
 &lt;div>
 &lt;a href="#openwrt%e8%ae%be%e7%bd%aeusb%e6%89%a9%e5%ae%b9">
 ##
@@ -6,7 +37,7 @@
 OpenWrt设置usb扩容
 &lt;/div>
 &lt;/h1>
-&lt;p>(原文)[https://openwrt.org/docs/guide-user/additional-software/extroot_configuration]&lt;/p>
+&lt;p>&lt;a href="https://openwrt.org/docs/guide-user/additional-software/extroot_configuration">原文&lt;/a>&lt;/p>
 &lt;h2 id="连接ssh" >
 &lt;div>
 &lt;a href="#%e8%bf%9e%e6%8e%a5ssh">
