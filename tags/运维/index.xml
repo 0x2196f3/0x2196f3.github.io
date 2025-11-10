@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>运维 on 0x2196f3's blog</title><link>/tags/%E8%BF%90%E7%BB%B4/</link><description>0x2196f3's blog (运维)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 10 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml"/><item><title>WHEA-Logger-17排查</title><link>/posts/whea-logger-17-fix/</link><pubDate>Mon, 10 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/whea-logger-17-fix/</guid><description>&lt;h3 id="症状" >
+&lt;div>
+&lt;a href="#%e7%97%87%e7%8a%b6">
+##
+&lt;/a>
+症状
+&lt;/div>
+&lt;/h3>
+&lt;p>Windows服务器不定期死机&lt;/p>
+&lt;h3 id="排查" >
+&lt;div>
+&lt;a href="#%e6%8e%92%e6%9f%a5">
+##
+&lt;/a>
+排查
+&lt;/div>
+&lt;/h3>
+&lt;p>Event Viewer 大量 WHEA-Logger-17的warning,只要一开机warning数量持续增加,几小时几万个&lt;/p>
+&lt;p>warning内容&lt;/p>
+&lt;pre tabindex="0">&lt;code>发生了已更正的硬件错误。
+组件: PCI Express Root Port
+错误源: Advanced Error Reporting (PCI Express)
+主总线: 设备: 函数: 0x0: 0x1: 0x0
+辅助总线: 设备: 函数: 0x0: 0x0: 0x0
+主要设备名称: PCI\VEN_8086&amp;amp;DEV_A70D&amp;amp;SUBSYS_00000000&amp;amp;REV_01
+辅助设备名称:
+&lt;/code>&lt;/pre>&lt;p>查询DEV_A70D是哪个设备&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-Powershell" data-lang="Powershell">&lt;span style="display:flex;">&lt;span>Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId &lt;span style="color:#f92672">-match&lt;/span> &lt;span style="color:#e6db74">&amp;#39;A70D&amp;#39;&lt;/span> } | Select-Object InstanceId, FriendlyName, Class, Status
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>输出&lt;/p>
+&lt;pre tabindex="0">&lt;code>InstanceId FriendlyName Class Status
+---------- ------------ ----- ------
+PCI\VEN_8086&amp;amp;DEV_A70D&amp;amp;SUBSYS_00000000&amp;amp;REV_01\3&amp;amp;11583659&amp;amp;0&amp;amp;08 Intel(R) PCIe RC 010 G5 - A70D System OK
+&lt;/code>&lt;/pre>&lt;p>GPT说G5可能代表PCIE5.0,这张主板是B760,只有显卡的PCIEx16支持PCIE5.0,确定是显卡的接口&lt;/p>
+&lt;h3 id="解决方案" >
+&lt;div>
+&lt;a href="#%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88">
+##
+&lt;/a>
+解决方案
+&lt;/div>
+&lt;/h3>
+&lt;p>GPT说已更正的硬件错误可能是PCIE接口物理接触不良/PCIE的ASPM(节能模式)配置&lt;/p>
+&lt;ul>
+&lt;li>添加显卡支架把显卡扶正,无效&lt;/li>
+&lt;li>重置BIOS,ASPM全默认,无效&lt;/li>
+&lt;li>把PCIE版本从auto调成4.0,warning再没有增加&lt;/li>
+&lt;/ul>
+&lt;p>该主板说明书只说支持PCIE4.0,但是最新BIOS的PCIE默认auto似乎仍然是gen5&lt;/p></description></item></channel></rss>

@@ -446,7 +446,7 @@ quic-dl
 &lt;li>同样的CDN配置除了vmess+ws也可以过vless+xhttp（vless没有加密，cdn可以看到明文的dns请求和sni）&lt;/li>
 &lt;li>如果已有一个vmess/vless+ws/xhttp过CDN的xray配置，不需要任何修改就能用&lt;/li>
 &lt;li>Gcore的ip被封锁很严重，即使优选ip也不稳定&lt;/li>
-&lt;/ul></description></item><item><title>Mihomo (Clash Meta) API示例</title><link>/posts/mihomo-api/</link><pubDate>Sun, 06 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/mihomo-api/</guid><description>&lt;p>&lt;a href="https://wiki.metacubex.one/api/">Mihomo官方文档&lt;/a>写的很简略,找示例可以在&lt;a href="https://github.com/MetaCubeX/metacubexd">MedaCubeXD&lt;/a>的源码里找&lt;/p>
+&lt;/ul></description></item><item><title>Mihomo (Clash Meta) API示例</title><link>/posts/mihomo-api-usage/</link><pubDate>Sun, 06 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/mihomo-api-usage/</guid><description>&lt;p>&lt;a href="https://wiki.metacubex.one/api/">Mihomo官方文档&lt;/a>写的很简略,找示例可以在&lt;a href="https://github.com/MetaCubeX/metacubexd">MedaCubeXD&lt;/a>的源码里找&lt;/p>
 &lt;p>也可以在浏览器的F12里监视MetaCubeXD页面的Network,抄到curl里就能用&lt;/p>
 &lt;h2 id="比如" >
 &lt;div>
