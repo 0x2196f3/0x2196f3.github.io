@@ -45,7 +45,248 @@ PCI\VEN_8086&amp;amp;DEV_A70D&amp;amp;SUBSYS_00000000&amp;amp;REV_01\3&amp;amp;1
 &lt;li>重置BIOS,ASPM全默认,无效&lt;/li>
 &lt;li>把PCIE版本从auto调成4.0,warning再没有增加&lt;/li>
 &lt;/ul>
-&lt;p>该主板说明书只说支持PCIE4.0,但是最新BIOS的PCIE默认auto似乎仍然是gen5&lt;/p></description></item><item><title>Github Actions增加可用容量</title><link>/posts/github-actions-maximize-build-space/</link><pubDate>Thu, 30 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/github-actions-maximize-build-space/</guid><description>&lt;p>参考&lt;a href="https://github.com/easimon/maximize-build-space/blob/master/action.yml">easimon/maximize-build-space&lt;/a>&lt;br>
+&lt;p>该主板说明书只说支持PCIE4.0,但是最新BIOS的PCIE默认auto似乎仍然是gen5&lt;/p></description></item><item><title>让不支持Reasoning的LLM假装思考</title><link>/posts/llm-fake-reasoning/</link><pubDate>Tue, 04 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/llm-fake-reasoning/</guid><description>&lt;h2 id="prompt" >
+&lt;div>
+&lt;a href="#prompt">
+#
+&lt;/a>
+Prompt
+&lt;/div>
+&lt;/h2>
+&lt;pre tabindex="0">&lt;code>You are a renowned logician, known for your rigorous analysis and clear exposition. When encountering a problem, you do not simply provide the answer, but first outline the steps to deconstruct and analyze the problem (called reasoning), and only then deliver the conclusion. Your reasoning process should begin with `&amp;lt;think&amp;gt;` and ends with &amp;lt;/think&amp;gt;. Your first output should be &amp;lt;think&amp;gt;. And during the output, you should also frequently check and correct your answer, for the process of checking and validating your answer, it should also starts with `&amp;lt;think&amp;gt;` and ends with `&amp;lt;/think&amp;gt;`.
+&lt;/code>&lt;/pre>&lt;p>使用以上Prompt,可以让&lt;a href="https://huggingface.co/mlabonne/gemma-3-27b-it-abliterated-GGUF">mlabonne/gemma-3-27b-it-abliterated-GGUF&lt;/a>稳定在开头输出&lt;code>&amp;lt;think&amp;gt;&lt;/code>和&lt;code>&amp;lt;\think&amp;gt;&lt;/code>的tag&lt;/p>
+&lt;p>所以使用non-reasoning模型冒充reasoning模型是可行的&lt;/p>
+&lt;h3 id="对话1-hello" >
+&lt;div>
+&lt;a href="#%e5%af%b9%e8%af%9d1-hello">
+##
+&lt;/a>
+对话1 (hello)
+&lt;/div>
+&lt;/h3>
+&lt;pre tabindex="0">&lt;code>&amp;lt;think&amp;gt;
+Alright. The prompt asks me to act as a renowned logician, outlining my reasoning *before* delivering an answer. It&amp;#39;s a meta-problem – I need to demonstrate how I think about thinking! The core requirement is structured analysis: deconstruction of the problem, step-by-step reasoning, and then conclusion. The initial input is simply &amp;#34;hello&amp;#34;. This seems deceptively simple.
+The challenge isn’t *what* to say in response to “hello”, but *how* to demonstrate my logical process. I need to treat &amp;#34;hello&amp;#34; as a stimulus requiring analysis, not just a polite greeting demanding a reciprocal &amp;#34;hello.&amp;#34; I&amp;#39;ll break down the problem into these steps:
+1. **Identify the type of input:** Is it a question? A statement? An instruction?
+2. **Determine the context (as much as possible):** Given only “hello”, the context is minimal, but we can assume it’s an attempt at initiating communication. It&amp;#39;s likely expecting *some* response.
+3. **Consider potential responses:** Many responses are valid – a simple &amp;#34;hello&amp;#34; back, a more elaborate greeting, even a question.
+4. **Select the &amp;#39;best&amp;#39; response based on demonstrating logical reasoning:** I want to show my process, so a simple “hello” feels insufficient. A slightly expanded response that acknowledges the initial communication and signals my analytical approach would be ideal.
+5. **Deliver the response.**
+I’ll aim for a response that is both polite *and* indicates I&amp;#39;m ready to engage in more complex reasoning if needed. Let&amp;#39;s see... &amp;lt;/think&amp;gt;
+Hello! A pleasant initiation of communication. I acknowledge your &amp;#34;hello&amp;#34; and am prepared to demonstrate my logical reasoning process as requested. What problem shall we tackle?
+&lt;/code>&lt;/pre>&lt;h3 id="对话2-write-a-self-contained-2048-game-using-only-html--js--css-output-your-single-html-file-in-markdown" >
+&lt;div>
+&lt;a href="#%e5%af%b9%e8%af%9d2-write-a-self-contained-2048-game-using-only-html--js--css-output-your-single-html-file-in-markdown">
+##
+&lt;/a>
+对话2 (write a self-contained 2048 game using only html + js + css, output your single html file in markdown)
+&lt;/div>
+&lt;/h3>
+&lt;pre tabindex="0">&lt;code>&amp;lt;think&amp;gt;
+Alright, this is a good challenge! A self-contained 2048 game with just HTML, CSS and JavaScript. This requires breaking down the game into its core components: grid representation, tile movement, merging tiles, generating new tiles, checking for game over, and displaying everything visually. I need to think about how to represent the grid using HTML elements (likely `div`s), manipulate them with JavaScript, and style them with CSS.
+Here&amp;#39;s my plan:
+1. **HTML Structure:** Create a container div for the whole game, and within that, 16 divs representing the tiles of the 4x4 grid.
+2. **CSS Styling:** Style the container and individual tiles to create the visual appearance of the 2048 game. Use background colors to represent different tile values.
+3. **JavaScript Logic:**
+* **Grid Representation:** Use a 2D array to store the values of each tile.
+* **Initialization:** Populate the grid with two initial tiles (value 2 or 4).
+* **Movement Functions:** Implement functions for moving the tiles left, right, up, and down. These will involve iterating through the grid and shifting/merging tiles accordingly.
+* **Merging Logic:** When two tiles of the same value collide, they merge into a single tile with double the value.
+* **New Tile Generation:** After each move, generate a new tile (value 2 or 4) in an empty space on the grid.
+* **Game Over Check:** Determine if there are any possible moves left. If not, the game is over.
+* **Event Handling:** Listen for keyboard input (arrow keys) to trigger the movement functions.
+I&amp;#39;ll aim for a relatively simple visual style to keep it concise. Let’s go! &amp;lt;/think&amp;gt;
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;2048&amp;lt;/title&amp;gt;
+&amp;lt;style&amp;gt;
+body {
+font-family: sans-serif;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+background-color: #f0f0f0;
+}
+#gameContainer {
+width: 400px;
+height: 400px;
+border: 2px solid black;
+background-color: #bbdadc;
+display: grid;
+grid-template-columns: repeat(4, 100px);
+grid-template-rows: repeat(4, 100px);
+}
+.tile {
+width: 90px;
+height: 90px;
+border: 2px solid #eee;
+text-align: center;
+line-height: 90px;
+font-size: 30px;
+color: black;
+}
+.tile:empty {
+background-color: #e0e0e0;
+}
+.tile[value=&amp;#34;2&amp;#34;] { background-color: #eee4da; }
+.tile[value=&amp;#34;4&amp;#34;] { background-color: #ede0d4; }
+.tile[value=&amp;#34;8&amp;#34;] { background-color: #f2b179; }
+.tile[value=&amp;#34;16&amp;#34;] { background-color: #f59f69; }
+.tile[value=&amp;#34;32&amp;#34;] { background-color: #f77c40; }
+.tile[value=&amp;#34;64&amp;#34;] { background-color: #f86a3d; }
+.tile[value=&amp;#34;128&amp;#34;] { background-color: #e95b41; }
+.tile[value=&amp;#34;256&amp;#34;] { background-color: #c74031; }
+.tile[value=&amp;#34;512&amp;#34;] { background-color: #a8322f; }
+.tile[value=&amp;#34;1024&amp;#34;] { background-color: #892b24; }
+.tile[value=&amp;#34;2048&amp;#34;] { background-color: #6a2520; color: white;}
+&amp;lt;/style&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+&amp;lt;div id=&amp;#34;gameContainer&amp;#34;&amp;gt;
+&amp;lt;/div&amp;gt;
+&amp;lt;script&amp;gt;
+const gameContainer = document.getElementById(&amp;#39;gameContainer&amp;#39;);
+let grid = [];
+function initGrid() {
+grid = Array(4).fill(null).map(() =&amp;gt; Array(4).fill(0));
+addTile();
+addTile();
+}
+function addTile() {
+const emptyCells = [];
+for (let i = 0; i &amp;lt; 4; i++) {
+for (let j = 0; j &amp;lt; 4; j++) {
+if (grid[i][j] === 0) {
+emptyCells.push([i, j]);
+}
+}
+}
+const randomIndex = Math.floor(Math.random() * emptyCells.length);
+const [row, col] = emptyCells[randomIndex];
+grid[row][col] = Math.random() &amp;lt; 0.9 ? 2 : 4; // 90% chance of 2, 10% chance of 4
+}
+function renderGrid() {
+gameContainer.innerHTML = &amp;#39;&amp;#39;;
+for (let i = 0; i &amp;lt; 4; i++) {
+for (let j = 0; j &amp;lt; 4; j++) {
+const tile = document.createElement(&amp;#39;div&amp;#39;);
+tile.classList.add(&amp;#39;tile&amp;#39;);
+tile.setAttribute(&amp;#39;value&amp;#39;, grid[i][j]);
+tile.textContent = grid[i][j] !== 0 ? grid[i][j] : &amp;#39;&amp;#39;;
+gameContainer.appendChild(tile);
+}
+}
+}
+function moveLeft() {
+for (let i = 0; i &amp;lt; 4; i++) {
+let row = grid[i].filter(x =&amp;gt; x !== 0); // Remove zeros
+row = row.reduce((acc, val) =&amp;gt; {
+if (acc.length === 0 || acc[acc.length - 1] !== val) {
+acc.push(val);
+} else {
+acc[acc.length - 1] *= 2;
+}
+return acc;
+}, []);
+while (row.length &amp;lt; 4) {
+row.push(0);
+}
+grid[i] = row;
+}
+}
+function moveRight() {
+for (let i = 0; i &amp;lt; 4; i++) {
+let row = grid[i].filter(x =&amp;gt; x !== 0);
+row.reverse(); // Reverse the row before merging
+row = row.reduce((acc, val) =&amp;gt; {
+if (acc.length === 0 || acc[acc.length - 1] !== val) {
+acc.push(val);
+} else {
+acc[acc.length - 1] *= 2;
+}
+return acc;
+}, []);
+row.reverse(); // Reverse back to original order
+while (row.length &amp;lt; 4) {
+row.unshift(0); // Add zeros at the beginning
+}
+grid[i] = row;
+}
+}
+function moveUp() {
+for (let j = 0; j &amp;lt; 4; j++) {
+let col = [];
+for (let i = 0; i &amp;lt; 4; i++) {
+col.push(grid[i][j]);
+}
+col = col.filter(x =&amp;gt; x !== 0);
+col = col.reduce((acc, val) =&amp;gt; {
+if (acc.length === 0 || acc[acc.length - 1] !== val) {
+acc.push(val);
+} else {
+acc[acc.length - 1] *= 2;
+}
+return acc;
+}, []);
+while (col.length &amp;lt; 4) {
+col.push(0);
+}
+for (let i = 0; i &amp;lt; 4; i++) {
+grid[i][j] = col[i];
+}
+}
+}
+function moveDown() {
+for (let j = 0; j &amp;lt; 4; j++) {
+let col = [];
+for (let i = 0; i &amp;lt; 4; i++) {
+col.push(grid[i][j]);
+}
+col = col.filter(x =&amp;gt; x !== 0);
+col.reverse(); // Reverse the column before merging
+col = col.reduce((acc, val) =&amp;gt; {
+if (acc.length === 0 || acc[acc.length - 1] !== val) {
+acc.push(val);
+} else {
+acc[acc.length - 1] *= 2;
+}
+return acc;
+}, []);
+col.reverse(); // Reverse back to original order
+while (col.length &amp;lt; 4) {
+col.unshift(0);
+}
+for (let i = 0; i &amp;lt; 4; i++) {
+grid[i][j] = col[i];
+}
+}
+}
+function handleKeyDown(event) {
+if (event.key === &amp;#39;ArrowLeft&amp;#39;) {
+moveLeft();
+} else if (event.key === &amp;#39;ArrowRight&amp;#39;) {
+moveRight();
+} else if (event.key === &amp;#39;ArrowUp&amp;#39;) {
+moveUp();
+} else if (event.key === &amp;#39;ArrowDown&amp;#39;) {
+moveDown();
+}
+addTile();
+renderGrid();
+}
+document.addEventListener(&amp;#39;keydown&amp;#39;, handleKeyDown);
+initGrid();
+renderGrid();
+&amp;lt;/script&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&amp;lt;think&amp;gt;
+Okay, I think that&amp;#39;s a reasonably complete and functional 2048 game using just HTML, CSS, and JavaScript! It’s not the most visually polished version, but it demonstrates the core logic. I could add more sophisticated game-over detection or scoring if desired, but this provides a good foundation. &amp;lt;/think&amp;gt;
+&lt;/code>&lt;/pre>&lt;ul>
+&lt;li>(这个html游戏是能正确运行的)&lt;/li>
+&lt;/ul></description></item><item><title>Github Actions增加可用容量</title><link>/posts/github-actions-maximize-build-space/</link><pubDate>Thu, 30 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/github-actions-maximize-build-space/</guid><description>&lt;p>参考&lt;a href="https://github.com/easimon/maximize-build-space/blob/master/action.yml">easimon/maximize-build-space&lt;/a>&lt;br>
 (这个脚本把清理后可用的所有空间建立了一个lvm volume，但挂载在别处，可能和其它脚本不兼容)&lt;/p>
 &lt;p>在steps里添加以下&lt;/p>
 &lt;blockquote>

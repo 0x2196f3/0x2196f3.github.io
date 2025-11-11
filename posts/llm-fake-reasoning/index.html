@@ -1,0 +1,266 @@
+<!doctype html><html lang=zh-CN data-theme><head><meta charset=utf-8><meta name=HandheldFriendly content="True"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=referrer content="no-referrer-when-downgrade"><meta name=theme-name content="Anubis2"><title>让不支持Reasoning的LLM假装思考 - 0x2196f3&rsquo;s blog</title><meta name=description content="
+
+    
+        #
+    
+    Prompt
+
+
+You are a renowned logician, known for your rigorous analysis and clear exposition. When encountering a problem, you do not simply provide the answer, but first outline the steps to deconstruct and analyze the problem (called reasoning), and only then deliver the conclusion. Your reasoning process should begin with `<think>` and ends with </think>. Your first output should be <think>. And during the output, you should also frequently check and correct your answer, for the process of checking and validating your answer, it should also starts with `<think>` and ends with `</think>`.
+使用以上Prompt,可以让mlabonne/gemma-3-27b-it-abliterated-GGUF稳定在开头输出<think>和<\think>的tag"><link rel=icon type=image/x-icon href=https://0x2196f3.github.io/favicon.ico><link rel=apple-touch-icon-precomposed href=https://0x2196f3.github.io/favicon.png><style>body{visibility:hidden;opacity:0}</style><noscript><style>body{visibility:visible;opacity:1}</style></noscript><link rel=stylesheet href=/css/style.min.ac9fbad24609bd533b00c98f0dfbd971989a71aca4b450e1e77ab6c33ee463c6.css integrity="sha256-rJ+60kYJvVM7AMmPDfvZcZiacayktFDh53q2wz7kY8Y="><link rel=stylesheet href=/css/style.min.c4c04b3ef88e3d619ad4c7ee5e03048422bc55c4fefdc1f07657c1133670aa22.css integrity="sha256-xMBLPviOPWGa1MfuXgMEhCK8VcT+/cHwdlfBEzZwqiI="><link rel=stylesheet href=/css/style.min.21c5d8fe0a79d623b0adc1ce4bd4f6dd2c05cd939c9aaaa966ba7186b1464f4d.css integrity="sha256-IcXY/gp51iOwrcHOS9T23SwFzZOcmqqpZrpxhrFGT00="><script src=/js/script.min.08f04d96386c73c9bf4d160333f8f448c05a6e01c06770542ee0e013954ce930.js type=text/javascript integrity="sha256-CPBNljhsc8m/TRYDM/j0SMBabgHAZ3BULuDgE5VM6TA="></script></head><body><a class=skip-main href=#main>Skip to main content</a><div class=container><header class=common-header><div class=header-top><div class=header-top-left><h1 class="site-title noselect"><a href=/>0x2196f3's blog</a></h1><div class=theme-switcher><span class=inline-svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-sun-high"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14.828 14.828A4 4 0 109.172 9.172a4 4 0 005.656 5.656z"/><path d="M6.343 17.657l-1.414 1.414"/><path d="M6.343 6.343 4.929 4.929"/><path d="M17.657 6.343l1.414-1.414"/><path d="M17.657 17.657l1.414 1.414"/><path d="M4 12H2"/><path d="M12 4V2"/><path d="M20 12h2"/><path d="M12 20v2"/></svg></span></div><script>const STORAGE_KEY="user-color-scheme",defaultTheme="auto";let currentTheme,switchButton,autoDefinedScheme=window.matchMedia("(prefers-color-scheme: dark)");function switchTheme(){currentTheme=currentTheme==="dark"?"light":"dark",localStorage&&localStorage.setItem(STORAGE_KEY,currentTheme),document.documentElement.setAttribute("data-theme",currentTheme),changeGiscusTheme(currentTheme),document.body.dispatchEvent(new CustomEvent(currentTheme+"-theme-set"))}const autoChangeScheme=e=>{currentTheme=e.matches?"dark":"light",document.documentElement.setAttribute("data-theme",currentTheme),changeGiscusTheme(currentTheme),document.body.dispatchEvent(new CustomEvent(currentTheme+"-theme-set"))};document.addEventListener("DOMContentLoaded",function(){switchButton=document.querySelector(".theme-switcher"),currentTheme=detectCurrentScheme(),currentTheme==="auto"?(autoChangeScheme(autoDefinedScheme),autoDefinedScheme.addListener(autoChangeScheme)):document.documentElement.setAttribute("data-theme",currentTheme),switchButton&&switchButton.addEventListener("click",switchTheme,!1),showContent()});function detectCurrentScheme(){return localStorage!==null&&localStorage.getItem(STORAGE_KEY)?localStorage.getItem(STORAGE_KEY):defaultTheme?defaultTheme:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}function showContent(){document.body.style.visibility="visible",document.body.style.opacity=1}function changeGiscusTheme(e){function t(e){const t=document.querySelector("iframe.giscus-frame");if(!t)return;t.contentWindow.postMessage({giscus:e},"https://giscus.app")}t({setConfig:{theme:e}})}</script><ul class="social-icons noselect"><li><a href=/index.xml title=RSS rel=me><span class=inline-svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-rss"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 19m-1 0a1 1 0 102 0 1 1 0 10-2 0"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg></span></a></li></ul></div><div class=header-top-right></div></div><nav class=noselect><a href=https://0x2196f3.github.io/ title>Home</a>
+<a href=https://0x2196f3.github.io/tags/ title>Tags</a>
+<a href=https://0x2196f3.github.io/posts/ title>Archive</a></nav></header><main id=main tabindex=-1><article class="post h-entry"><div class=post-header><header><h1 class="p-name post-title">让不支持Reasoning的LLM假装思考</h1></header><div class="post-info noselect"><div class="post-date dt-published"><time datetime=2025-11-04>2025-11-04</time></div><a class="post-hidden-url u-url" href=/posts/llm-fake-reasoning/>/posts/llm-fake-reasoning/</a>
+<a href=https://0x2196f3.github.io/ class="p-name p-author post-hidden-author h-card" rel=me></a><div class=post-taxonomies><ul class=post-tags><li><a href=/tags/ai>#AI</a></li><li><a href=/tags/llm>#LLM</a></li><li><a href=/tags/security>#Security</a></li></ul></div></div></div><details class="toc noselect"><summary>Table of Contents</summary><div class=inner><nav id=TableOfContents><ul><li><a href=#prompt>Prompt</a><ul><li><a href=#对话1-hello>对话1 (hello)</a></li><li><a href=#对话2-write-a-self-contained-2048-game-using-only-html--js--css-output-your-single-html-file-in-markdown>对话2 (write a self-contained 2048 game using only html + js + css, output your single html file in markdown)</a></li></ul></li></ul></nav></div></details><script>var toc=document.querySelector(".toc");toc&&toc.addEventListener("click",function(){event.target.tagName!=="A"&&(event.preventDefault(),this.open?(this.open=!1,this.classList.remove("expanded")):(this.open=!0,this.classList.add("expanded")))})</script><div class="content e-content"><h2 id=prompt><div><a href=#prompt>#
+</a>Prompt</div></h2><pre tabindex=0><code>You are a renowned logician, known for your rigorous analysis and clear exposition. When encountering a problem, you do not simply provide the answer, but first outline the steps to deconstruct and analyze the problem (called reasoning), and only then deliver the conclusion. Your reasoning process should begin with `&lt;think&gt;` and ends with &lt;/think&gt;. Your first output should be &lt;think&gt;. And during the output, you should also frequently check and correct your answer, for the process of checking and validating your answer, it should also starts with `&lt;think&gt;` and ends with `&lt;/think&gt;`.
+</code></pre><p>使用以上Prompt,可以让<a href=https://huggingface.co/mlabonne/gemma-3-27b-it-abliterated-GGUF>mlabonne/gemma-3-27b-it-abliterated-GGUF</a>稳定在开头输出<code>&lt;think></code>和<code>&lt;\think></code>的tag</p><p>所以使用non-reasoning模型冒充reasoning模型是可行的</p><h3 id=对话1-hello><div><a href=#%e5%af%b9%e8%af%9d1-hello>##
+</a>对话1 (hello)</div></h3><pre tabindex=0><code>&lt;think&gt;
+Alright. The prompt asks me to act as a renowned logician, outlining my reasoning *before* delivering an answer. It&#39;s a meta-problem – I need to demonstrate how I think about thinking! The core requirement is structured analysis: deconstruction of the problem, step-by-step reasoning, and then conclusion. The initial input is simply &#34;hello&#34;. This seems deceptively simple.
+
+The challenge isn’t *what* to say in response to “hello”, but *how* to demonstrate my logical process. I need to treat &#34;hello&#34; as a stimulus requiring analysis, not just a polite greeting demanding a reciprocal &#34;hello.&#34;  I&#39;ll break down the problem into these steps:
+
+1. **Identify the type of input:** Is it a question? A statement? An instruction?
+2. **Determine the context (as much as possible):** Given only “hello”, the context is minimal, but we can assume it’s an attempt at initiating communication. It&#39;s likely expecting *some* response.
+3. **Consider potential responses:** Many responses are valid – a simple &#34;hello&#34; back, a more elaborate greeting, even a question.
+4. **Select the &#39;best&#39; response based on demonstrating logical reasoning:** I want to show my process, so a simple “hello” feels insufficient. A slightly expanded response that acknowledges the initial communication and signals my analytical approach would be ideal.
+5. **Deliver the response.**
+
+I’ll aim for a response that is both polite *and* indicates I&#39;m ready to engage in more complex reasoning if needed. Let&#39;s see... &lt;/think&gt;
+
+Hello! A pleasant initiation of communication. I acknowledge your &#34;hello&#34; and am prepared to demonstrate my logical reasoning process as requested. What problem shall we tackle?
+</code></pre><h3 id=对话2-write-a-self-contained-2048-game-using-only-html--js--css-output-your-single-html-file-in-markdown><div><a href=#%e5%af%b9%e8%af%9d2-write-a-self-contained-2048-game-using-only-html--js--css-output-your-single-html-file-in-markdown>##
+</a>对话2 (write a self-contained 2048 game using only html + js + css, output your single html file in markdown)</div></h3><pre tabindex=0><code>&lt;think&gt;
+Alright, this is a good challenge! A self-contained 2048 game with just HTML, CSS and JavaScript. This requires breaking down the game into its core components: grid representation, tile movement, merging tiles, generating new tiles, checking for game over, and displaying everything visually. I need to think about how to represent the grid using HTML elements (likely `div`s), manipulate them with JavaScript, and style them with CSS.
+
+Here&#39;s my plan:
+
+1. **HTML Structure:** Create a container div for the whole game, and within that, 16 divs representing the tiles of the 4x4 grid.
+2. **CSS Styling:** Style the container and individual tiles to create the visual appearance of the 2048 game. Use background colors to represent different tile values.
+3. **JavaScript Logic:**
+    *   **Grid Representation:** Use a 2D array to store the values of each tile.
+    *   **Initialization:** Populate the grid with two initial tiles (value 2 or 4).
+    *   **Movement Functions:** Implement functions for moving the tiles left, right, up, and down. These will involve iterating through the grid and shifting/merging tiles accordingly.
+    *   **Merging Logic:** When two tiles of the same value collide, they merge into a single tile with double the value.
+    *   **New Tile Generation:** After each move, generate a new tile (value 2 or 4) in an empty space on the grid.
+    *   **Game Over Check:** Determine if there are any possible moves left. If not, the game is over.
+    *   **Event Handling:** Listen for keyboard input (arrow keys) to trigger the movement functions.
+
+I&#39;ll aim for a relatively simple visual style to keep it concise. Let’s go! &lt;/think&gt;
+
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;2048&lt;/title&gt;
+  &lt;style&gt;
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    #gameContainer {
+      width: 400px;
+      height: 400px;
+      border: 2px solid black;
+      background-color: #bbdadc;
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-template-rows: repeat(4, 100px);
+    }
+
+    .tile {
+      width: 90px;
+      height: 90px;
+      border: 2px solid #eee;
+      text-align: center;
+      line-height: 90px;
+      font-size: 30px;
+      color: black;
+    }
+
+    .tile:empty {
+        background-color: #e0e0e0;
+    }
+
+    .tile[value=&#34;2&#34;] { background-color: #eee4da; }
+    .tile[value=&#34;4&#34;] { background-color: #ede0d4; }
+    .tile[value=&#34;8&#34;] { background-color: #f2b179; }
+    .tile[value=&#34;16&#34;] { background-color: #f59f69; }
+    .tile[value=&#34;32&#34;] { background-color: #f77c40; }
+    .tile[value=&#34;64&#34;] { background-color: #f86a3d; }
+    .tile[value=&#34;128&#34;] { background-color: #e95b41; }
+    .tile[value=&#34;256&#34;] { background-color: #c74031; }
+    .tile[value=&#34;512&#34;] { background-color: #a8322f; }
+    .tile[value=&#34;1024&#34;] { background-color: #892b24; }
+    .tile[value=&#34;2048&#34;] { background-color: #6a2520; color: white;}
+
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;div id=&#34;gameContainer&#34;&gt;
+    &lt;/div&gt;
+
+  &lt;script&gt;
+    const gameContainer = document.getElementById(&#39;gameContainer&#39;);
+    let grid = [];
+
+    function initGrid() {
+      grid = Array(4).fill(null).map(() =&gt; Array(4).fill(0));
+      addTile();
+      addTile();
+    }
+
+    function addTile() {
+      const emptyCells = [];
+      for (let i = 0; i &lt; 4; i++) {
+        for (let j = 0; j &lt; 4; j++) {
+          if (grid[i][j] === 0) {
+            emptyCells.push([i, j]);
+          }
+        }
+      }
+
+      const randomIndex = Math.floor(Math.random() * emptyCells.length);
+      const [row, col] = emptyCells[randomIndex];
+      grid[row][col] = Math.random() &lt; 0.9 ? 2 : 4; // 90% chance of 2, 10% chance of 4
+    }
+
+    function renderGrid() {
+      gameContainer.innerHTML = &#39;&#39;;
+      for (let i = 0; i &lt; 4; i++) {
+        for (let j = 0; j &lt; 4; j++) {
+          const tile = document.createElement(&#39;div&#39;);
+          tile.classList.add(&#39;tile&#39;);
+          tile.setAttribute(&#39;value&#39;, grid[i][j]);
+          tile.textContent = grid[i][j] !== 0 ? grid[i][j] : &#39;&#39;;
+          gameContainer.appendChild(tile);
+        }
+      }
+    }
+
+    function moveLeft() {
+      for (let i = 0; i &lt; 4; i++) {
+        let row = grid[i].filter(x =&gt; x !== 0); // Remove zeros
+        row = row.reduce((acc, val) =&gt; {
+          if (acc.length === 0 || acc[acc.length - 1] !== val) {
+            acc.push(val);
+          } else {
+            acc[acc.length - 1] *= 2;
+          }
+          return acc;
+        }, []);
+
+        while (row.length &lt; 4) {
+          row.push(0);
+        }
+        grid[i] = row;
+      }
+    }
+
+    function moveRight() {
+      for (let i = 0; i &lt; 4; i++) {
+        let row = grid[i].filter(x =&gt; x !== 0);
+        row.reverse(); // Reverse the row before merging
+        row = row.reduce((acc, val) =&gt; {
+          if (acc.length === 0 || acc[acc.length - 1] !== val) {
+            acc.push(val);
+          } else {
+            acc[acc.length - 1] *= 2;
+          }
+          return acc;
+        }, []);
+        row.reverse(); // Reverse back to original order
+
+        while (row.length &lt; 4) {
+          row.unshift(0); // Add zeros at the beginning
+        }
+        grid[i] = row;
+      }
+    }
+
+    function moveUp() {
+      for (let j = 0; j &lt; 4; j++) {
+        let col = [];
+        for (let i = 0; i &lt; 4; i++) {
+          col.push(grid[i][j]);
+        }
+
+        col = col.filter(x =&gt; x !== 0);
+        col = col.reduce((acc, val) =&gt; {
+          if (acc.length === 0 || acc[acc.length - 1] !== val) {
+            acc.push(val);
+          } else {
+            acc[acc.length - 1] *= 2;
+          }
+          return acc;
+        }, []);
+
+        while (col.length &lt; 4) {
+          col.push(0);
+        }
+
+        for (let i = 0; i &lt; 4; i++) {
+          grid[i][j] = col[i];
+        }
+      }
+    }
+
+    function moveDown() {
+      for (let j = 0; j &lt; 4; j++) {
+        let col = [];
+        for (let i = 0; i &lt; 4; i++) {
+          col.push(grid[i][j]);
+        }
+
+        col = col.filter(x =&gt; x !== 0);
+        col.reverse(); // Reverse the column before merging
+        col = col.reduce((acc, val) =&gt; {
+          if (acc.length === 0 || acc[acc.length - 1] !== val) {
+            acc.push(val);
+          } else {
+            acc[acc.length - 1] *= 2;
+          }
+          return acc;
+        }, []);
+        col.reverse(); // Reverse back to original order
+
+        while (col.length &lt; 4) {
+          col.unshift(0);
+        }
+
+        for (let i = 0; i &lt; 4; i++) {
+          grid[i][j] = col[i];
+        }
+      }
+    }
+
+
+    function handleKeyDown(event) {
+      if (event.key === &#39;ArrowLeft&#39;) {
+        moveLeft();
+      } else if (event.key === &#39;ArrowRight&#39;) {
+        moveRight();
+      } else if (event.key === &#39;ArrowUp&#39;) {
+        moveUp();
+      } else if (event.key === &#39;ArrowDown&#39;) {
+        moveDown();
+      }
+
+      addTile();
+      renderGrid();
+    }
+
+    document.addEventListener(&#39;keydown&#39;, handleKeyDown);
+    initGrid();
+    renderGrid();
+  &lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+
+&lt;think&gt;
+Okay, I think that&#39;s a reasonably complete and functional 2048 game using just HTML, CSS, and JavaScript! It’s not the most visually polished version, but it demonstrates the core logic. I could add more sophisticated game-over detection or scoring if desired, but this provides a good foundation. &lt;/think&gt;
+</code></pre><ul><li>(这个html游戏是能正确运行的)</li></ul></div></article><h3 class="read-next-title noselect">Read next</h3><ul class="read-next-posts noselect"><li><a href=/posts/llama-swap-on-linux/>docker部署llama-swap</a></li></ul><script>function detectCurrentScheme2(){const e="auto";return localStorage!==null&&localStorage.getItem("user-color-scheme")?localStorage.getItem("user-color-scheme"):e==="dark"||e==="light"?e:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}let giscusTheme=detectCurrentScheme2(),giscusAttributes={src:"https://giscus.app/client.js","data-repo":"0x2196f3/0x2196f3.github.io","data-repo-id":"R_kgDOPJtijw","data-category":"Announcements","data-category-id":"DIC_kwDOPJtij84Cs6CT","data-mapping":"pathname","data-strict":"0","data-reactions-enabled":"1","data-emit-metadata":"0","data-input-position":"bottom","data-theme":giscusTheme,"data-lang":"en",crossorigin:"anonymous",lazyload:"false",async:!0},main=document.querySelector("main"),giscusScript=document.createElement("script");Object.entries(giscusAttributes).forEach(([e,t])=>giscusScript.setAttribute(e,t)),main.appendChild(giscusScript)</script></main><footer class="common-footer noselect"><div class=common-footer-bottom><div style=display:flex;align-items:center;gap:8px>© 2025</div><div style=display:flex;align-items:center;gap:4px></div></div><p class="h-card vcard"><a href=https://0x2196f3.github.io/ class="p-name u-url url fn" rel=me></a></p></footer></div></body></html>
