@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Security on 0x2196f3's blog</title><link>/tags/security/</link><description>0x2196f3's blog (Security)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 04 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/security/index.xml" rel="self" type="application/rss+xml"/><item><title>让不支持Reasoning的LLM假装思考</title><link>/posts/llm-fake-reasoning/</link><pubDate>Tue, 04 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/llm-fake-reasoning/</guid><description>&lt;h2 id="prompt" >
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Security on 0x2196f3's blog</title><link>/tags/security/</link><description>0x2196f3's blog (Security)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 04 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/security/index.xml" rel="self" type="application/rss+xml"/><item><title>让不支持Reasoning的LLM假装思考</title><link>/posts/llm-fake-reasoning/</link><pubDate>Tue, 04 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/llm-fake-reasoning/</guid><description>&lt;h3 id="prompt" >
 &lt;div>
 &lt;a href="#prompt">
-#
+##
 &lt;/a>
 Prompt
 &lt;/div>
-&lt;/h2>
+&lt;/h3>
 &lt;pre tabindex="0">&lt;code>You are a renowned logician, known for your rigorous analysis and clear exposition. When encountering a problem, you do not simply provide the answer, but first outline the steps to deconstruct and analyze the problem (called reasoning), and only then deliver the conclusion. Your reasoning process should begin with `&amp;lt;think&amp;gt;` and ends with &amp;lt;/think&amp;gt;. Your first output should be &amp;lt;think&amp;gt;. And during the output, you should also frequently check and correct your answer, for the process of checking and validating your answer, it should also starts with `&amp;lt;think&amp;gt;` and ends with `&amp;lt;/think&amp;gt;`.
 &lt;/code>&lt;/pre>&lt;p>使用以上Prompt,可以让&lt;a href="https://huggingface.co/mlabonne/gemma-3-27b-it-abliterated-GGUF">mlabonne/gemma-3-27b-it-abliterated-GGUF&lt;/a>稳定在开头输出&lt;code>&amp;lt;think&amp;gt;&lt;/code>和&lt;code>&amp;lt;\think&amp;gt;&lt;/code>的tag&lt;/p>
 &lt;p>所以使用non-reasoning模型冒充reasoning模型是可行的&lt;/p>

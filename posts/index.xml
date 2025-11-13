@@ -1,4 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 10 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>WHEA-Logger-17排查</title><link>/posts/whea-logger-17-fix/</link><pubDate>Mon, 10 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/whea-logger-17-fix/</guid><description>&lt;h3 id="症状" >
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 11 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Windows关机时自动关闭未保存的程序</title><link>/posts/windows-autoendtasks/</link><pubDate>Tue, 11 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/windows-autoendtasks/</guid><description>&lt;p>在关机时自动关闭所有提示保存的程序,否则默认状态下什么都不做电脑永远不会关&lt;/p>
+&lt;pre tabindex="0">&lt;code>Windows Registry Editor Version 5.00
+; Created by: Shawn Brink
+; Created on: November 12th 2017
+; Tutorial: https://www.tenforums.com/tutorials/97821-turn-autoendtasks-restart-shut-down-sign-out-windows-10-a.html
+[HKEY_USERS\.DEFAULT\Control Panel\Desktop]
+&amp;#34;AutoEndTasks&amp;#34;=&amp;#34;1&amp;#34;
+&lt;/code>&lt;/pre></description></item><item><title>WHEA-Logger-17排查</title><link>/posts/whea-logger-17-fix/</link><pubDate>Mon, 10 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/whea-logger-17-fix/</guid><description>&lt;h3 id="症状" >
 &lt;div>
 &lt;a href="#%e7%97%87%e7%8a%b6">
 ##
@@ -45,14 +52,14 @@ PCI\VEN_8086&amp;amp;DEV_A70D&amp;amp;SUBSYS_00000000&amp;amp;REV_01\3&amp;amp;1
 &lt;li>重置BIOS,ASPM全默认,无效&lt;/li>
 &lt;li>把PCIE版本从auto调成4.0,warning再没有增加&lt;/li>
 &lt;/ul>
-&lt;p>该主板说明书只说支持PCIE4.0,但是最新BIOS的PCIE默认auto似乎仍然是gen5&lt;/p></description></item><item><title>让不支持Reasoning的LLM假装思考</title><link>/posts/llm-fake-reasoning/</link><pubDate>Tue, 04 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/llm-fake-reasoning/</guid><description>&lt;h2 id="prompt" >
+&lt;p>该主板说明书只说支持PCIE4.0,但是最新BIOS的PCIE默认auto似乎仍然是gen5&lt;/p></description></item><item><title>让不支持Reasoning的LLM假装思考</title><link>/posts/llm-fake-reasoning/</link><pubDate>Tue, 04 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/llm-fake-reasoning/</guid><description>&lt;h3 id="prompt" >
 &lt;div>
 &lt;a href="#prompt">
-#
+##
 &lt;/a>
 Prompt
 &lt;/div>
-&lt;/h2>
+&lt;/h3>
 &lt;pre tabindex="0">&lt;code>You are a renowned logician, known for your rigorous analysis and clear exposition. When encountering a problem, you do not simply provide the answer, but first outline the steps to deconstruct and analyze the problem (called reasoning), and only then deliver the conclusion. Your reasoning process should begin with `&amp;lt;think&amp;gt;` and ends with &amp;lt;/think&amp;gt;. Your first output should be &amp;lt;think&amp;gt;. And during the output, you should also frequently check and correct your answer, for the process of checking and validating your answer, it should also starts with `&amp;lt;think&amp;gt;` and ends with `&amp;lt;/think&amp;gt;`.
 &lt;/code>&lt;/pre>&lt;p>使用以上Prompt,可以让&lt;a href="https://huggingface.co/mlabonne/gemma-3-27b-it-abliterated-GGUF">mlabonne/gemma-3-27b-it-abliterated-GGUF&lt;/a>稳定在开头输出&lt;code>&amp;lt;think&amp;gt;&lt;/code>和&lt;code>&amp;lt;\think&amp;gt;&lt;/code>的tag&lt;/p>
 &lt;p>所以使用non-reasoning模型冒充reasoning模型是可行的&lt;/p>
