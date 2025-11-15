@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 11 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Windows关机时自动关闭未保存的程序</title><link>/posts/windows-autoendtasks/</link><pubDate>Tue, 11 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/windows-autoendtasks/</guid><description>&lt;p>在关机时自动关闭所有提示保存的程序,否则默认状态下什么都不做电脑永远不会关&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 14 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Windows关机时自动关闭未保存的程序</title><link>/posts/windows-autoendtasks/</link><pubDate>Tue, 11 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/windows-autoendtasks/</guid><description>&lt;p>在关机时自动关闭所有提示保存的程序,否则默认状态下什么都不做电脑永远不会关&lt;/p>
 &lt;pre tabindex="0">&lt;code>Windows Registry Editor Version 5.00
 ; Created by: Shawn Brink
 ; Created on: November 12th 2017
@@ -1045,36 +1045,89 @@ Linux Curl调用Cloudflare API
 &lt;/div>
 &lt;/h2>
 &lt;p>&lt;img src="https://0x2196f3.github.io/images/System_Monitor.png" alt="System Monitor">&lt;br>
-在顶栏添加系统状态监控，用来显示实时网速，维护中&lt;/p></description></item><item><title>Xray Reality 偷域名经验</title><link>/posts/xray-reality-target/</link><pubDate>Fri, 04 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/xray-reality-target/</guid><description>&lt;blockquote>
-&lt;p>搜索同ASN同地区可用域名&lt;/p>&lt;/blockquote>
+在顶栏添加系统状态监控，用来显示实时网速，维护中&lt;/p></description></item><item><title>Xray Reality 偷域名经验</title><link>/posts/xray-reality-target/</link><pubDate>Fri, 04 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/xray-reality-target/</guid><description>&lt;h2 id="搜索同asn同地区可用域名" >
+&lt;div>
+&lt;a href="#%e6%90%9c%e7%b4%a2%e5%90%8casn%e5%90%8c%e5%9c%b0%e5%8c%ba%e5%8f%af%e7%94%a8%e5%9f%9f%e5%90%8d">
+#
+&lt;/a>
+搜索同ASN同地区可用域名
+&lt;/div>
+&lt;/h2>
 &lt;p>&lt;a href="https://search.censys.io">search.censys.io&lt;/a>&lt;/p>
 &lt;p>&lt;img src="https://0x2196f3.github.io/images/censys.gif" alt="censys">&lt;/p>
 &lt;p>搜索框输入以下内容,不登录只能看一页,Per Page选100,Virtual Hosts 选INCLUDE或ONLY&lt;/p>
 &lt;pre tabindex="0">&lt;code># 把ASN换成服务器所在ASN（5位数字）， country换成服务器所在国家
 autonomous_system.asn:00000 and location.country: &amp;#34;United States&amp;#34; and services: (port: 443 and service_name: HTTP and http.response.status_code: 200 and tls.version_selected: TLSv1_3)
 &lt;/code>&lt;/pre>&lt;p>&lt;a href="https://workshop.censys.io/censys-search-questions/">参考censys search语法&lt;/a>&lt;/p>
-&lt;blockquote>
-&lt;p>检查可用性&lt;/p>&lt;/blockquote>
+&lt;h2 id="检查可用性" >
+&lt;div>
+&lt;a href="#%e6%a3%80%e6%9f%a5%e5%8f%af%e7%94%a8%e6%80%a7">
+#
+&lt;/a>
+检查可用性
+&lt;/div>
+&lt;/h2>
 &lt;ul>
 &lt;li>网页有内容&lt;/li>
-&lt;li>http/2&lt;/li>
+&lt;li>http/2 (F12 -&amp;gt; Network)&lt;/li>
 &lt;li>路径&lt;code>/&lt;/code>返回200&lt;/li>
-&lt;li>tls v1.3&lt;del>且支持x25519&lt;/del>(基本都支持)&lt;/li>
+&lt;li>tls v1.3且支持x25519 (F12 -&amp;gt; Security)&lt;/li>
 &lt;/ul>
-&lt;blockquote>
-&lt;p>检查网站没有使用cdn&lt;/p>&lt;/blockquote>
+&lt;h2 id="检查网站没有使用cdn" >
+&lt;div>
+&lt;a href="#%e6%a3%80%e6%9f%a5%e7%bd%91%e7%ab%99%e6%b2%a1%e6%9c%89%e4%bd%bf%e7%94%a8cdn">
+#
+&lt;/a>
+检查网站没有使用cdn
+&lt;/div>
+&lt;/h2>
 &lt;ul>
 &lt;li>&lt;code>https://dns.google/resolve?name=target.domain&lt;/code>&lt;br>
 查询ip是否属于某个cdn,如果有多个ip大概率是cdn的ip&lt;/li>
 &lt;li>&lt;code>https://target.domain/cdn-cgi/trace&lt;/code> 访问这个路径,有内容说明使用了Cloudflare CDN,&lt;strong>绝对不能用&lt;/strong>&lt;/li>
 &lt;/ul>
-&lt;blockquote>
-&lt;p>网站安全检查&lt;/p>&lt;/blockquote>
+&lt;h2 id="网站安全检查" >
+&lt;div>
+&lt;a href="#%e7%bd%91%e7%ab%99%e5%ae%89%e5%85%a8%e6%a3%80%e6%9f%a5">
+#
+&lt;/a>
+网站安全检查
+&lt;/div>
+&lt;/h2>
 &lt;ul>
 &lt;li>在搜索引擎里搜索网站名称,能搜到这个域名说明至少搜索引擎认为这个网站比较正常.&lt;/li>
 &lt;li>不要用中文网站尤其是有备案号的(有备案号ip肯定在中国),极有可能是黑产网站隐藏在看起来正常的静态网页里.&lt;/li>
 &lt;li>外国大公司能产生大量流量的网站,要么在中国有CDN要么被墙了,所以最好都不要用.&lt;/li>
-&lt;/ul></description></item><item><title>搬瓦工VPS配置自定义IPv6地址</title><link>/posts/bandwagonhost-ipv6-configuration/</link><pubDate>Thu, 03 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/bandwagonhost-ipv6-configuration/</guid><description>&lt;p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的ipv6出口的,公网ipv6地址在&lt;code>ipv6net&lt;/code>上,不是&lt;code>eth0&lt;/code>&lt;/p>
+&lt;/ul>
+&lt;h2 id="验证伪装域名正常工作" >
+&lt;div>
+&lt;a href="#%e9%aa%8c%e8%af%81%e4%bc%aa%e8%a3%85%e5%9f%9f%e5%90%8d%e6%ad%a3%e5%b8%b8%e5%b7%a5%e4%bd%9c">
+#
+&lt;/a>
+验证伪装域名正常工作
+&lt;/div>
+&lt;/h2>
+&lt;p>在没有翻墙的电脑上运行以下curl命令&lt;/p>
+&lt;h3 id="测试连接目标域名的真实ip" >
+&lt;div>
+&lt;a href="#%e6%b5%8b%e8%af%95%e8%bf%9e%e6%8e%a5%e7%9b%ae%e6%a0%87%e5%9f%9f%e5%90%8d%e7%9a%84%e7%9c%9f%e5%ae%9eip">
+##
+&lt;/a>
+测试连接目标域名的真实ip
+&lt;/div>
+&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -v &lt;span style="color:#e6db74">&amp;#34;https://[domain]/&amp;#34;&lt;/span> --resolve &lt;span style="color:#e6db74">&amp;#34;[domain]:443:[real-ip]&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="测试连接自己的ip" >
+&lt;div>
+&lt;a href="#%e6%b5%8b%e8%af%95%e8%bf%9e%e6%8e%a5%e8%87%aa%e5%b7%b1%e7%9a%84ip">
+##
+&lt;/a>
+测试连接自己的ip
+&lt;/div>
+&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -v &lt;span style="color:#e6db74">&amp;#34;https://[domain]/&amp;#34;&lt;/span> --resolve &lt;span style="color:#e6db74">&amp;#34;[domain]:443:[your-ip]&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>正常情况下这两个命令应该返回相同的一大串html代码&lt;/p>
+&lt;p>更稳妥的方式是改系统的host,重启后用浏览器直接访问域名&lt;/p></description></item><item><title>搬瓦工VPS配置自定义IPv6地址</title><link>/posts/bandwagonhost-ipv6-configuration/</link><pubDate>Thu, 03 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/bandwagonhost-ipv6-configuration/</guid><description>&lt;p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的ipv6出口的,公网ipv6地址在&lt;code>ipv6net&lt;/code>上,不是&lt;code>eth0&lt;/code>&lt;/p>
 &lt;ul>
 &lt;li>ipv6直连中国速度比ipv4慢不少&lt;/li>
 &lt;li>删了ipv6重新分配还是原来的那个&lt;/li>
