@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 02 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Windows关机时自动关闭未保存的程序</title><link>/posts/windows-autoendtasks/</link><pubDate>Tue, 11 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/windows-autoendtasks/</guid><description>&lt;p>在关机时自动关闭所有提示保存的程序,否则默认状态下什么都不做电脑永远不会关&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>0x2196f3's blog</title><link>/</link><description>0x2196f3's blog</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 12 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Windows关机时自动关闭未保存的程序</title><link>/posts/windows-autoendtasks/</link><pubDate>Tue, 11 Nov 2025 00:00:00 +0000</pubDate><guid>/posts/windows-autoendtasks/</guid><description>&lt;p>在关机时自动关闭所有提示保存的程序,否则默认状态下什么都不做电脑永远不会关&lt;/p>
 &lt;pre tabindex="0">&lt;code>Windows Registry Editor Version 5.00
 ; Created by: Shawn Brink
 ; Created on: November 12th 2017
@@ -1056,9 +1056,10 @@ Linux Curl调用Cloudflare API
 &lt;p>&lt;a href="https://search.censys.io">search.censys.io&lt;/a>&lt;/p>
 &lt;p>&lt;img src="https://0x2196f3.github.io/images/censys.gif" alt="censys">&lt;/p>
 &lt;p>搜索框输入以下内容,不登录只能看一页,Per Page选100,Virtual Hosts 选INCLUDE或ONLY&lt;/p>
-&lt;pre tabindex="0">&lt;code># 把ASN换成服务器所在ASN（5位数字）， country换成服务器所在国家
-autonomous_system.asn:00000 and location.country: &amp;#34;United States&amp;#34; and services: (port: 443 and service_name: HTTP and http.response.status_code: 200 and tls.version_selected: TLSv1_3)
-&lt;/code>&lt;/pre>&lt;p>&lt;a href="https://workshop.censys.io/censys-search-questions/">参考censys search语法&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>把ASN换成服务器所在ASN（5位数字）， country换成服务器所在国家&lt;/p>&lt;/blockquote>
+&lt;pre tabindex="0">&lt;code>autonomous_system.asn:00000 and location.country: &amp;#34;United States&amp;#34; and services: (port: 443 and service_name: HTTP and http.response.status_code: 200 and tls.version_selected: TLSv1_3)
+&lt;/code>&lt;/pre>&lt;p>&lt;a href="https://workshop.censys.io/censys-search-questions/">censys search语法&lt;/a>&lt;/p>
 &lt;h2 id="检查可用性" >
 &lt;div>
 &lt;a href="#%e6%a3%80%e6%9f%a5%e5%8f%af%e7%94%a8%e6%80%a7">
@@ -1068,9 +1069,10 @@ autonomous_system.asn:00000 and location.country: &amp;#34;United States&amp;#34
 &lt;/div>
 &lt;/h2>
 &lt;ul>
+&lt;li>不翻墙可以正常访问&lt;/li>
 &lt;li>网页有内容&lt;/li>
-&lt;li>http/2 (F12 -&amp;gt; Network)&lt;/li>
-&lt;li>路径&lt;code>/&lt;/code>返回200&lt;/li>
+&lt;li>路径&lt;code>/&lt;/code>使用http/2 (F12 -&amp;gt; Network)&lt;/li>
+&lt;li>路径&lt;code>/&lt;/code>返回200 (F12 -&amp;gt; Network)&lt;/li>
 &lt;li>tls v1.3且支持x25519 (F12 -&amp;gt; Security)&lt;/li>
 &lt;/ul>
 &lt;h2 id="检查网站没有使用cdn" >
@@ -1078,13 +1080,16 @@ autonomous_system.asn:00000 and location.country: &amp;#34;United States&amp;#34
 &lt;a href="#%e6%a3%80%e6%9f%a5%e7%bd%91%e7%ab%99%e6%b2%a1%e6%9c%89%e4%bd%bf%e7%94%a8cdn">
 #
 &lt;/a>
-检查网站没有使用cdn
+检查网站没有使用CDN
 &lt;/div>
 &lt;/h2>
+&lt;ol>
+&lt;li>在&lt;a href="https://dns.google">dns.google&lt;/a>查询域名解析出的ip&lt;/li>
+&lt;li>拿查到的ip去&lt;a href="https://ip.sb">ip.sb&lt;/a>或&lt;a href="https://ip138.com">ip138.com&lt;/a>查询ASN归属,确认不属于CDN提供商&lt;/li>
+&lt;/ol>
 &lt;ul>
-&lt;li>&lt;code>https://dns.google/resolve?name=target.domain&lt;/code>&lt;br>
-查询ip是否属于某个cdn,如果有多个ip大概率是cdn的ip&lt;/li>
-&lt;li>&lt;code>https://target.domain/cdn-cgi/trace&lt;/code> 访问这个路径,有内容说明使用了Cloudflare CDN,&lt;strong>绝对不能用&lt;/strong>&lt;/li>
+&lt;li>&lt;code>https://target.domain/cdn-cgi/trace&lt;/code> 访问这个路径,有内容说明使用了Cloudflare CDN,&lt;strong>有人扫,绝对不能用&lt;/strong>&lt;/li>
+&lt;li>一般小网站但解析出多个ip地址很有可能使用了CDN,不能用&lt;/li>
 &lt;/ul>
 &lt;h2 id="网站安全检查" >
 &lt;div>
@@ -1107,27 +1112,40 @@ autonomous_system.asn:00000 and location.country: &amp;#34;United States&amp;#34
 验证伪装域名正常工作
 &lt;/div>
 &lt;/h2>
-&lt;p>在没有翻墙的电脑上运行以下curl命令&lt;/p>
-&lt;h3 id="测试连接目标域名的真实ip" >
+&lt;p>在没有翻墙的电脑改host(被偷的域名 -&amp;gt; VPS ip),用浏览器访问&lt;code>https://域名&lt;/code>,没有证书报错并且显示的内容和没改host时一模一样,说明reality正常工作.&lt;/p>
+&lt;h2 id="注意事项" >
 &lt;div>
-&lt;a href="#%e6%b5%8b%e8%af%95%e8%bf%9e%e6%8e%a5%e7%9b%ae%e6%a0%87%e5%9f%9f%e5%90%8d%e7%9a%84%e7%9c%9f%e5%ae%9eip">
-##
+&lt;a href="#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9">
+#
 &lt;/a>
-测试连接目标域名的真实ip
+注意事项
 &lt;/div>
-&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -v &lt;span style="color:#e6db74">&amp;#34;https://[domain]/&amp;#34;&lt;/span> --resolve &lt;span style="color:#e6db74">&amp;#34;[domain]:443:[real-ip]&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="测试连接自己的ip" >
-&lt;div>
-&lt;a href="#%e6%b5%8b%e8%af%95%e8%bf%9e%e6%8e%a5%e8%87%aa%e5%b7%b1%e7%9a%84ip">
-##
-&lt;/a>
-测试连接自己的ip
-&lt;/div>
-&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -v &lt;span style="color:#e6db74">&amp;#34;https://[domain]/&amp;#34;&lt;/span> --resolve &lt;span style="color:#e6db74">&amp;#34;[domain]:443:[your-ip]&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>正常情况下这两个命令应该返回相同的一大串html代码&lt;/p>
-&lt;p>更稳妥的方式是改系统的host,重启后用浏览器直接访问域名&lt;/p></description></item><item><title>搬瓦工VPS配置自定义IPv6地址</title><link>/posts/bandwagonhost-ipv6-configuration/</link><pubDate>Thu, 03 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/bandwagonhost-ipv6-configuration/</guid><description>&lt;p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的ipv6出口的,公网ipv6地址在&lt;code>ipv6net&lt;/code>上,不是&lt;code>eth0&lt;/code>&lt;/p>
+&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>xtls-rprx-vision不支持mux(多路复用),一条内层连接一定对应一条外层连接.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>reality服务器每收到一个请求,不管reality验证有没有通过,都要向域名的源服务器建立一个连接.&lt;br>
+这就导致翻墙时整个设备经过代理的tcp连接数=VPS单个ip到域名的源服务器的tcp连接数(尽管很快就关闭了也没多少流量),可能被该网站ban ip.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>因此,向reality节点建立连接时第一个RTT的延迟=client 到 VPS的延迟 + VPS 到被偷网站的延迟,实测在局域网搭建偷&lt;code>yahoo.com&lt;/code>的reality,连接局域网内的服务也有几百毫秒的延迟&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>reality验证失败时会进入爬虫模式,此时也会对目标域名的源服务器建立大量爬内容的请求,如果短时间大量连接reality的请求失败,也会对域名源服务器产生大量请求导致被ban&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>我测试时被好几个源站ban了ip,所以可能短时间内reality多次验证失败就足够稳定触发某种fail2ban的默认设定.&lt;/li>
+&lt;/ul>
+&lt;ol start="5">
+&lt;li>感觉运营商/GFW会对非白名单的sni做tls连接的限速/劣化:&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>一个reality ipv4经常经历&lt;strong>准确的&lt;/strong>30秒ip完全被阻断然后立刻完全恢复正常(也没有限速),只换了目标域名没换ip暂时解决.&lt;/li>
+&lt;li>另一个reality ipv6白天速度能跑满宽带,但晚上被限速&lt;strong>稳定的&lt;/strong>0.5mbps,此时同ip同端口udp的hysteria(sni=bing.com,bbr)没有被限速(100+mbps)&lt;/li>
+&lt;/ul></description></item><item><title>搬瓦工VPS配置自定义IPv6地址</title><link>/posts/bandwagonhost-ipv6-configuration/</link><pubDate>Thu, 03 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/bandwagonhost-ipv6-configuration/</guid><description>&lt;p>搬瓦工提供的ipv6是通过6in4隧道连接到另一台服务器的ipv6出口的,公网ipv6地址在&lt;code>ipv6net&lt;/code>上,不是&lt;code>eth0&lt;/code>&lt;/p>
 &lt;ul>
 &lt;li>ipv6直连中国速度比ipv4慢不少&lt;/li>
 &lt;li>删了ipv6重新分配还是原来的那个&lt;/li>
@@ -1170,7 +1188,9 @@ autonomous_system.asn:00000 and location.country: &amp;#34;United States&amp;#34
 &lt;/code>&lt;/pre>&lt;blockquote>
 &lt;p>重启网络&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>systemctl restart networking
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>XHTTP过Cloudfront CDN</title><link>/posts/cloudfront-xhttp-settings/</link><pubDate>Wed, 02 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/cloudfront-xhttp-settings/</guid><description>&lt;h2 id="vxesswstls的cache-policy" >
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Xray Websocket/XHTTP过Cloudfront CDN</title><link>/posts/xray-over-cloudfront-cdn/</link><pubDate>Wed, 02 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/xray-over-cloudfront-cdn/</guid><description>&lt;p>&lt;a href="https://bulianglin.com/archives/cft.html">不良林的教程&lt;/a>
+&lt;a href="https://www.youtube.com/watch?v=MHFYRRo1Q8E">不良林的视频&lt;/a>&lt;/p>
+&lt;h2 id="vxesswstls的cache-policy" >
 &lt;div>
 &lt;a href="#vxesswstls%e7%9a%84cache-policy">
 #
@@ -1188,9 +1208,32 @@ XHTTP的Cache Policy
 &lt;/div>
 &lt;/h2>
 &lt;p>&lt;img src="https://0x2196f3.github.io/images/Cloudfront-XHTTP.PNG" alt="XHTTP">&lt;/p>
+&lt;h2 id="注意事项" >
+&lt;div>
+&lt;a href="#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9">
+#
+&lt;/a>
+注意事项
+&lt;/div>
+&lt;/h2>
 &lt;ul>
-&lt;li>Cloudfront 可以根据不同的path设置不同的behavior，所以WS和XHTTP节点可以放在同一个CDN链接里（需要节点服务器用nginx分流）&lt;/li>
-&lt;li>&lt;del>Cloudfront 上传按量收费，下载1TB以内免费，所以可以下载走CDN上行走别的&lt;/del>&lt;/li>
+&lt;li>
+&lt;p>现在(2025-08及以后)新注册的AWS账号没有永久免费的1TB/月下载流量,没有账号就不必折腾了&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Cloudfront 可以根据不同的path设置不同的behavior，所以WS和XHTTP节点可以放在同一个CDN链接里共存&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Cloudfront 有非常强大的分流功能,一个CDN资源可以添加多个源,可以是同域名不同端口/不同域名/甚至直连IP,&lt;del>还支持执行简单的脚本(Cloudfront Function的免费额度较少,Lambda@Edge按量计费,最好都别碰防被反薅)&lt;/del>.&lt;br>
+相比之下Cloudflare CDN免费版只支持重写端口.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>不一定要有自己的域名才能使用Cloudfront,Cloudfront只说要有一个域名DNS解析成ipv4地址(update 2025-12 ipv6 only也支持了),没说域名要是自己的或要有ssl证书,所以可以使用&lt;code>1.2.3.4.nip.io&lt;/code>或&lt;code>fe80--1.sslip.io&lt;/code>这类通配符DNS域名,自动把带ip地址的域名解析成对应的ip地址,作为CDN的源,实际上等于直接设置ip.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;del>Cloudfront 上传按量收费，下载1TB以内免费，所以可以下行走Cloudfront上行走别的&lt;/del>&lt;br>
+实测不主动上传文件,总流量200GB以内一般不会收费(会产生0.0x美元的账单但不会从卡里扣钱)&lt;/p>
+&lt;/li>
 &lt;/ul></description></item><item><title>OpenWrt 修改Kernel Hash安装官方源kmod-ipk</title><link>/posts/openwrt-change-kernel-hash/</link><pubDate>Tue, 01 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-change-kernel-hash/</guid><description>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vi /usr/lib/opkg/status
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># replace hash_a by hash_b&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>:%s/hash_a/hash_b/g
