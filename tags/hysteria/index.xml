@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hysteria on 0x2196f3's blog</title><link>/tags/hysteria/</link><description>0x2196f3's blog (Hysteria)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 12 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/hysteria/index.xml" rel="self" type="application/rss+xml"/><item><title>Hysteria2测试</title><link>/posts/hysteria2-test/</link><pubDate>Fri, 12 Dec 2025 00:00:00 +0000</pubDate><guid>/posts/hysteria2-test/</guid><description>&lt;h1 id="使用自签证书的安全提示" >
+&lt;div>
+&lt;a href="#%e4%bd%bf%e7%94%a8%e8%87%aa%e7%ad%be%e8%af%81%e4%b9%a6%e7%9a%84%e5%ae%89%e5%85%a8%e6%8f%90%e7%a4%ba">
+##
+&lt;/a>
+使用自签证书的安全提示
+&lt;/div>
+&lt;/h1>
+&lt;ol>
+&lt;li>此时hysteria无法防御主动探测,因为无法提供伪装网站的合法ssl证书.&lt;br>
+所以想精准识别hysteria非常容易,现在不封只是GFW对quic的封锁还不成熟.&lt;/li>
+&lt;li>客户端建议pin自签的证书,否则可能被中间人攻击&lt;/li>
+&lt;/ol>
+&lt;h1 id="性能" >
+&lt;div>
+&lt;a href="#%e6%80%a7%e8%83%bd">
+##
+&lt;/a>
+性能
+&lt;/div>
+&lt;/h1>
+&lt;p>使用bbr时跑100mbps对性能没有什么要求&lt;/p>
+&lt;h1 id="速度测试" >
+&lt;div>
+&lt;a href="#%e9%80%9f%e5%ba%a6%e6%b5%8b%e8%af%95">
+##
+&lt;/a>
+速度测试
+&lt;/div>
+&lt;/h1>
+&lt;p>正常情况下quic直连墙外会被阻断到无法使用.&lt;/p>
+&lt;p>比如&lt;a href="https://dash.cloudflare.com">dash.cloudflare.com&lt;/a>,F12-&amp;gt;Network可以看到大量使用h3下载的js,速度极慢导致网页&lt;strong>全天&lt;/strong>完全不可用,只有浏览器/路由器禁用h3才能正常登录.&lt;/p>
+&lt;p>但是某垃圾VPS晚高峰测速,hysteria仅用bbr就能100+mbps,同ip同端口的reality被限速0.5mbps.加上&lt;code>dash.cloudflare.com&lt;/code>h2正常h3不可用,说明过墙的h3不是拥堵而是是被运营商/GFW主动劣化到不能用的.&lt;/p>
+&lt;p>我测试用的hysteria可能因为sni是&lt;code>bing.com&lt;/code>在白名单里所以不被限速/丢包&lt;/p>
+&lt;h1 id="tips" >
+&lt;div>
+&lt;a href="#tips">
+##
+&lt;/a>
+Tips
+&lt;/div>
+&lt;/h1>
+&lt;ul>
+&lt;li>如果用别人的域名,因为不防主动探测,建议使用ipv6部署hysteria,封了换ip比较容易.&lt;/li>
+&lt;li>GFW审查quic的成本高于其它基于tcp的翻墙协议,因为quic里传输的所有内容都是加密的,从加密的quic中解密出sni的计算量比直接从tcp中读取明文sni大.&lt;/li>
+&lt;li>使用docker &lt;code>-p [::]:443:443/udp&lt;/code>即可&lt;strong>仅&lt;/strong>让此容器监听ipv6发来的udp数据包,同时另一个容器监听同端口的tcp连接&lt;code>-p 443:443/tcp&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;h1 id="部署" >
+&lt;div>
+&lt;a href="#%e9%83%a8%e7%bd%b2">
+##
+&lt;/a>
+部署
+&lt;/div>
+&lt;/h1>
+&lt;h2 id="服务端" >
+&lt;div>
+&lt;a href="#%e6%9c%8d%e5%8a%a1%e7%ab%af">
+#
+&lt;/a>
+服务端
+&lt;/div>
+&lt;/h2>
+&lt;blockquote>
+&lt;p>安装docker&lt;/p>&lt;/blockquote>
+&lt;blockquote>
+&lt;p>创建一个hysteria目录&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>mkdir hysteria &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> cd hysteria
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>生成自签证书&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>openssl req -x509 -nodes -newkey ec:&amp;lt;&lt;span style="color:#f92672">(&lt;/span>openssl ecparam -name prime256v1&lt;span style="color:#f92672">)&lt;/span> -keyout ./server.key -out ./server.crt -subj &lt;span style="color:#e6db74">&amp;#34;/CN=bing.com&amp;#34;&lt;/span> -days &lt;span style="color:#ae81ff">36500&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>生成配置文件&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>nano hysteria.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">tls&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">cert&lt;/span>: &lt;span style="color:#ae81ff">/etc/hysteria/server.crt&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">key&lt;/span>: &lt;span style="color:#ae81ff">/etc/hysteria/server.key&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">auth&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">type&lt;/span>: &lt;span style="color:#ae81ff">password&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">password&lt;/span>: &lt;span style="color:#ae81ff">123456&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">masquerade&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">type&lt;/span>: &lt;span style="color:#ae81ff">proxy&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">proxy&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">url&lt;/span>: &lt;span style="color:#ae81ff">https://bing.com&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">rewriteHost&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>运行&amp;amp;开机自启动&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>docker run -d --name hysteria --pull always --restart always -p 443:443/udp -v ./hysteria/:/etc/hysteria/ tobyxdd/hysteria server -c /etc/hysteria/hysteria.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>检查hysteria是否正常运行&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>docker logs hysteria
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="客户端" >
+&lt;div>
+&lt;a href="#%e5%ae%a2%e6%88%b7%e7%ab%af">
+#
+&lt;/a>
+客户端
+&lt;/div>
+&lt;/h2>
+&lt;ul>
+&lt;li>长期使用建议直接用sing-box或mihomo&lt;/li>
+&lt;/ul>
+&lt;p>Windows:下载&lt;a href="https://github.com/apernet/hysteria/releases">hysteria-windows-amd64-avx.exe&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>config.yaml,保存到exe同目录&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">server&lt;/span>: [&lt;span style="color:#ae81ff">your-ip]:[your-port]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">auth&lt;/span>: [&lt;span style="color:#ae81ff">your-password]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">tls&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">insecure&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">http&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">listen&lt;/span>: &lt;span style="color:#ae81ff">127.0.0.1&lt;/span>:&lt;span style="color:#ae81ff">8080&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">disableUDP&lt;/span>: &lt;span style="color:#66d9ef">false&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>我的Windows无法开启Socks5代理,只用http&lt;/p>
+&lt;ul>
+&lt;li>手动将系统代理设置为&lt;code>127.0.0.1:8080&lt;/code>&lt;/li>
+&lt;li>或Firefox里单独给浏览器设置代理&lt;/li>
+&lt;/ul></description></item></channel></rss>
