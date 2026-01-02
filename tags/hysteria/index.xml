@@ -9,7 +9,7 @@
 &lt;ol>
 &lt;li>此时hysteria无法防御主动探测,因为无法提供伪装网站的合法ssl证书.&lt;br>
 所以想精准识别hysteria非常容易,现在不封只是GFW对quic的封锁还不成熟.&lt;/li>
-&lt;li>客户端建议pin自签的证书,否则可能被中间人攻击&lt;/li>
+&lt;li>客户端建议pin自签的证书,否则被中间人攻击时客户端无法察觉&lt;/li>
 &lt;/ol>
 &lt;h1 id="性能" >
 &lt;div>

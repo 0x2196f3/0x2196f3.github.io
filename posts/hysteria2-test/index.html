@@ -9,7 +9,7 @@
 
 此时hysteria无法防御主动探测,因为无法提供伪装网站的合法ssl证书.
 所以想精准识别hysteria非常容易,现在不封只是GFW对quic的封锁还不成熟.
-客户端建议pin自签的证书,否则可能被中间人攻击
+客户端建议pin自签的证书,否则被中间人攻击时客户端无法察觉
 
 
 
@@ -85,7 +85,7 @@ openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout 
 <a href=https://0x2196f3.github.io/tags/ title>Tags</a>
 <a href=https://0x2196f3.github.io/posts/ title>Archive</a></nav></header><main id=main tabindex=-1><article class="post h-entry"><div class=post-header><header><h1 class="p-name post-title">Hysteria2测试</h1></header><div class="post-info noselect"><div class="post-date dt-published"><time datetime=2025-12-12>2025-12-12</time></div><a class="post-hidden-url u-url" href=/posts/hysteria2-test/>/posts/hysteria2-test/</a>
 <a href=https://0x2196f3.github.io/ class="p-name p-author post-hidden-author h-card" rel=me></a><div class=post-taxonomies><ul class=post-tags><li><a href=/tags/%E7%BF%BB%E5%A2%99>#翻墙</a></li><li><a href=/tags/hysteria>#hysteria</a></li></ul></div></div></div><details class="toc noselect"><summary>Table of Contents</summary><div class=inner><nav id=TableOfContents><ul><li><a href=#服务端>服务端</a></li><li><a href=#客户端>客户端</a><ul><li><a href=#hysteria官方客户端>Hysteria官方客户端</a></li><li><a href=#mihomo>Mihomo</a></li></ul></li></ul></nav></div></details><script>var toc=document.querySelector(".toc");toc&&toc.addEventListener("click",function(){event.target.tagName!=="A"&&(event.preventDefault(),this.open?(this.open=!1,this.classList.remove("expanded")):(this.open=!0,this.classList.add("expanded")))})</script><div class="content e-content"><h1 id=使用自签证书的安全提示><div><a href=#%e4%bd%bf%e7%94%a8%e8%87%aa%e7%ad%be%e8%af%81%e4%b9%a6%e7%9a%84%e5%ae%89%e5%85%a8%e6%8f%90%e7%a4%ba>##
-</a>使用自签证书的安全提示</div></h1><ol><li>此时hysteria无法防御主动探测,因为无法提供伪装网站的合法ssl证书.<br>所以想精准识别hysteria非常容易,现在不封只是GFW对quic的封锁还不成熟.</li><li>客户端建议pin自签的证书,否则可能被中间人攻击</li></ol><h1 id=性能><div><a href=#%e6%80%a7%e8%83%bd>##
+</a>使用自签证书的安全提示</div></h1><ol><li>此时hysteria无法防御主动探测,因为无法提供伪装网站的合法ssl证书.<br>所以想精准识别hysteria非常容易,现在不封只是GFW对quic的封锁还不成熟.</li><li>客户端建议pin自签的证书,否则被中间人攻击时客户端无法察觉</li></ol><h1 id=性能><div><a href=#%e6%80%a7%e8%83%bd>##
 </a>性能</div></h1><p>使用bbr时跑100mbps对性能没有什么要求</p><h1 id=速度测试><div><a href=#%e9%80%9f%e5%ba%a6%e6%b5%8b%e8%af%95>##
 </a>速度测试</div></h1><p>正常情况下quic直连墙外会被阻断到无法使用.</p><p>比如<a href=https://dash.cloudflare.com>dash.cloudflare.com</a>,F12->Network可以看到大量使用h3下载的js,速度极慢导致网页<strong>全天</strong>完全不可用,只有浏览器/路由器禁用h3才能正常登录.</p><p>但是某垃圾VPS晚高峰测速,hysteria仅用bbr就能100+mbps</p><p>可能因为sni=<code>bing.com</code>在白名单里所以没有被限速/丢包</p><p>同ip同端口的reality(同ASN的小众域名)被限速0.5mbps,说明过墙的h3不是拥堵而是是被ISP/GFW主动劣化到不能用的</p><h1 id=tips><div><a href=#tips>##
 </a>Tips</div></h1><ul><li><p>如果用别人的域名,因为不防主动探测,建议使用ipv6部署hysteria,封了换ip比较容易.</p></li><li><p>GFW审查quic的成本高于其它基于tcp的协议,因为quic里传输的所有内容都是加密的,从加密的quic中解密出client hello里的sni的计算量比直接从tcp中读取明文sni大.</p></li><li><p>使用docker <code>-p [::]:443:443/udp</code>即可<strong>仅</strong>让此容器监听ipv6发来的udp数据包,同时另一个容器监听同端口的tcp连接<code>-p 443:443/tcp</code>.达成hysteria和xray在同ip的443端口共存<br><del>相同的[ip+port],udp和tcp的sni不同也可能是特征</del></p></li><li><p>即使使用bbr+真实域名,hysteria也不能套CDN,想套CDN并使用quic过墙可以尝试xray的xhttp</p></li></ul><h1 id=部署><div><a href=#%e9%83%a8%e7%bd%b2>##
