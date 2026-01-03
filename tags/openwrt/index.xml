@@ -73,7 +73,7 @@ OpenWRT 25.12.0-rc1已知问题
 &lt;ul>
 &lt;li>以前的教程解锁ssh需要装OpenWRT虚拟机开无线热点,现在xmir-patcher开箱即用,不需要管理员权限,可以自动获取sn/计算root密码/开启ssh/备份固件/刷机&amp;hellip;&lt;/li>
 &lt;/ul>
-&lt;p>下载并解压&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher/archive/refs/heads/main.zip">源码&lt;/a>.zip,点击&lt;code>run.bat&lt;/code>&lt;/p>
+&lt;p>下载并解压&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher/archive/refs/heads/main.zip">源码.zip&lt;/a>,点击&lt;code>run.bat&lt;/code>&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cmd" data-lang="cmd">&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>==========================================================
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
