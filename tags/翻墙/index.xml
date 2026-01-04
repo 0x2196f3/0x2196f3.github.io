@@ -763,7 +763,7 @@ quic-dl
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> down /sbin/ip -6 addr del &lt;span style="color:#f92672">[&lt;/span>another custom ipv6&lt;span style="color:#f92672">]&lt;/span>/64 dev $IFACE
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> down /sbin/ip -6 addr del &lt;span style="color:#f92672">[&lt;/span>yet another custom ipv6&lt;span style="color:#f92672">]&lt;/span>/64 dev $IFACE
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>ip地址根据搬瓦工后台的配置照抄,up和down的ipv6地址一一对应,复制多行可以添加多个自定义ipv6地址&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>endpoint和local的ipv4地址根据搬瓦工后台的配置照抄,up和down的ipv6地址一一对应,复制多行可以添加多个自定义ipv6地址&lt;/p>
 &lt;blockquote>
 &lt;p>&lt;code>/64&lt;/code>代表自定义ipv6的后一半地址可以随便写,举例:&lt;/p>&lt;/blockquote>
 &lt;pre tabindex="0">&lt;code># 这是网关
@@ -773,6 +773,21 @@ quic-dl
 &lt;/code>&lt;/pre>&lt;blockquote>
 &lt;p>重启网络&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>systemctl restart networking
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>docker开启ipv6
+编辑&lt;code>daemon.json&lt;/code>&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>nano /etc/docker/daemon.json
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># 如果是ubuntu并且通过snap安装的docker,编辑下面的文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nano /var/snap/docker/current/config/daemon.json
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>将整个文件修改为&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;log-level&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;error&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;ipv6&amp;#34;&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;fixed-cidr-v6&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;2001:db8:1::/64&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>（那个ipv6是固定的不改）&lt;br>
+重启&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>reboot
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Xray Websocket/XHTTP过Cloudfront CDN</title><link>/posts/xray-over-cloudfront-cdn/</link><pubDate>Wed, 02 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/xray-over-cloudfront-cdn/</guid><description>&lt;p>&lt;a href="https://bulianglin.com/archives/cft.html">不良林的教程&lt;/a>
 &lt;a href="https://www.youtube.com/watch?v=MHFYRRo1Q8E">不良林的视频&lt;/a>&lt;/p>
 &lt;h2 id="vxesswstls的cache-policy" >
