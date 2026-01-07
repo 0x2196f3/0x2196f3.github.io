@@ -1,4 +1,242 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Mihomo on 0x2196f3's blog</title><link>/tags/mihomo/</link><description>0x2196f3's blog (Mihomo)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 06 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/mihomo/index.xml" rel="self" type="application/rss+xml"/><item><title>Mihomo (Clash Meta) API示例</title><link>/posts/mihomo-api-usage/</link><pubDate>Sun, 06 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/mihomo-api-usage/</guid><description>&lt;p>&lt;a href="https://wiki.metacubex.one/api/">Mihomo官方文档&lt;/a>写的很简略,找示例可以在&lt;a href="https://github.com/MetaCubeX/metacubexd">MedaCubeXD&lt;/a>的源码里找&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Mihomo on 0x2196f3's blog</title><link>/tags/mihomo/</link><description>0x2196f3's blog (Mihomo)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 25 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/mihomo/index.xml" rel="self" type="application/rss+xml"/><item><title>给套Cloudflare CDN的节点开启ECH</title><link>/posts/xray-mihomo-enable-ech-for-cloudflare-nodes/</link><pubDate>Thu, 25 Dec 2025 00:00:00 +0000</pubDate><guid>/posts/xray-mihomo-enable-ech-for-cloudflare-nodes/</guid><description>&lt;h1 id="参考" >
+&lt;div>
+&lt;a href="#%e5%8f%82%e8%80%83">
+##
+&lt;/a>
+参考
+&lt;/div>
+&lt;/h1>
+&lt;p>&lt;a href="https://www.chonglangtv.org/t/topic/625">[5] 冲浪小本本儿 (二)(2-2)—-http-https-ECH 最广泛、最真实、最管用的互联网隐私保护[3]— ECH详谈&lt;/a>&lt;/p>
+&lt;h1 id="省流" >
+&lt;div>
+&lt;a href="#%e7%9c%81%e6%b5%81">
+##
+&lt;/a>
+省流
+&lt;/div>
+&lt;/h1>
+&lt;ul>
+&lt;li>启用ECH的https连接从外观上(从ISP/GFW的角度观测)除了sni是&lt;code>某ech域名&lt;/code>之外和明文client hello的https连接没有明显的区别&lt;/li>
+&lt;li>由于启用ECH时任何到Cloudflare CDN的https连接sni都是&lt;code>cloudflare-ech.com&lt;/code>,GFW阻断该域名Cloudflare的ECH就不能用了&lt;/li>
+&lt;li>对于翻墙软件,只要有正确的ECH Config即可建立ECH连接,不论这个ECH Config原本是给哪个域名的,是提前配置的固定值/明文DNS查询到的/DoH查询到的&lt;/li>
+&lt;li>使用Cloudflare CDN的所有网站在同一时刻共用同一个ECH Config,但ECH Config几小时就会换一个&lt;br>
+这代表:&lt;br>
+1.Cloudflare CDN上任何网站的ECH Config都可以用于连接任意使用Cloudflare CDN的域名(即使该域名查不到ECH Config也可以强制ECH连接)&lt;br>
+2.即使一个域名被DNS污染+SNI阻断,拿到Cloudflare CDN的ip和ECH Config即可使用&lt;code>cloudflare-ech.com&lt;/code>的sni连接cloudflare的ip访问该网站&lt;br>
+3.不能将事先查好的ECH Config写在翻墙软件的配置文件里,几小时就过期了,需要每次连接时向DNS服务器查询&lt;/li>
+&lt;li>目前国内存在能返回Cloudflare的正确ECH Config的明文DNS或DoH服务器,但以后可能全部被污染.最好自建一个私人DoH服务器&lt;/li>
+&lt;/ul>
+&lt;h1 id="客户端配置" >
+&lt;div>
+&lt;a href="#%e5%ae%a2%e6%88%b7%e7%ab%af%e9%85%8d%e7%bd%ae">
+##
+&lt;/a>
+客户端配置
+&lt;/div>
+&lt;/h1>
+&lt;p>对于套Cloudflare CDN的节点,ECH由Cloudflare的边缘服务器处理,自己的翻墙服务器和Cloudflare面板上不需要任何配置:ECH默认启用且免费账号不能禁用&lt;/p>
+&lt;h2 id="xray客户端" >
+&lt;div>
+&lt;a href="#xray%e5%ae%a2%e6%88%b7%e7%ab%af">
+#
+&lt;/a>
+Xray客户端
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;a href="https://xtls.github.io/config/transport.html#tlsobject">文档&lt;/a>&lt;br>
+支持编辑ECH的GUI目前基本没有,需要直接改json&lt;/p>
+&lt;blockquote>
+&lt;p>在tlsSettings里添加&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">&amp;#34;tlsSettings&amp;#34;&lt;/span>&lt;span style="color:#960050;background-color:#1e0010">:&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;echConfigList&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;cloudflare-ech.com+https://dns.alidns.com/dns-query&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;echForceQuery&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;full&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>full:无法获取ECH Config就断开连接(推荐)&lt;/li>
+&lt;li>half/none:无法获取ECH Config时回退到明文Client Hello,会暴露域名&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>或在分享链接里添加(大多数GUI目前还不支持)&lt;/p>&lt;/blockquote>
+&lt;pre tabindex="0">&lt;code>&amp;amp;ech=cloudflare-ech.com%2Bhttps%3A%2F%2Fdns.alidns.com%2Fdns-query&amp;amp;
+&lt;/code>&lt;/pre>&lt;blockquote>
+&lt;p>&lt;code>cloudflare-ech.com+https://dns.alidns.com/dns-query&lt;/code>的意思?&lt;/p>&lt;/blockquote>
+&lt;p>向&lt;code>dns.alidns.com&lt;/code>这个DoH服务器发起HTTPS(65)查询,域名是&lt;code>cloudflare-ech.com&lt;/code>,使用DoH服务器返回的(原本是给&lt;code>cloudflare-ech.com&lt;/code>用的)ECH Config对你节点的ip和域名建立ECH连接&lt;/p>
+&lt;h2 id="mihomo客户端" >
+&lt;div>
+&lt;a href="#mihomo%e5%ae%a2%e6%88%b7%e7%ab%af">
+#
+&lt;/a>
+Mihomo客户端
+&lt;/div>
+&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">ech-opts&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">enable&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>需要给节点设置一个能查到ECH Config的DNS服务器&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">dns&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">enable&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">proxy-server-nameserver&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> - &lt;span style="color:#ae81ff">https://dns.alidns.com/dns-query&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;a href="https://wiki.metacubex.one/config/proxies/tls/#ech-opts">文档&lt;/a>里没写的:&lt;/p>
+&lt;ul>
+&lt;li>不支持从proxy provider的vless分享链接的&lt;code>ech&lt;/code>字段里读取ech config.&lt;br>
+&lt;code>alpha-498f81a&lt;/code>版本的&lt;code>common/convert/converter.go&lt;/code> 206行和&lt;code>common/convert/v.go&lt;/code>,vless没有处理ech字段&lt;/li>
+&lt;li>不支持用&lt;strong>DNS查询其它域名&lt;/strong>获取的ECH Config连接节点&lt;br>
+见&lt;a href="https://github.com/MetaCubeX/mihomo/pull/2411/commits">feat: allow custom ECH domain#2411&lt;/a>&lt;/li>
+&lt;li>在无法获取ECH Config时无法建立连接,不会回退到明文Client Hello.&lt;br>
+实测ISP默认DNS查不到ECH Config,此时节点完全无法连接,&lt;code>proxy-server-nameserver&lt;/code>切换到&lt;code>dns.alidns.com&lt;/code>后能正常连接 &lt;del>懒得翻代码了&lt;/del>&lt;/li>
+&lt;/ul>
+&lt;h1 id="可能的用法" >
+&lt;div>
+&lt;a href="#%e5%8f%af%e8%83%bd%e7%9a%84%e7%94%a8%e6%b3%95">
+##
+&lt;/a>
+可能的用法
+&lt;/div>
+&lt;/h1>
+&lt;ol>
+&lt;li>由于开启ech后所有连接sni都是&lt;code>cloudflare-ech.com&lt;/code>,一个节点的多个CDN ip做负载均衡,在ISP/GFW看起来就像在访问Cloudflare上不同的网站?&lt;/li>
+&lt;li>&lt;a href="https://github.com/XTLS/Xray-core/discussions/5199">使用Xray进行MitM代理，强制使用ECH，直连所有CF网站&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;h1 id="测试" >
+&lt;div>
+&lt;a href="#%e6%b5%8b%e8%af%95">
+##
+&lt;/a>
+测试
+&lt;/div>
+&lt;/h1>
+&lt;h2 id="准备" >
+&lt;div>
+&lt;a href="#%e5%87%86%e5%a4%87">
+#
+&lt;/a>
+准备
+&lt;/div>
+&lt;/h2>
+&lt;p>一个Debian 13虚拟机&lt;br>
+能访问&lt;code>dns.google&lt;/code>&lt;/p>
+&lt;pre tabindex="0">&lt;code>sudo apt install dnsutils
+&lt;/code>&lt;/pre>&lt;blockquote>
+&lt;p>使用ISP分配的默认DNS查询HTTPS解析&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>dig HTTPS cloudflare-ech.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>使用ISP分配的默认DNS查询A解析&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>dig A cloudflare-ech.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>使用&lt;code>223.5.5.5&lt;/code>明文DNS查询HTTPS解析&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>dig HTTPS cloudflare-ech.com @223.5.5.5
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>使用&lt;code>https://dns.alidns.com&lt;/code>DoH查询HTTPS解析&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>dig HTTPS cloudflare-ech.com +https @dns.alidns.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>使用&lt;code>dns.google&lt;/code>查询&lt;code>www.qbittorrent.org&lt;/code>的HTTPS解析&lt;/p>&lt;/blockquote>
+&lt;p>浏览器输入&lt;code>https://dns.google/query?name=www.qbittorrent.org&amp;amp;rr_type=https&amp;amp;ecs=&lt;/code>&lt;/p>
+&lt;h2 id="国内dns对ech的支持" >
+&lt;div>
+&lt;a href="#%e5%9b%bd%e5%86%85dns%e5%af%b9ech%e7%9a%84%e6%94%af%e6%8c%81">
+#
+&lt;/a>
+国内DNS对ECH的支持?
+&lt;/div>
+&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Domain&lt;/th>
+&lt;th>ISP默认DNS (plain)&lt;/th>
+&lt;th>223.5.5.5 (plain)&lt;/th>
+&lt;th>dns.alidns.com (DOH)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>cloudflare-ech.com&lt;/td>
+&lt;td>timeout&lt;/td>
+&lt;td>ECH config found&lt;/td>
+&lt;td>ECH config found&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>baidu.com&lt;/td>
+&lt;td>timeout&lt;/td>
+&lt;td>ECH config not found&lt;/td>
+&lt;td>ECH config not found&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>阿里DNS即使域名不支持ECH也立刻返回结果,不会超时,但ISP分配的默认DNS,所有HTTPS(65)请求都超时&lt;/p>
+&lt;ul>
+&lt;li>说明明文DNS也能查询到ECH Config&lt;/li>
+&lt;li>说明有些DNS屏蔽了全部HTTPS查询&lt;/li>
+&lt;/ul>
+&lt;h2 id="哪些域名能查到coudflare分配的ech-config" >
+&lt;div>
+&lt;a href="#%e5%93%aa%e4%ba%9b%e5%9f%9f%e5%90%8d%e8%83%bd%e6%9f%a5%e5%88%b0coudflare%e5%88%86%e9%85%8d%e7%9a%84ech-config">
+#
+&lt;/a>
+哪些域名能查到Coudflare分配的ECH CONFIG?
+&lt;/div>
+&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Domain&lt;/th>
+&lt;th>国内&lt;/th>
+&lt;th>国外&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>cloudflare-ech.com&lt;/td>
+&lt;td>✔&lt;/td>
+&lt;td>✔&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>servo.org&lt;/td>
+&lt;td>✔&lt;/td>
+&lt;td>✔&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://www.qbittorrent.org">www.qbittorrent.org&lt;/a>&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;td>✔&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rutracker.org&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;td>✔&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>cloudflare.com&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>speed.cloudflare.com&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>japan.com&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>visa.com.sg&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>visa.com.hk&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;td>✖&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;a href="https://github.com/net4people/bbs/issues/393#issuecomment-2365428913">部分可查到Cloudflare ECH Config的域名&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>以前cloudflare优选ip常用的域名都查不到,可能是付费用户默认不启用或主动关闭了ECH&lt;/li>
+&lt;/ul></description></item><item><title>Mihomo (Clash Meta) API示例</title><link>/posts/mihomo-api-usage/</link><pubDate>Sun, 06 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/mihomo-api-usage/</guid><description>&lt;p>&lt;a href="https://wiki.metacubex.one/api/">Mihomo官方文档&lt;/a>写的很简略,找示例可以在&lt;a href="https://github.com/MetaCubeX/metacubexd">MedaCubeXD&lt;/a>的源码里找&lt;/p>
 &lt;p>也可以在浏览器的F12里监视MetaCubeXD页面的Network,抄到curl里就能用&lt;/p>
 &lt;h2 id="比如" >
 &lt;div>

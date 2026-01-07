@@ -30,7 +30,7 @@
 
 
 这款路由器三个千兆网口共享1G带宽,无线/有线都基本不可能跑满2.5G,不建议为了能刷机购买.见acwifi评测
-IPQ5018处理器性能较弱(双核1GHZ A53),且OpenWRT不支持硬件NAT,不建议用于拨号/翻墙
+IPQ5018处理器性能较弱(双核1GHZ A53,相当于不到半个NanoPi R2s软路由),且OpenWRT不支持硬件NAT加速,不建议用于拨号/翻墙
 
 
 
@@ -55,25 +55,14 @@ Xiaomi AX6000历史固件下载
     
         #
     
-    2.下载Openwrt固件
-
-
-openwrt firmware-selector
-选择Xiaomi AX6000, 25.12.x
-下载第一个SYSTEMUPGRADE (xxx-squashfs-sysupgrade.bin)
-和第三个INITRAMFS-FACTORY (xxx-initramfs-factory.ubi)
-
-
-    
-        #
-    
-    3.使用xmir-patcher解锁ssh
+    2.使用xmir-patcher解锁ssh
 
 
 
-以前的教程解锁ssh需要装OpenWRT虚拟机开无线热点,现在xmir-patcher开箱即用,不需要管理员权限,可以自动获取sn/计算root密码/开启ssh/备份固件/刷机&mldr;
+网上搜到的教程解锁ssh需要装OpenWRT虚拟机开无线热点,现在xmir-patcher开箱即用,不需要管理员权限,可以自动获取sn/计算root密码/开启ssh/备份固件/刷机&mldr;
 
 下载并解压源码.zip,点击run.bat
+双击run.bat
 
 ==========================================================
 
@@ -95,15 +84,14 @@ Select:
 选2 解锁ssh'><link rel=icon type=image/x-icon href=https://0x2196f3.github.io/favicon.ico><link rel=apple-touch-icon-precomposed href=https://0x2196f3.github.io/favicon.png><style>body{visibility:hidden;opacity:0}</style><noscript><style>body{visibility:visible;opacity:1}</style></noscript><link rel=stylesheet href=/css/style.min.ac9fbad24609bd533b00c98f0dfbd971989a71aca4b450e1e77ab6c33ee463c6.css integrity="sha256-rJ+60kYJvVM7AMmPDfvZcZiacayktFDh53q2wz7kY8Y="><link rel=stylesheet href=/css/style.min.c4c04b3ef88e3d619ad4c7ee5e03048422bc55c4fefdc1f07657c1133670aa22.css integrity="sha256-xMBLPviOPWGa1MfuXgMEhCK8VcT+/cHwdlfBEzZwqiI="><link rel=stylesheet href=/css/style.min.21c5d8fe0a79d623b0adc1ce4bd4f6dd2c05cd939c9aaaa966ba7186b1464f4d.css integrity="sha256-IcXY/gp51iOwrcHOS9T23SwFzZOcmqqpZrpxhrFGT00="><script src=/js/script.min.08f04d96386c73c9bf4d160333f8f448c05a6e01c06770542ee0e013954ce930.js type=text/javascript integrity="sha256-CPBNljhsc8m/TRYDM/j0SMBabgHAZ3BULuDgE5VM6TA="></script></head><body><a class=skip-main href=#main>Skip to main content</a><div class=container><header class=common-header><div class=header-top><div class=header-top-left><h1 class="site-title noselect"><a href=/>0x2196f3's blog</a></h1><div class=theme-switcher><span class=inline-svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-sun-high"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14.828 14.828A4 4 0 109.172 9.172a4 4 0 005.656 5.656z"/><path d="M6.343 17.657l-1.414 1.414"/><path d="M6.343 6.343 4.929 4.929"/><path d="M17.657 6.343l1.414-1.414"/><path d="M17.657 17.657l1.414 1.414"/><path d="M4 12H2"/><path d="M12 4V2"/><path d="M20 12h2"/><path d="M12 20v2"/></svg></span></div><script>const STORAGE_KEY="user-color-scheme",defaultTheme="auto";let currentTheme,switchButton,autoDefinedScheme=window.matchMedia("(prefers-color-scheme: dark)");function switchTheme(){currentTheme=currentTheme==="dark"?"light":"dark",localStorage&&localStorage.setItem(STORAGE_KEY,currentTheme),document.documentElement.setAttribute("data-theme",currentTheme),changeGiscusTheme(currentTheme),document.body.dispatchEvent(new CustomEvent(currentTheme+"-theme-set"))}const autoChangeScheme=e=>{currentTheme=e.matches?"dark":"light",document.documentElement.setAttribute("data-theme",currentTheme),changeGiscusTheme(currentTheme),document.body.dispatchEvent(new CustomEvent(currentTheme+"-theme-set"))};document.addEventListener("DOMContentLoaded",function(){switchButton=document.querySelector(".theme-switcher"),currentTheme=detectCurrentScheme(),currentTheme==="auto"?(autoChangeScheme(autoDefinedScheme),autoDefinedScheme.addListener(autoChangeScheme)):document.documentElement.setAttribute("data-theme",currentTheme),switchButton&&switchButton.addEventListener("click",switchTheme,!1),showContent()});function detectCurrentScheme(){return localStorage!==null&&localStorage.getItem(STORAGE_KEY)?localStorage.getItem(STORAGE_KEY):defaultTheme?defaultTheme:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}function showContent(){document.body.style.visibility="visible",document.body.style.opacity=1}function changeGiscusTheme(e){function t(e){const t=document.querySelector("iframe.giscus-frame");if(!t)return;t.contentWindow.postMessage({giscus:e},"https://giscus.app")}t({setConfig:{theme:e}})}</script><ul class="social-icons noselect"><li><a href=/index.xml title=RSS rel=me><span class=inline-svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-rss"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 19m-1 0a1 1 0 102 0 1 1 0 10-2 0"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg></span></a></li></ul></div><div class=header-top-right></div></div><nav class=noselect><a href=https://0x2196f3.github.io/ title>Home</a>
 <a href=https://0x2196f3.github.io/tags/ title>Tags</a>
 <a href=https://0x2196f3.github.io/posts/ title>Archive</a></nav></header><main id=main tabindex=-1><article class="post h-entry"><div class=post-header><header><h1 class="p-name post-title">Xiaomi AX6000刷OpenWRT</h1></header><div class="post-info noselect"><div class="post-date dt-published"><time datetime=2025-12-30>2025-12-30</time></div><a class="post-hidden-url u-url" href=/posts/xiaomi-ax6000-openwrt/>/posts/xiaomi-ax6000-openwrt/</a>
-<a href=https://0x2196f3.github.io/ class="p-name p-author post-hidden-author h-card" rel=me></a><div class=post-taxonomies><ul class=post-tags><li><a href=/tags/openwrt>#Openwrt</a></li></ul></div></div></div><details class="toc noselect"><summary>Table of Contents</summary><div class=inner><nav id=TableOfContents><ul><li><a href=#openwrt-25120-rc1已知问题>OpenWRT 25.12.0-rc1已知问题</a></li><li><a href=#路由器自身的问题>路由器自身的问题</a></li></ul><ul><li><a href=#1降级到1055>1.降级到1.0.55</a></li><li><a href=#2下载openwrt固件>2.下载Openwrt固件</a></li><li><a href=#3使用xmir-patcher解锁ssh>3.使用<a href=https://github.com/openwrt-xiaomi/xmir-patcher>xmir-patcher</a>解锁ssh</a></li><li><a href=#4备份并刷机>4.备份并刷机</a></li></ul></nav></div></details><script>var toc=document.querySelector(".toc");toc&&toc.addEventListener("click",function(){event.target.tagName!=="A"&&(event.preventDefault(),this.open?(this.open=!1,this.classList.remove("expanded")):(this.open=!0,this.classList.add("expanded")))})</script><div class="content e-content"><h1 id=已知问题><div><a href=#%e5%b7%b2%e7%9f%a5%e9%97%ae%e9%a2%98>##
+<a href=https://0x2196f3.github.io/ class="p-name p-author post-hidden-author h-card" rel=me></a><div class=post-taxonomies><ul class=post-tags><li><a href=/tags/openwrt>#Openwrt</a></li></ul></div></div></div><details class="toc noselect"><summary>Table of Contents</summary><div class=inner><nav id=TableOfContents><ul><li><a href=#openwrt-25120-rc1已知问题>OpenWRT 25.12.0-rc1已知问题</a></li><li><a href=#路由器自身的问题>路由器自身的问题</a></li></ul><ul><li><a href=#1降级到1055>1.降级到1.0.55</a></li><li><a href=#2使用xmir-patcher解锁ssh>2.使用<a href=https://github.com/openwrt-xiaomi/xmir-patcher>xmir-patcher</a>解锁ssh</a></li><li><a href=#3备份>3.备份</a></li><li><a href=#4下载openwrt固件>4.下载Openwrt固件</a></li><li><a href=#5刷机>5.刷机</a></li></ul></nav></div></details><script>var toc=document.querySelector(".toc");toc&&toc.addEventListener("click",function(){event.target.tagName!=="A"&&(event.preventDefault(),this.open?(this.open=!1,this.classList.remove("expanded")):(this.open=!0,this.classList.add("expanded")))})</script><div class="content e-content"><h1 id=已知问题><div><a href=#%e5%b7%b2%e7%9f%a5%e9%97%ae%e9%a2%98>##
 </a>已知问题</div></h1><h2 id=openwrt-25120-rc1已知问题><div><a href=#openwrt-25120-rc1%e5%b7%b2%e7%9f%a5%e9%97%ae%e9%a2%98>#
 </a>OpenWRT 25.12.0-rc1已知问题</div></h2><ul><li>5Ghz Wifi,信道选auto无法启动,需要手动设置信道为36</li><li>5Ghz Wifi即使开启160mhz也无法协商到超过1200mbps,测速跑不满千兆,对无线速度有要求就再等等</li><li>虽然路由器有128mb闪存,但OpenWRT可用容量仅60mb</li><li>内存占用异常:不装任何插件内存占用300mb+(正常情况下512mb内存应该占用200mb左右)</li></ul><h2 id=路由器自身的问题><div><a href=#%e8%b7%af%e7%94%b1%e5%99%a8%e8%87%aa%e8%ba%ab%e7%9a%84%e9%97%ae%e9%a2%98>#
-</a>路由器自身的问题</div></h2><ul><li>这款路由器三个千兆网口共享1G带宽,无线/有线都基本不可能跑满2.5G,不建议为了能刷机购买.见<a href=https://www.acwifi.net/12621.html>acwifi评测</a></li><li>IPQ5018处理器性能较弱(双核1GHZ A53),且OpenWRT不支持硬件NAT,不建议用于拨号/翻墙</li></ul><h1 id=刷机步骤><div><a href=#%e5%88%b7%e6%9c%ba%e6%ad%a5%e9%aa%a4>##
+</a>路由器自身的问题</div></h2><ul><li>这款路由器三个千兆网口共享1G带宽,无线/有线都基本不可能跑满2.5G,不建议为了能刷机购买.见<a href=https://www.acwifi.net/12621.html>acwifi评测</a></li><li>IPQ5018处理器性能较弱(双核1GHZ A53,相当于不到半个NanoPi R2s软路由),且OpenWRT不支持硬件NAT加速,不建议用于拨号/翻墙</li></ul><h1 id=刷机步骤><div><a href=#%e5%88%b7%e6%9c%ba%e6%ad%a5%e9%aa%a4>##
 </a>刷机步骤</div></h1><h2 id=1降级到1055><div><a href=#1%e9%99%8d%e7%ba%a7%e5%88%b01055>#
-</a>1.降级到1.0.55</div></h2><p><a href=https://mirom.ezbox.idv.tw/miwifi/RA72/roms-stable/>Xiaomi AX6000历史固件下载</a><br>实测最新稳定版(1.0.122)可以直接降级到1.0.55</p><h2 id=2下载openwrt固件><div><a href=#2%e4%b8%8b%e8%bd%bdopenwrt%e5%9b%ba%e4%bb%b6>#
-</a>2.下载Openwrt固件</div></h2><p><a href=https://firmware-selector.openwrt.org/>openwrt firmware-selector</a>
-选择Xiaomi AX6000, 25.12.x</p><p>下载第一个<strong>SYSTEMUPGRADE</strong> (xxx-squashfs-sysupgrade.bin)<br>和第三个<strong>INITRAMFS-FACTORY</strong> (xxx-initramfs-factory.ubi)</p><h2 id=3使用xmir-patcher解锁ssh><div><a href=#3%e4%bd%bf%e7%94%a8xmir-patcher%e8%a7%a3%e9%94%81ssh>#
-</a>3.使用<a href=https://github.com/openwrt-xiaomi/xmir-patcher>xmir-patcher</a>解锁ssh</div></h2><ul><li>以前的教程解锁ssh需要装OpenWRT虚拟机开无线热点,现在xmir-patcher开箱即用,不需要管理员权限,可以自动获取sn/计算root密码/开启ssh/备份固件/刷机&mldr;</li></ul><p>下载并解压<a href=https://github.com/openwrt-xiaomi/xmir-patcher/archive/refs/heads/main.zip>源码.zip</a>,点击<code>run.bat</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-cmd data-lang=cmd><span style=display:flex><span>
+</a>1.降级到1.0.55</div></h2><p><a href=https://mirom.ezbox.idv.tw/miwifi/RA72/roms-stable/>Xiaomi AX6000历史固件下载</a><br>实测最新稳定版(1.0.122)可以直接降级到1.0.55</p><h2 id=2使用xmir-patcher解锁ssh><div><a href=#2%e4%bd%bf%e7%94%a8xmir-patcher%e8%a7%a3%e9%94%81ssh>#
+</a>2.使用<a href=https://github.com/openwrt-xiaomi/xmir-patcher>xmir-patcher</a>解锁ssh</div></h2><ul><li>网上搜到的教程解锁ssh需要装OpenWRT虚拟机开无线热点,现在xmir-patcher开箱即用,不需要管理员权限,可以自动获取sn/计算root密码/开启ssh/备份固件/刷机&mldr;</li></ul><p>下载并解压<a href=https://github.com/openwrt-xiaomi/xmir-patcher/archive/refs/heads/main.zip>源码.zip</a>,点击<code>run.bat</code>
+双击<code>run.bat</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-cmd data-lang=cmd><span style=display:flex><span>
 </span></span><span style=display:flex><span>==========================================================
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>Xiaomi MiR Patcher
@@ -121,6 +109,9 @@ Select:
 </span></span><span style=display:flex><span> 0 - Exit
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>Select:
-</span></span></code></pre></div><p>选2 解锁ssh</p><h2 id=4备份并刷机><div><a href=#4%e5%a4%87%e4%bb%bd%e5%b9%b6%e5%88%b7%e6%9c%ba>#
-</a>4.备份并刷机</div></h2><p>将<code>...-initramfs-factory.ubi</code>放入<code>./xmir-patcher-main/firmware</code></p><p>双击<code>run.bat</code></p><p>选4 备份闪存内容,刷回原版有用,但变砖可能要拆机救<br>选6 固化ssh<br>选7 刷机</p><ul><li>OpenWRT默认不开启WIFI,必须连网线</li><li>OpenWRT默认ip是<code>192.168.1.1</code>,首次开机不要接上游避免ip冲突</li></ul><p>重启连接网线到lan口(三个千兆口的任意一个),浏览器输入<code>192.168.1.1</code>即可进入luci界面,没有密码.</p><p>在System -> Backup / Flash Firmware -> Flash Image<br>刷入<code>...-squashfs-sysupgrade.bin</code></p><p>重启</p><h1 id=参考><div><a href=#%e5%8f%82%e8%80%83>##
+</span></span></code></pre></div><p>选2 解锁ssh</p><h2 id=3备份><div><a href=#3%e5%a4%87%e4%bb%bd>#
+</a>3.备份</div></h2><p>选4 备份闪存内容,刷回原版有用,但变砖可能要拆机救<br>选6 固化ssh</p><h2 id=4下载openwrt固件><div><a href=#4%e4%b8%8b%e8%bd%bdopenwrt%e5%9b%ba%e4%bb%b6>#
+</a>4.下载Openwrt固件</div></h2><p><a href=https://firmware-selector.openwrt.org/>openwrt firmware-selector</a>
+选择Xiaomi AX6000, 25.12.x</p><p>下载第一个<strong>SYSTEMUPGRADE</strong> (xxx-squashfs-sysupgrade.bin)<br>和第三个<strong>INITRAMFS-FACTORY</strong> (xxx-initramfs-factory.ubi)</p><h2 id=5刷机><div><a href=#5%e5%88%b7%e6%9c%ba>#
+</a>5.刷机</div></h2><p>将<code>...-initramfs-factory.ubi</code>放入<code>./xmir-patcher-main/firmware</code></p><p>选7 刷机</p><ul><li>OpenWRT默认不开启WIFI,必须连网线</li><li>OpenWRT默认ip是<code>192.168.1.1</code>,首次开机不要接上游避免ip冲突</li></ul><p>重启连接网线到lan口(三个千兆口的任意一个),浏览器输入<code>192.168.1.1</code>即可进入luci界面,没有密码.</p><p>在System -> Backup / Flash Firmware -> Flash Image<br>刷入<code>...-squashfs-sysupgrade.bin</code></p><p>重启</p><h1 id=参考><div><a href=#%e5%8f%82%e8%80%83>##
 </a>参考</div></h1><p><a href=https://www.bilibili.com/opus/1079010971533443094>小米 AX6000 刷 OpenWrt</a></p></div></article><script>function detectCurrentScheme2(){const e="auto";return localStorage!==null&&localStorage.getItem("user-color-scheme")?localStorage.getItem("user-color-scheme"):e==="dark"||e==="light"?e:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}let giscusTheme=detectCurrentScheme2(),giscusAttributes={src:"https://giscus.app/client.js","data-repo":"0x2196f3/0x2196f3.github.io","data-repo-id":"R_kgDOPJtijw","data-category":"Announcements","data-category-id":"DIC_kwDOPJtij84Cs6CT","data-mapping":"pathname","data-strict":"0","data-reactions-enabled":"1","data-emit-metadata":"0","data-input-position":"bottom","data-theme":giscusTheme,"data-lang":"en",crossorigin:"anonymous",lazyload:"false",async:!0},main=document.querySelector("main"),giscusScript=document.createElement("script");Object.entries(giscusAttributes).forEach(([e,t])=>giscusScript.setAttribute(e,t)),main.appendChild(giscusScript)</script></main><footer class="common-footer noselect"><div class=common-footer-bottom><div style=display:flex;align-items:center;gap:8px>© 2026</div><div style=display:flex;align-items:center;gap:4px></div></div><p class="h-card vcard"><a href=https://0x2196f3.github.io/ class="p-name u-url url fn" rel=me></a></p></footer></div></body></html>

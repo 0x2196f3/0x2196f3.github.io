@@ -30,7 +30,7 @@ OpenWRT 25.12.0-rc1已知问题
 &lt;/h2>
 &lt;ul>
 &lt;li>这款路由器三个千兆网口共享1G带宽,无线/有线都基本不可能跑满2.5G,不建议为了能刷机购买.见&lt;a href="https://www.acwifi.net/12621.html">acwifi评测&lt;/a>&lt;/li>
-&lt;li>IPQ5018处理器性能较弱(双核1GHZ A53),且OpenWRT不支持硬件NAT,不建议用于拨号/翻墙&lt;/li>
+&lt;li>IPQ5018处理器性能较弱(双核1GHZ A53,相当于不到半个NanoPi R2s软路由),且OpenWRT不支持硬件NAT加速,不建议用于拨号/翻墙&lt;/li>
 &lt;/ul>
 &lt;h1 id="刷机步骤" >
 &lt;div>
@@ -50,30 +50,19 @@ OpenWRT 25.12.0-rc1已知问题
 &lt;/h2>
 &lt;p>&lt;a href="https://mirom.ezbox.idv.tw/miwifi/RA72/roms-stable/">Xiaomi AX6000历史固件下载&lt;/a>&lt;br>
 实测最新稳定版(1.0.122)可以直接降级到1.0.55&lt;/p>
-&lt;h2 id="2下载openwrt固件" >
+&lt;h2 id="2使用xmir-patcher解锁ssh" >
 &lt;div>
-&lt;a href="#2%e4%b8%8b%e8%bd%bdopenwrt%e5%9b%ba%e4%bb%b6">
+&lt;a href="#2%e4%bd%bf%e7%94%a8xmir-patcher%e8%a7%a3%e9%94%81ssh">
 #
 &lt;/a>
-2.下载Openwrt固件
-&lt;/div>
-&lt;/h2>
-&lt;p>&lt;a href="https://firmware-selector.openwrt.org/">openwrt firmware-selector&lt;/a>
-选择Xiaomi AX6000, 25.12.x&lt;/p>
-&lt;p>下载第一个&lt;strong>SYSTEMUPGRADE&lt;/strong> (xxx-squashfs-sysupgrade.bin)&lt;br>
-和第三个&lt;strong>INITRAMFS-FACTORY&lt;/strong> (xxx-initramfs-factory.ubi)&lt;/p>
-&lt;h2 id="3使用xmir-patcher解锁ssh" >
-&lt;div>
-&lt;a href="#3%e4%bd%bf%e7%94%a8xmir-patcher%e8%a7%a3%e9%94%81ssh">
-#
-&lt;/a>
-3.使用&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher">xmir-patcher&lt;/a>解锁ssh
+2.使用&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher">xmir-patcher&lt;/a>解锁ssh
 &lt;/div>
 &lt;/h2>
 &lt;ul>
-&lt;li>以前的教程解锁ssh需要装OpenWRT虚拟机开无线热点,现在xmir-patcher开箱即用,不需要管理员权限,可以自动获取sn/计算root密码/开启ssh/备份固件/刷机&amp;hellip;&lt;/li>
+&lt;li>网上搜到的教程解锁ssh需要装OpenWRT虚拟机开无线热点,现在xmir-patcher开箱即用,不需要管理员权限,可以自动获取sn/计算root密码/开启ssh/备份固件/刷机&amp;hellip;&lt;/li>
 &lt;/ul>
-&lt;p>下载并解压&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher/archive/refs/heads/main.zip">源码.zip&lt;/a>,点击&lt;code>run.bat&lt;/code>&lt;/p>
+&lt;p>下载并解压&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher/archive/refs/heads/main.zip">源码.zip&lt;/a>,点击&lt;code>run.bat&lt;/code>
+双击&lt;code>run.bat&lt;/code>&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cmd" data-lang="cmd">&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>==========================================================
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -93,19 +82,38 @@ OpenWRT 25.12.0-rc1已知问题
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Select:
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>选2 解锁ssh&lt;/p>
-&lt;h2 id="4备份并刷机" >
+&lt;h2 id="3备份" >
 &lt;div>
-&lt;a href="#4%e5%a4%87%e4%bb%bd%e5%b9%b6%e5%88%b7%e6%9c%ba">
+&lt;a href="#3%e5%a4%87%e4%bb%bd">
 #
 &lt;/a>
-4.备份并刷机
+3.备份
+&lt;/div>
+&lt;/h2>
+&lt;p>选4 备份闪存内容,刷回原版有用,但变砖可能要拆机救&lt;br>
+选6 固化ssh&lt;/p>
+&lt;h2 id="4下载openwrt固件" >
+&lt;div>
+&lt;a href="#4%e4%b8%8b%e8%bd%bdopenwrt%e5%9b%ba%e4%bb%b6">
+#
+&lt;/a>
+4.下载Openwrt固件
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;a href="https://firmware-selector.openwrt.org/">openwrt firmware-selector&lt;/a>
+选择Xiaomi AX6000, 25.12.x&lt;/p>
+&lt;p>下载第一个&lt;strong>SYSTEMUPGRADE&lt;/strong> (xxx-squashfs-sysupgrade.bin)&lt;br>
+和第三个&lt;strong>INITRAMFS-FACTORY&lt;/strong> (xxx-initramfs-factory.ubi)&lt;/p>
+&lt;h2 id="5刷机" >
+&lt;div>
+&lt;a href="#5%e5%88%b7%e6%9c%ba">
+#
+&lt;/a>
+5.刷机
 &lt;/div>
 &lt;/h2>
 &lt;p>将&lt;code>...-initramfs-factory.ubi&lt;/code>放入&lt;code>./xmir-patcher-main/firmware&lt;/code>&lt;/p>
-&lt;p>双击&lt;code>run.bat&lt;/code>&lt;/p>
-&lt;p>选4 备份闪存内容,刷回原版有用,但变砖可能要拆机救&lt;br>
-选6 固化ssh&lt;br>
-选7 刷机&lt;/p>
+&lt;p>选7 刷机&lt;/p>
 &lt;ul>
 &lt;li>OpenWRT默认不开启WIFI,必须连网线&lt;/li>
 &lt;li>OpenWRT默认ip是&lt;code>192.168.1.1&lt;/code>,首次开机不要接上游避免ip冲突&lt;/li>
