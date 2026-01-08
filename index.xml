@@ -19,6 +19,7 @@ OpenWRT 25.12.0-rc1已知问题
 &lt;li>5Ghz Wifi即使开启160mhz也无法协商到超过1200mbps,测速跑不满千兆,对无线速度有要求就再等等&lt;/li>
 &lt;li>虽然路由器有128mb闪存,但OpenWRT可用容量仅60mb&lt;/li>
 &lt;li>内存占用异常:不装任何插件内存占用300mb+(正常情况下512mb内存应该占用200mb左右)&lt;/li>
+&lt;li>以上问题rc2一个都没有修复&lt;/li>
 &lt;/ul>
 &lt;h2 id="路由器自身的问题" >
 &lt;div>
@@ -29,9 +30,75 @@ OpenWRT 25.12.0-rc1已知问题
 &lt;/div>
 &lt;/h2>
 &lt;ul>
-&lt;li>这款路由器三个千兆网口共享1G带宽,无线/有线都基本不可能跑满2.5G,不建议为了能刷机购买.见&lt;a href="https://www.acwifi.net/12621.html">acwifi评测&lt;/a>&lt;/li>
-&lt;li>IPQ5018处理器性能较弱(双核1GHZ A53,相当于不到半个NanoPi R2s软路由),且OpenWRT不支持硬件NAT加速,不建议用于拨号/翻墙&lt;/li>
+&lt;li>这款路由器三个千兆网口共享1G带宽,无线/有线都基本不可能跑满2.5G,不建议&lt;del>为了能刷机&lt;/del>购买.见&lt;a href="https://www.acwifi.net/12621.html">acwifi评测&lt;/a>&lt;/li>
+&lt;li>IPQ5018处理器性能较弱(双核1GHZ A53,相当于NanoPi R2s软路由的一半不到),且原版OpenWRT不支持硬件加速,不建议用于拨号/翻墙&lt;/li>
 &lt;/ul>
+&lt;h2 id="评价" >
+&lt;div>
+&lt;a href="#%e8%af%84%e4%bb%b7">
+#
+&lt;/a>
+评价
+&lt;/div>
+&lt;/h2>
+&lt;p>Xiaomi AX6000本来就是一款除了无线性能勉强及格其它一无是处的路由器,刷OpenWRT后无线也不及格了,&lt;strong>不建议刷&lt;/strong>&lt;/p>
+&lt;h1 id="测速" >
+&lt;div>
+&lt;a href="#%e6%b5%8b%e9%80%9f">
+##
+&lt;/a>
+测速
+&lt;/div>
+&lt;/h1>
+&lt;ul>
+&lt;li>开启Software flow offloading&lt;/li>
+&lt;li>内网使用&lt;a href="https://hub.docker.com/r/openspeedtest/latest/">OpenSpeedTest&lt;/a>&lt;/li>
+&lt;li>外网使用&lt;a href="https://test.ustc.edu.cn">中科大测速站&lt;/a>&lt;/li>
+&lt;li>wan口=2.5G网口&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>测试场景&lt;/th>
+&lt;th>速度 (下载/上传)&lt;/th>
+&lt;th>备注&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>两个千兆 LAN 口之间测速&lt;/td>
+&lt;td>&lt;strong>1000 Mbps / 1000 Mbps&lt;/strong>&lt;/td>
+&lt;td>推测流量在交换芯片内部处理未经过CPU&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>千兆 LAN 口向 WAN 公网测速&lt;/td>
+&lt;td>&lt;strong>650 Mbps / NA&lt;/strong>&lt;/td>
+&lt;td>达到宽带上限&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>千兆 LAN 口向 WAN 服务器测速&lt;/td>
+&lt;td>&lt;strong>920 Mbps / 700 Mbps&lt;/strong>&lt;/td>
+&lt;td>-&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>5 GHz WiFi 向 LAN 口测速&lt;/td>
+&lt;td>&lt;strong>350 Mbps / 500 Mbps&lt;/strong>&lt;/td>
+&lt;td>-&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>5 GHz WiFi 向 WAN 公网测速&lt;/td>
+&lt;td>&lt;strong>350 Mbps / NA&lt;/strong>&lt;/td>
+&lt;td>-&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>5 GHz WiFi 向 WAN 服务器测速&lt;/td>
+&lt;td>&lt;strong>730 Mbps / 500 Mbps&lt;/strong>&lt;/td>
+&lt;td>-&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>测了很多遍,确实是这种奇怪的结果,我不知道原因&lt;/p>
+&lt;p>5Ghz Wifi目前肯定工作不正常,但只要固件不支持Qualcommax NSS(高通硬件加速),这么烂的CPU能不能跑满5Ghz Wifi或千兆网络依然是问题.&lt;/p>
 &lt;h1 id="刷机步骤" >
 &lt;div>
 &lt;a href="#%e5%88%b7%e6%9c%ba%e6%ad%a5%e9%aa%a4">
@@ -40,29 +107,30 @@ OpenWRT 25.12.0-rc1已知问题
 刷机步骤
 &lt;/div>
 &lt;/h1>
-&lt;h2 id="1降级到1055" >
+&lt;h2 id="0降级到1055-optional" >
 &lt;div>
-&lt;a href="#1%e9%99%8d%e7%ba%a7%e5%88%b01055">
+&lt;a href="#0%e9%99%8d%e7%ba%a7%e5%88%b01055-optional">
 #
 &lt;/a>
-1.降级到1.0.55
+0.降级到1.0.55 (Optional)
 &lt;/div>
 &lt;/h2>
-&lt;p>&lt;a href="https://mirom.ezbox.idv.tw/miwifi/RA72/roms-stable/">Xiaomi AX6000历史固件下载&lt;/a>&lt;br>
-实测最新稳定版(1.0.122)可以直接降级到1.0.55&lt;/p>
-&lt;h2 id="2使用xmir-patcher解锁ssh" >
+&lt;blockquote>
+&lt;p>有些新生产的Xiaomi AX6000路由器无法降级到低版本,可能是因为硬件规格改变(缩水)但没有更换型号,可以先在当前版本尝试解锁ssh,失败再降级&lt;/p>&lt;/blockquote>
+&lt;p>&lt;a href="https://mirom.ezbox.idv.tw/miwifi/RA72/roms-stable/">Xiaomi AX6000历史固件下载&lt;/a>&lt;/p>
+&lt;p>实测我自己的路由器可以从最新稳定版(1.0.122)直接降级到1.0.55&lt;/p>
+&lt;h2 id="1使用xmir-patcher解锁ssh" >
 &lt;div>
-&lt;a href="#2%e4%bd%bf%e7%94%a8xmir-patcher%e8%a7%a3%e9%94%81ssh">
+&lt;a href="#1%e4%bd%bf%e7%94%a8xmir-patcher%e8%a7%a3%e9%94%81ssh">
 #
 &lt;/a>
-2.使用&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher">xmir-patcher&lt;/a>解锁ssh
+1.使用&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher">xmir-patcher&lt;/a>解锁ssh
 &lt;/div>
 &lt;/h2>
 &lt;ul>
 &lt;li>网上搜到的教程解锁ssh需要装OpenWRT虚拟机开无线热点,现在xmir-patcher开箱即用,不需要管理员权限,可以自动获取sn/计算root密码/开启ssh/备份固件/刷机&amp;hellip;&lt;/li>
 &lt;/ul>
-&lt;p>下载并解压&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher/archive/refs/heads/main.zip">源码.zip&lt;/a>,点击&lt;code>run.bat&lt;/code>
-双击&lt;code>run.bat&lt;/code>&lt;/p>
+&lt;p>下载并解压&lt;a href="https://github.com/openwrt-xiaomi/xmir-patcher/archive/refs/heads/main.zip">源码.zip&lt;/a>,点击&lt;code>run.bat&lt;/code>&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cmd" data-lang="cmd">&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>==========================================================
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -82,34 +150,34 @@ OpenWRT 25.12.0-rc1已知问题
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Select:
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>选2 解锁ssh&lt;/p>
-&lt;h2 id="3备份" >
+&lt;h2 id="2备份" >
 &lt;div>
-&lt;a href="#3%e5%a4%87%e4%bb%bd">
+&lt;a href="#2%e5%a4%87%e4%bb%bd">
 #
 &lt;/a>
-3.备份
+2.备份
 &lt;/div>
 &lt;/h2>
 &lt;p>选4 备份闪存内容,刷回原版有用,但变砖可能要拆机救&lt;br>
 选6 固化ssh&lt;/p>
-&lt;h2 id="4下载openwrt固件" >
+&lt;h2 id="3下载openwrt固件" >
 &lt;div>
-&lt;a href="#4%e4%b8%8b%e8%bd%bdopenwrt%e5%9b%ba%e4%bb%b6">
+&lt;a href="#3%e4%b8%8b%e8%bd%bdopenwrt%e5%9b%ba%e4%bb%b6">
 #
 &lt;/a>
-4.下载Openwrt固件
+3.下载Openwrt固件
 &lt;/div>
 &lt;/h2>
 &lt;p>&lt;a href="https://firmware-selector.openwrt.org/">openwrt firmware-selector&lt;/a>
 选择Xiaomi AX6000, 25.12.x&lt;/p>
 &lt;p>下载第一个&lt;strong>SYSTEMUPGRADE&lt;/strong> (xxx-squashfs-sysupgrade.bin)&lt;br>
 和第三个&lt;strong>INITRAMFS-FACTORY&lt;/strong> (xxx-initramfs-factory.ubi)&lt;/p>
-&lt;h2 id="5刷机" >
+&lt;h2 id="4刷机" >
 &lt;div>
-&lt;a href="#5%e5%88%b7%e6%9c%ba">
+&lt;a href="#4%e5%88%b7%e6%9c%ba">
 #
 &lt;/a>
-5.刷机
+4.刷机
 &lt;/div>
 &lt;/h2>
 &lt;p>将&lt;code>...-initramfs-factory.ubi&lt;/code>放入&lt;code>./xmir-patcher-main/firmware&lt;/code>&lt;/p>
@@ -852,7 +920,42 @@ tmpfs 5.0M 0 5.0M 0% /run/lock
 /dev/sdb15 105M 6.2M 99M 6% /boot/efi
 /dev/sda1 74G 4.1G 66G 6% /mnt
 tmpfs 1.6G 12K 1.6G 1% /run/user/1001
-&lt;/code>&lt;/pre>&lt;p>理论上把actions里的脚本挪到/mnt跑已经足够了，但不确定是否每个runner分配的/mnt都有这么大容量，因为&lt;a href="https://github.com/marketplace/actions/maximize-build-disk-space">easimon/maximize-build-space&lt;/a>里说只有14GB&lt;/p></description></item><item><title>OpenWrt设置usb扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
+&lt;/code>&lt;/pre>&lt;p>理论上把actions里的脚本挪到/mnt跑已经足够了，但不确定是否每个runner分配的/mnt都有这么大容量，因为&lt;a href="https://github.com/marketplace/actions/maximize-build-disk-space">easimon/maximize-build-space&lt;/a>里说只有14GB&lt;/p></description></item><item><title>OpenWrt扩容</title><link>/posts/openwrt-expand-root/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-expand-root/</guid><description>&lt;h1 id="openwrt扩容" >
+&lt;div>
+&lt;a href="#openwrt%e6%89%a9%e5%ae%b9">
+##
+&lt;/a>
+OpenWrt扩容
+&lt;/div>
+&lt;/h1>
+&lt;p>原文: &lt;a href="https://openwrt.org/docs/guide-user/advanced/expand_root">Expanding root partition and filesystem&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>很多教程说扩容仅支持EXT4,不支持SquashFS,实测OpenWRT24.10 SquashFS可以扩容&lt;/li>
+&lt;li>很多教程说扩容后无法更新系统,虽然原文说可以在更新后自动把扩容脚本再执行一遍,但没说原来的数据会怎么样.我没试过,最好不要更新系统.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>cd /tmp
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Install packages&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>opkg update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>opkg install parted losetup resize2fs blkid
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Download expand-root.sh&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>wget -U &lt;span style="color:#e6db74">&amp;#34;&amp;#34;&lt;/span> -O expand-root.sh &lt;span style="color:#e6db74">&amp;#34;https://openwrt.org/_export/code/docs/guide-user/advanced/expand_root?codeblock=0&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Source the script (creates /etc/uci-defaults/70-rootpt-resize and /etc/uci-defaults/80-rootpt-resize, and adds them to /etc/sysupgrade.conf so they will be re-run after a sysupgrade)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ./expand-root.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Resize root partition and filesystem (will resize partiton, reboot resize filesystem, and reboot again)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sh /etc/uci-defaults/70-rootpt-resize
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>这段脚本做了什么?&lt;/p>&lt;/blockquote>
+&lt;ol start="0">
+&lt;li>扩容&lt;/li>
+&lt;li>将扩容脚本写入到&lt;code>/etc/uci-defaults/70-rootpt-resize&lt;/code>和&lt;code>/etc/uci-defaults/80-rootfs-resize&lt;/code>&lt;/li>
+&lt;li>自动设置在系统更新后保留这两个脚本(luci界面&lt;code>System -&amp;gt; Backup / Flash Firmware / Configuration&lt;/code>可查)&lt;/li>
+&lt;li>但没有将这两个脚本写入&lt;code>/etc/sysupgrade.conf&lt;/code>(这个文件甚至不存在).&lt;/li>
+&lt;/ol>
+&lt;p>所以默认自动更新后应该不会扩容&lt;/p></description></item><item><title>OpenWrt设置usb扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
 &lt;div>
 &lt;a href="#openwrt%e8%ae%be%e7%bd%aeusb%e6%89%a9%e5%ae%b9">
 ##

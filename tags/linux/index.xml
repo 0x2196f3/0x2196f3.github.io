@@ -1,4 +1,39 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on 0x2196f3's blog</title><link>/tags/linux/</link><description>0x2196f3's blog (Linux)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 27 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>OpenWrt设置usb扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on 0x2196f3's blog</title><link>/tags/linux/</link><description>0x2196f3's blog (Linux)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 27 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>OpenWrt扩容</title><link>/posts/openwrt-expand-root/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-expand-root/</guid><description>&lt;h1 id="openwrt扩容" >
+&lt;div>
+&lt;a href="#openwrt%e6%89%a9%e5%ae%b9">
+##
+&lt;/a>
+OpenWrt扩容
+&lt;/div>
+&lt;/h1>
+&lt;p>原文: &lt;a href="https://openwrt.org/docs/guide-user/advanced/expand_root">Expanding root partition and filesystem&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>很多教程说扩容仅支持EXT4,不支持SquashFS,实测OpenWRT24.10 SquashFS可以扩容&lt;/li>
+&lt;li>很多教程说扩容后无法更新系统,虽然原文说可以在更新后自动把扩容脚本再执行一遍,但没说原来的数据会怎么样.我没试过,最好不要更新系统.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>cd /tmp
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Install packages&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>opkg update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>opkg install parted losetup resize2fs blkid
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Download expand-root.sh&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>wget -U &lt;span style="color:#e6db74">&amp;#34;&amp;#34;&lt;/span> -O expand-root.sh &lt;span style="color:#e6db74">&amp;#34;https://openwrt.org/_export/code/docs/guide-user/advanced/expand_root?codeblock=0&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Source the script (creates /etc/uci-defaults/70-rootpt-resize and /etc/uci-defaults/80-rootpt-resize, and adds them to /etc/sysupgrade.conf so they will be re-run after a sysupgrade)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ./expand-root.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Resize root partition and filesystem (will resize partiton, reboot resize filesystem, and reboot again)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sh /etc/uci-defaults/70-rootpt-resize
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>这段脚本做了什么?&lt;/p>&lt;/blockquote>
+&lt;ol start="0">
+&lt;li>扩容&lt;/li>
+&lt;li>将扩容脚本写入到&lt;code>/etc/uci-defaults/70-rootpt-resize&lt;/code>和&lt;code>/etc/uci-defaults/80-rootfs-resize&lt;/code>&lt;/li>
+&lt;li>自动设置在系统更新后保留这两个脚本(luci界面&lt;code>System -&amp;gt; Backup / Flash Firmware / Configuration&lt;/code>可查)&lt;/li>
+&lt;li>但没有将这两个脚本写入&lt;code>/etc/sysupgrade.conf&lt;/code>(这个文件甚至不存在).&lt;/li>
+&lt;/ol>
+&lt;p>所以默认自动更新后应该不会扩容&lt;/p></description></item><item><title>OpenWrt设置usb扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
 &lt;div>
 &lt;a href="#openwrt%e8%ae%be%e7%bd%aeusb%e6%89%a9%e5%ae%b9">
 ##
