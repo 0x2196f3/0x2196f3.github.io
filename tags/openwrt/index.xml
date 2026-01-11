@@ -149,7 +149,8 @@ OpenWRT 25.12.0-rc1已知问题
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> 0 - Exit
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Select:
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>选2 解锁ssh&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>使用网线或wifi连接到小米路由器&lt;br>
+选2 解锁ssh&lt;/p>
 &lt;h2 id="2备份" >
 &lt;div>
 &lt;a href="#2%e5%a4%87%e4%bb%bd">
@@ -158,7 +159,7 @@ OpenWRT 25.12.0-rc1已知问题
 2.备份
 &lt;/div>
 &lt;/h2>
-&lt;p>选4 备份闪存内容,刷回原版有用,但变砖可能要拆机救&lt;br>
+&lt;p>选4 备份闪存内容,刷回原版可能有用,但变砖可能要拆机救&lt;br>
 选6 固化ssh&lt;/p>
 &lt;h2 id="3下载openwrt固件" >
 &lt;div>
@@ -190,6 +191,21 @@ OpenWRT 25.12.0-rc1已知问题
 &lt;p>在System -&amp;gt; Backup / Flash Firmware -&amp;gt; Flash Image&lt;br>
 刷入&lt;code>...-squashfs-sysupgrade.bin&lt;/code>&lt;/p>
 &lt;p>重启&lt;/p>
+&lt;h2 id="5刷回原厂系统" >
+&lt;div>
+&lt;a href="#5%e5%88%b7%e5%9b%9e%e5%8e%9f%e5%8e%82%e7%b3%bb%e7%bb%9f">
+#
+&lt;/a>
+5.刷回原厂系统
+&lt;/div>
+&lt;/h2>
+&lt;ol start="0">
+&lt;li>下载&lt;a href="https://bigota.miwifi.com/xiaoqiang/tools/MIWIFIRepairTool.x86.zip">MIWIFIRepairTool.zip&lt;/a>和&lt;a href="https://mirom.ezbox.idv.tw/miwifi/RA72/roms-stable/">最新固件&lt;/a>&lt;/li>
+&lt;li>电脑有线网口连接第一个千兆lan口&lt;/li>
+&lt;li>打开&lt;code>MIWIFIRepairTool.x86.exe&lt;/code>,手动上传最新固件(&lt;code>.bin&lt;/code>格式),选择连接路由器的网卡,一路下一步&lt;/li>
+&lt;li>按住reset按钮时插入路由器电源,reset一直按住不放直到路由器橙灯闪烁,松开,开始刷机&lt;/li>
+&lt;li>等几分钟,路由器快速闪白灯后拔电重启(和工具里说的亮蓝灯不一样)&lt;/li>
+&lt;/ol>
 &lt;h1 id="参考" >
 &lt;div>
 &lt;a href="#%e5%8f%82%e8%80%83">
