@@ -1,4 +1,1228 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Wed, 01 Apr 2026 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Xiaomi AX6000刷OpenWRT</title><link>/posts/xiaomi-ax6000-openwrt/</link><pubDate>Tue, 30 Dec 2025 00:00:00 +0000</pubDate><guid>/posts/xiaomi-ax6000-openwrt/</guid><description>&lt;h1 id="已知问题" >
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on 0x2196f3's blog</title><link>/posts/</link><description>0x2196f3's blog (Posts)</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 26 Jul 2026 00:00:00 +0000</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>llama.cpp CPU性能优化</title><link>/posts/llama.cpp-cpu-performance-optimization/</link><pubDate>Sun, 26 Jul 2026 00:00:00 +0000</pubDate><guid>/posts/llama.cpp-cpu-performance-optimization/</guid><description>&lt;h1 id="性能评价指标" >
+&lt;div>
+&lt;a href="#%e6%80%a7%e8%83%bd%e8%af%84%e4%bb%b7%e6%8c%87%e6%a0%87">
+##
+&lt;/a>
+性能评价指标
+&lt;/div>
+&lt;/h1>
+&lt;p>llama.cpp自带&lt;code>llama-bench.exe&lt;/code> (这是测试llama.cpp这个程序的运行效率的,不是测试LLM智力的)&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cmd" data-lang="cmd">&lt;span style="display:flex;">&lt;span>.\llama-bench.exe -m .\gemma-4-26B-A4B-it-qat-UD-Q4_K_XL.gguf -n 512 -p 512
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>| model | size | params | backend | ngl | test | t/s |
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>| ------------------------------ | ---------: | ---------: | ---------- | --: | --------------: | -------------------: |
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>| gemma4 26B.A4B Q4_0 | 13.26 GiB | 25.23 B | CUDA | -1 | pp512 | 3231.47 ± 13.18 |
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>| gemma4 26B.A4B Q4_0 | 13.26 GiB | 25.23 B | CUDA | -1 | tg512 | 87.63 ± 0.03 |
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>build: 69e62fc77 (10206)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>
+&lt;p>pp512(prompt processing): 处理512个输入tokens的速度.&lt;br>
+瓶颈在GPU矩阵计算性能.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>tg512(token generation): 输出512个tokens的速度.&lt;br>
+每生成一个token,理论上要将模型的所有权重从显存读入GPU核心进行运算,所以显存带宽是严重的瓶颈.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="cpu运行llm" >
+&lt;div>
+&lt;a href="#cpu%e8%bf%90%e8%a1%8cllm">
+##
+&lt;/a>
+CPU运行LLM
+&lt;/div>
+&lt;/h1>
+&lt;ul>
+&lt;li>llama.cpp版本&lt;code>b7406&lt;/code>&lt;/li>
+&lt;li>模型&lt;code>Qwen3-30B-A3B-Instruct-2507-Q4_K_M.gguf&lt;/code>&lt;/li>
+&lt;li>测试命令&lt;code>.\llama-bench.exe -m .\Qwen3-30B-A3B-Instruct-2507-Q4_K_M.gguf -p 512 -n 512&lt;/code>&lt;/li>
+&lt;li>llama.cpp有一万多个Release,GitHub网页最多显示100页(大约4个月以内的),一年前的Release已经找不到了
+但是下载链接还在,替换版本号即可,比如&lt;a href="https://github.com/ggml-org/llama.cpp/releases/download/b7406/llama-b7406-bin-win-cpu-x64.zip">https://github.com/ggml-org/llama.cpp/releases/download/b7406/llama-b7406-bin-win-cpu-x64.zip&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;h3 id="1-ryzen9-5950x--128bit-ddr4-3600mhz-在bios内关闭一部分核心" >
+&lt;div>
+&lt;a href="#1-ryzen9-5950x--128bit-ddr4-3600mhz-%e5%9c%a8bios%e5%86%85%e5%85%b3%e9%97%ad%e4%b8%80%e9%83%a8%e5%88%86%e6%a0%b8%e5%bf%83">
+##
+&lt;/a>
+1. Ryzen9 5950X + 128bit DDR4 3600mhz, 在BIOS内关闭一部分核心
+&lt;/div>
+&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">设备&lt;/th>
+&lt;th style="text-align: left">pp512 (t/s)&lt;/th>
+&lt;th style="text-align: left">tg512 (t/s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">5950X 2c&lt;/td>
+&lt;td style="text-align: left">27.73 ± 1.88&lt;/td>
+&lt;td style="text-align: left">15.72 ± 0.56&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">5950X 4c&lt;/td>
+&lt;td style="text-align: left">51.81 ± 3.19&lt;/td>
+&lt;td style="text-align: left">21.44 ± 0.16&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">5950X 6c&lt;/td>
+&lt;td style="text-align: left">66.18 ± 2.97&lt;/td>
+&lt;td style="text-align: left">21.07 ± 0.33&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">5950X 8c&lt;/td>
+&lt;td style="text-align: left">85.24 ± 3.60&lt;/td>
+&lt;td style="text-align: left">21.25 ± 0.06&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">5950X 16c&lt;/td>
+&lt;td style="text-align: left">143.92 ± 1.81&lt;/td>
+&lt;td style="text-align: left">21.22 ± 0.05&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="测试2-ryzen9-5950x-128bit-ddr4内存频率从2133mhz提升到3600mhz" >
+&lt;div>
+&lt;a href="#%e6%b5%8b%e8%af%952-ryzen9-5950x-128bit-ddr4%e5%86%85%e5%ad%98%e9%a2%91%e7%8e%87%e4%bb%8e2133mhz%e6%8f%90%e5%8d%87%e5%88%b03600mhz">
+##
+&lt;/a>
+测试2. Ryzen9 5950X 128bit DDR4,内存频率从2133mhz提升到3600mhz
+&lt;/div>
+&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">设备&lt;/th>
+&lt;th style="text-align: left">pp512 (t/s)&lt;/th>
+&lt;th style="text-align: left">tg512 (t/s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">2133mhz&lt;/td>
+&lt;td style="text-align: left">129.60 ± 2.38&lt;/td>
+&lt;td style="text-align: left">13.44 ± 0.00&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">3600mhz&lt;/td>
+&lt;td style="text-align: left">143.92 ± 1.81&lt;/td>
+&lt;td style="text-align: left">21.22 ± 0.05&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="结论" >
+&lt;div>
+&lt;a href="#%e7%bb%93%e8%ae%ba">
+##
+&lt;/a>
+结论
+&lt;/div>
+&lt;/h3>
+&lt;ul>
+&lt;li>4核心以上,token generation(tg512)速度基本没有提升&lt;/li>
+&lt;li>内存带宽和token generation(tg512)速度成正比&lt;/li>
+&lt;li>prompt processing(pp512)能充分利用CPU性能&lt;/li>
+&lt;/ul>
+&lt;h1 id="核显运行llm" >
+&lt;div>
+&lt;a href="#%e6%a0%b8%e6%98%be%e8%bf%90%e8%a1%8cllm">
+##
+&lt;/a>
+核显运行LLM
+&lt;/div>
+&lt;/h1>
+&lt;ul>
+&lt;li>核显指所有没有独立显存,共享内存当显存的GPU&lt;/li>
+&lt;/ul>
+&lt;h3 id="1-arc-140v--128bit-lpddr5-8533mhz" >
+&lt;div>
+&lt;a href="#1-arc-140v--128bit-lpddr5-8533mhz">
+##
+&lt;/a>
+1. Arc 140V + 128bit LPDDR5 8533mhz
+&lt;/div>
+&lt;/h3>
+&lt;ul>
+&lt;li>llama.cpp版本&lt;code>b10182&lt;/code>&lt;/li>
+&lt;li>模型&lt;code>gpt-oss-20b-mxfp4.gguf&lt;/code>&lt;/li>
+&lt;li>测试命令&lt;code>.\llama-bench.exe -m .\gpt-oss-20b-mxfp4.gguf -p 512 -n 512&lt;/code>&lt;/li>
+&lt;li>OpenVINO,SYCL和Vulkan由llama.cpp官方维护&lt;/li>
+&lt;li>IPEX-LLM由Intel自己维护,后端也是SYCL,目前已停止更新,最后一个版本发布于2025年7月,新模型或新GPU很可能不支持&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">后端&lt;/th>
+&lt;th style="text-align: left">pp512 (t/s)&lt;/th>
+&lt;th style="text-align: left">tg512 (t/s)&lt;/th>
+&lt;th style="text-align: left">备注&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">CPU&lt;/td>
+&lt;td style="text-align: left">35.51 ± 0.59&lt;/td>
+&lt;td style="text-align: left">13.26 ± 0.03&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">OpenVINO&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;td style="text-align: left">无法运行&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">SYCL&lt;/td>
+&lt;td style="text-align: left">115.02 ± 1.00&lt;/td>
+&lt;td style="text-align: left">8.24 ± 0.19&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">Vulkan&lt;/td>
+&lt;td style="text-align: left">590.05 ± 16.50&lt;/td>
+&lt;td style="text-align: left">18.20 ± 0.12&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">IPEX-LLM&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;td style="text-align: left">不支持 GPT-OSS，但在Arc 140V上可以跑Qwen3-30B-A3B&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="2-亮机核显uhd700系列128bit-ddr4" >
+&lt;div>
+&lt;a href="#2-%e4%ba%ae%e6%9c%ba%e6%a0%b8%e6%98%beuhd700%e7%b3%bb%e5%88%97128bit-ddr4">
+##
+&lt;/a>
+2. 亮机核显(UHD700系列)+128bit DDR4
+&lt;/div>
+&lt;/h3>
+&lt;p>Vulkan后端,相比CPU性能严重下降&lt;/p>
+&lt;h3 id="结论-1" >
+&lt;div>
+&lt;a href="#%e7%bb%93%e8%ae%ba-1">
+##
+&lt;/a>
+结论
+&lt;/div>
+&lt;/h3>
+&lt;ol>
+&lt;li>足够强的核显推理速度有可能超过CPU,可以尝试.&lt;/li>
+&lt;li>Vulkan的性能和兼容性都最好.&lt;/li>
+&lt;/ol>
+&lt;h1 id="llamacpp参数优化" >
+&lt;div>
+&lt;a href="#llamacpp%e5%8f%82%e6%95%b0%e4%bc%98%e5%8c%96">
+##
+&lt;/a>
+llama.cpp参数优化
+&lt;/div>
+&lt;/h1>
+&lt;h3 id="1--c-8192-设定上下文长度" >
+&lt;div>
+&lt;a href="#1--c-8192-%e8%ae%be%e5%ae%9a%e4%b8%8a%e4%b8%8b%e6%96%87%e9%95%bf%e5%ba%a6">
+##
+&lt;/a>
+1. &lt;code>-c 8192&lt;/code> 设定上下文长度
+&lt;/div>
+&lt;/h3>
+&lt;p>由于内存带宽不足导致推理速度慢, 8192(8k)已经很难用完, 相比默认256k可大幅降低内存占用.&lt;/p>
+&lt;h3 id="2---reasoning-budget-0-设定思考消耗tokens上限" >
+&lt;div>
+&lt;a href="#2---reasoning-budget-0-%e8%ae%be%e5%ae%9a%e6%80%9d%e8%80%83%e6%b6%88%e8%80%97tokens%e4%b8%8a%e9%99%90">
+##
+&lt;/a>
+2. &lt;code>--reasoning-budget 0&lt;/code> 设定思考消耗tokens上限
+&lt;/div>
+&lt;/h3>
+&lt;p>设置为0可关闭大部分模型的思考模式,减少上下文长度和输出耗时.&lt;/p>
+&lt;ul>
+&lt;li>gpt-oss官方表示无法关闭思考,但目前可以完全关闭&lt;/li>
+&lt;li>qwen3-30b-a3b-2507 分为Instruct和Thinking两个版本,Thinking在旧版本llama.cpp和ollama无法关闭思考.&lt;br>
+目前它虽然不输出&lt;code>&amp;lt;think&amp;gt;&lt;/code>标识,但内容还是&lt;code>&amp;lt;think&amp;gt;&lt;/code>里面的内容&lt;/li>
+&lt;li>新模型gemma4或qwen3.6完全正常&lt;/li>
+&lt;li>如果不设置也可以由用户通过API控制&lt;/li>
+&lt;/ul>
+&lt;h3 id="3--lm-load-mode-模型加载到内存的方式" >
+&lt;div>
+&lt;a href="#3--lm-load-mode-%e6%a8%a1%e5%9e%8b%e5%8a%a0%e8%bd%bd%e5%88%b0%e5%86%85%e5%ad%98%e7%9a%84%e6%96%b9%e5%bc%8f">
+##
+&lt;/a>
+3. &lt;code>-lm&lt;/code> (&amp;ndash;load-mode) 模型加载到内存的方式
+&lt;/div>
+&lt;/h3>
+&lt;p>llama.cpp的内存主要分为两部分&lt;/p>
+&lt;ol>
+&lt;li>模型内存: 硬盘中&lt;code>model.gguf&lt;/code>在内存中的副本
+&lt;ul>
+&lt;li>只读&lt;/li>
+&lt;li>每生成一个token就要将整个模型从内存读取到CPU进行计算&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>上下文内存: 用户输入的tokens和已经输出的tokens (KV Cache)
+&lt;ul>
+&lt;li>在推理过程中需要频繁读写&lt;/li>
+&lt;li>如果内存严重不足(比如模型本身就大于内存容量),KV Cache会被频繁SWAP到磁盘,严重损耗磁盘寿命&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>&lt;code>-lm&lt;/code>设置的内存工作模式只对存储模型权重的内存生效,KV Cache不受&lt;code>-lm&lt;/code>控制.&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">模式&lt;/th>
+&lt;th style="text-align: left">说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">&lt;strong>mmap (默认)&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">使用&lt;code>mmap()&lt;/code>将文件映射到虚拟内存并按需加载进物理内存. 内存不足时直接从物理内存清除. 由于模型只读,内存中的内容只是硬盘文件的映射,所以模型内存永远不会进入SWAP. 多个进程可共享同一个gguf文件的映射,只占一份内存.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">&lt;strong>mmap + mlock&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">&lt;code>mmap()&lt;/code>功能同上,但强制OS将模型内存全部加载到物理内存,如果内存不足,直接OOM退出&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">&lt;strong>none&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">使用&lt;code>malloc()&lt;/code>将文件读入进程私有内存,不可共享.如果内存不足,模型可能会被SWAP到硬盘,导致大量硬盘写入.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">&lt;strong>mlock&lt;/strong> (none+mlock)&lt;/td>
+&lt;td style="text-align: left">&lt;code>malloc()&lt;/code>功能同上,但强制OS将模型内存全部加载到物理内存且不可被SWAP,如果内存不足,直接OOM退出&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">&lt;strong>dio&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">使用GPU推理,将模型加载到GPU VRAM时,不在内存中保留副本,可以大幅节约内存&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="4--ngl-999-使用gpu推理时模型加载到gpu的层数" >
+&lt;div>
+&lt;a href="#4--ngl-999-%e4%bd%bf%e7%94%a8gpu%e6%8e%a8%e7%90%86%e6%97%b6%e6%a8%a1%e5%9e%8b%e5%8a%a0%e8%bd%bd%e5%88%b0gpu%e7%9a%84%e5%b1%82%e6%95%b0">
+###
+&lt;/a>
+4. &lt;code>-ngl 999&lt;/code> 使用GPU推理时模型加载到GPU的层数,
+&lt;/div>
+&lt;/h4>
+&lt;ul>
+&lt;li>其余Layers使用CPU推理&lt;/li>
+&lt;li>设置为一个极大值999使得模型永远在GPU推理&lt;br>
+(VRAM不足时使用内存作为共享VRAM,推理时先读进GPU VRAM再由GPU推理)&lt;/li>
+&lt;/ul>
+&lt;h4 id="5---spec-type-draft-mtp---spec-draft-n-max-2--md-mtpgguf-开启mtp" >
+&lt;div>
+&lt;a href="#5---spec-type-draft-mtp---spec-draft-n-max-2--md-mtpgguf-%e5%bc%80%e5%90%afmtp">
+###
+&lt;/a>
+5. &lt;code>--spec-type draft-mtp --spec-draft-n-max 2 -md mtp.gguf&lt;/code> 开启MTP
+&lt;/div>
+&lt;/h4>
+&lt;ul>
+&lt;li>在GPU上MoE模型能有小幅度提速&lt;/li>
+&lt;li>据说对于dense模型能有数倍的提速&lt;/li>
+&lt;li>使用多个不同型号的CPU测试,开启MTP都会降速&lt;/li>
+&lt;/ul>
+&lt;h1 id="llamacpp编译期优化" >
+&lt;div>
+&lt;a href="#llamacpp%e7%bc%96%e8%af%91%e6%9c%9f%e4%bc%98%e5%8c%96">
+##
+&lt;/a>
+llama.cpp编译期优化
+&lt;/div>
+&lt;/h1>
+&lt;ul>
+&lt;li>C++编译器只能优化在CPU上执行的指令的效率,要优化GPU执行效率,建议使用&lt;a href="https://github.com/NVIDIA/TensorRT-LLM">Nvidia/TensorRT-LLM&lt;/a>(只支持Nvidia GPU)&lt;/li>
+&lt;/ul>
+&lt;h2 id="在本机编译开启native" >
+&lt;div>
+&lt;a href="#%e5%9c%a8%e6%9c%ac%e6%9c%ba%e7%bc%96%e8%af%91%e5%bc%80%e5%90%afnative">
+#
+&lt;/a>
+在本机编译(开启Native)
+&lt;/div>
+&lt;/h2>
+&lt;p>绝大部分和LLM推理有关的代码会被编译到&lt;code>libggml*.so&lt;/code>&lt;br>
+目前llama.cpp的release已经打包了大量针对不同CPU架构优化的&lt;code>libggml-cpu&lt;/code>,比如&lt;code>libggml-cpu-alderlake.so&lt;/code>,会自动调用alderlake支持的先进指令集(如AVX2,AVX_VNNI)加速计算.&lt;/p>
+&lt;blockquote>
+&lt;p>使用objdump可以看到&lt;code>libggml-cpu-alderlake.so&lt;/code>使用了AVX_VNNI指令集,而&lt;code>libggml-cpu-skylakex.so&lt;/code>的没有.&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>objdump -d libggml-cpu-alderlake.so | grep -E &lt;span style="color:#e6db74">&amp;#39;vpdpbusd|vpdpbusds|vpdpwssd|vpdpwssds|vpdpssd|vpdpbdd|vpdpbudd|vpdpsdd&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>由于官方版本已针对先进指令集优化,在本机编译并开启&lt;code>-DGGML_NATIVE=ON&lt;/code>的性能提升很小&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">后端&lt;/th>
+&lt;th style="text-align: left">pp512 (t/s)&lt;/th>
+&lt;th style="text-align: left">tg512 (t/s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">llama.cpp official (&lt;code>libggml-cpu-alderlake.so&lt;/code>)&lt;/td>
+&lt;td style="text-align: left">81.54 ± 0.43&lt;/td>
+&lt;td style="text-align: left">14.52 ± 0.01&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">native (&lt;code>-DGGML_NATIVE=ON -DGGML_LTO=ON&lt;/code>)&lt;/td>
+&lt;td style="text-align: left">82.19 ± 0.22&lt;/td>
+&lt;td style="text-align: left">14.69 ± 0.11&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="使用blas代替libggml-cpu" >
+&lt;div>
+&lt;a href="#%e4%bd%bf%e7%94%a8blas%e4%bb%a3%e6%9b%bflibggml-cpu">
+#
+&lt;/a>
+使用BLAS代替libggml-cpu
+&lt;/div>
+&lt;/h2>
+&lt;p>(BLAS=Basic Linear Algebra Subprograms,&lt;a href="https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms">基础线性代数程序集&lt;/a>)&lt;br>
+是一个关于矩阵运算的标准,不同厂商可以有不同的实现&lt;/p>
+&lt;p>在编译时期开启&lt;code>-DGGML_BLAS=ON&lt;/code>,则LLM推理的计算不再调用&lt;code>libggml-cpu-*.so&lt;/code>,而是交由指定的BLAS库执行&lt;/p>
+&lt;h3 id="llamacpp支持的blas库-llamacppdocsbuildmd" >
+&lt;div>
+&lt;a href="#llamacpp%e6%94%af%e6%8c%81%e7%9a%84blas%e5%ba%93-llamacppdocsbuildmd">
+##
+&lt;/a>
+llama.cpp支持的BLAS库 &lt;a href="https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md">llama.cpp/docs/build.md&lt;/a>
+&lt;/div>
+&lt;/h3>
+&lt;p>OpenBLAS&lt;br>
+BLIS&lt;br>
+Intel oneMKL&lt;/p>
+&lt;ul>
+&lt;li>由于大部分BLAS库是预编译的二进制文件(*.so),编译llama.cpp时BLAS库本身不会从头编译,而是直接引用下载的so,所以无论编译llama.cpp时如何设置参数,BLAS库本身的性能不会有太大区别.&lt;/li>
+&lt;li>高性能BLAS库的so会对不同CPU架构做针对性的优化,所以不用担心没有在本机编译性能会下降.&lt;/li>
+&lt;/ul>
+&lt;h3 id="blas库性能测试" >
+&lt;div>
+&lt;a href="#blas%e5%ba%93%e6%80%a7%e8%83%bd%e6%b5%8b%e8%af%95">
+##
+&lt;/a>
+BLAS库性能测试
+&lt;/div>
+&lt;/h3>
+&lt;ul>
+&lt;li>CPU: 14600K,仅使用6大核,不使用超线程和小核&lt;/li>
+&lt;li>内存 128bit DDR4 2666mhz&lt;/li>
+&lt;li>llama.cpp版本&lt;code>b10154&lt;/code>&lt;/li>
+&lt;li>模型&lt;code>gemma-4-26B-A4B-it-qat-UD-Q4_K_XL.gguf&lt;/code>&lt;/li>
+&lt;li>测试命令&lt;code>.\llama-bench.exe -m /data/model.gguf -p 512 -n 512 -t 6&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h4 id="使用gcc编译" >
+&lt;div>
+&lt;a href="#%e4%bd%bf%e7%94%a8gcc%e7%bc%96%e8%af%91">
+###
+&lt;/a>
+使用GCC编译
+&lt;/div>
+&lt;/h4>
+&lt;blockquote>
+&lt;p>编译参数&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-DCMAKE_C_FLAGS&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;-O3 -march=&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>MARCH&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span>-DCMAKE_CXX_FLAGS&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;-O3 -march=&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>MARCH&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span>-DGGML_LTO&lt;span style="color:#f92672">=&lt;/span>ON &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span>-DGGML_BLAS&lt;span style="color:#f92672">=&lt;/span>ON &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span>-DGGML_BLAS_VENDOR&lt;span style="color:#f92672">=&lt;/span>FLAME
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">后端&lt;/th>
+&lt;th style="text-align: left">pp512 (t/s)&lt;/th>
+&lt;th style="text-align: left">tg512 (t/s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">OpenBLAS&lt;/td>
+&lt;td style="text-align: left">60.13 ± 0.38&lt;/td>
+&lt;td style="text-align: left">14.40 ± 0.27&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">BLIS&lt;/td>
+&lt;td style="text-align: left">81.57 ± 0.75&lt;/td>
+&lt;td style="text-align: left">14.36 ± 0.01&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">libggml-cpu&lt;/td>
+&lt;td style="text-align: left">81.54 ± 0.43&lt;/td>
+&lt;td style="text-align: left">14.52 ± 0.01&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="使用intel-icx编译" >
+&lt;div>
+&lt;a href="#%e4%bd%bf%e7%94%a8intel-icx%e7%bc%96%e8%af%91">
+###
+&lt;/a>
+使用Intel ICX编译
+&lt;/div>
+&lt;/h4>
+&lt;blockquote>
+&lt;p>编译参数&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-DCMAKE_C_COMPILER&lt;span style="color:#f92672">=&lt;/span>icx &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span>-DCMAKE_CXX_COMPILER&lt;span style="color:#f92672">=&lt;/span>icpx &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span>-DCMAKE_C_FLAGS&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;-O3 -march=&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>MARCH&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\ &lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>-DCMAKE_CXX_FLAGS&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;-O3 -march=&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>MARCH&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span>-DGGML_LTO&lt;span style="color:#f92672">=&lt;/span>ON &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span>-DGGML_BLAS&lt;span style="color:#f92672">=&lt;/span>ON &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span>-DGGML_BLAS_VENDOR&lt;span style="color:#f92672">=&lt;/span>Intel10_64lp
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">后端&lt;/th>
+&lt;th style="text-align: left">pp512 (t/s)&lt;/th>
+&lt;th style="text-align: left">tg512 (t/s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">OneMKL&lt;/td>
+&lt;td style="text-align: left">94.82 ± 0.14&lt;/td>
+&lt;td style="text-align: left">15.34 ± 0.00&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">BLIS&lt;/td>
+&lt;td style="text-align: left">95.43 ± 0.17&lt;/td>
+&lt;td style="text-align: left">15.33 ± 0.01&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">libggml-cpu&lt;/td>
+&lt;td style="text-align: left">95.43 ± 0.24&lt;/td>
+&lt;td style="text-align: left">15.34 ± 0.01&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="结论-2" >
+&lt;div>
+&lt;a href="#%e7%bb%93%e8%ae%ba-2">
+###
+&lt;/a>
+结论
+&lt;/div>
+&lt;/h4>
+&lt;ul>
+&lt;li>性能只和编译器有关,和BLAS无关.&lt;/li>
+&lt;li>推测Q4量化的模型根本不会调用BLAS库,因为BLAS不支持Q4,只支持FP32这类传统数据类型&lt;/li>
+&lt;li>使用CPU运行LLM受限于内存带宽,不可能用fp16或fp32的模型,所以使用BLAS没有意义&lt;/li>
+&lt;/ul>
+&lt;h2 id="使用intel-icx编译器代替gcc" >
+&lt;div>
+&lt;a href="#%e4%bd%bf%e7%94%a8intel-icx%e7%bc%96%e8%af%91%e5%99%a8%e4%bb%a3%e6%9b%bfgcc">
+#
+&lt;/a>
+使用Intel ICX编译器代替GCC
+&lt;/div>
+&lt;/h2>
+&lt;ul>
+&lt;li>硬件,软件,模型同上&lt;/li>
+&lt;li>不使用BLAS&lt;/li>
+&lt;/ul>
+&lt;h4 id="1--ipo" >
+&lt;div>
+&lt;a href="#1--ipo">
+###
+&lt;/a>
+1. &lt;code>-ipo&lt;/code>
+&lt;/div>
+&lt;/h4>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-DCMAKE_C_FLAGS&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;-O3 -march=&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>MARCH&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74"> -ipo&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\ &lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>-DCMAKE_CXX_FLAGS&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;-O3 -march=&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>MARCH&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74"> -ipo&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>编译报错&lt;/li>
+&lt;/ul>
+&lt;h4 id="2--xmarch" >
+&lt;div>
+&lt;a href="#2--xmarch">
+###
+&lt;/a>
+2. &lt;code>-x${MARCH}&lt;/code>
+&lt;/div>
+&lt;/h4>
+&lt;p>针对特定架构CPU优化,开启后编译出的文件无法在非Intel CPU上执行(原理是运行时主动检测CPU型号,不是Intel就直接退出).&lt;br>
+由于llama.cpp在编译时会先编译一些临时二进制文件,再在本机执行它们进行后续操作,所以开启&lt;code>-x&lt;/code>后无法在AMD平台编译.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">参数&lt;/th>
+&lt;th style="text-align: left">pp512 (t/s)&lt;/th>
+&lt;th style="text-align: left">tg512 (t/s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">-xraptorlake&lt;/td>
+&lt;td style="text-align: left">95.89 ± 0.13&lt;/td>
+&lt;td style="text-align: left">15.05 ± 0.05&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">-march=raptorlake&lt;/td>
+&lt;td style="text-align: left">95.43 ± 0.24&lt;/td>
+&lt;td style="text-align: left">15.34 ± 0.01&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>0.3的差距不是误差,确实有变化.&lt;/li>
+&lt;li>会导致无法使用Github Actions编译(Github的Runner很多是AMD CPU)&lt;/li>
+&lt;/ul>
+&lt;h4 id="3--fp-modelfast" >
+&lt;div>
+&lt;a href="#3--fp-modelfast">
+###
+&lt;/a>
+3. &lt;code>-fp-model=fast&lt;/code>
+&lt;/div>
+&lt;/h4>
+&lt;p>通过牺牲浮点数的计算准确度加速运算.理论上对模型输出的质量有影响&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">参数&lt;/th>
+&lt;th style="text-align: left">pp512 (t/s)&lt;/th>
+&lt;th style="text-align: left">tg512 (t/s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">-march=raptorlake -fp-model=fast&lt;/td>
+&lt;td style="text-align: left">95.33 ± 0.34&lt;/td>
+&lt;td style="text-align: left">15.32 ± 0.00&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">-march=raptorlake&lt;/td>
+&lt;td style="text-align: left">95.43 ± 0.24&lt;/td>
+&lt;td style="text-align: left">15.34 ± 0.01&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>可以编译成功,但性能没区别,可能根本不支持q4量化的模型.&lt;/li>
+&lt;li>没有必要继续测试模型智力的损失&lt;/li>
+&lt;/ul>
+&lt;h2 id="amd平台能运行intel-icx编译的二进制文件吗" >
+&lt;div>
+&lt;a href="#amd%e5%b9%b3%e5%8f%b0%e8%83%bd%e8%bf%90%e8%a1%8cintel-icx%e7%bc%96%e8%af%91%e7%9a%84%e4%ba%8c%e8%bf%9b%e5%88%b6%e6%96%87%e4%bb%b6%e5%90%97">
+#
+&lt;/a>
+AMD平台能运行Intel ICX编译的二进制文件吗?
+&lt;/div>
+&lt;/h2>
+&lt;ul>
+&lt;li>Ryzen7 5800x + 128bit DDR4 3600mhz&lt;/li>
+&lt;li>模型&lt;code>Qwen3-30B-A3B-Instruct-2507-Q4_K_M.gguf&lt;/code>&lt;/li>
+&lt;li>使用&lt;strong>wsl2&lt;/strong>运行docker&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">后端&lt;/th>
+&lt;th style="text-align: left">pp512 (t/s)&lt;/th>
+&lt;th style="text-align: left">tg512 (t/s)&lt;/th>
+&lt;th style="text-align: left">备注&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">Intel icx + OneMKL (haswell) docker image&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;td style="text-align: left">可以编译成功但无法运行&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">Intel icx (haswell) docker image&lt;/td>
+&lt;td style="text-align: left">112.97 ± 14.59&lt;/td>
+&lt;td style="text-align: left">20.18 ± 0.14&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">llama.cpp official docker image&lt;/td>
+&lt;td style="text-align: left">98.95 ± 12.27&lt;/td>
+&lt;td style="text-align: left">20.07 ± 0.08&lt;/td>
+&lt;td style="text-align: left">-&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">llama.cpp official Windows release&lt;/td>
+&lt;td style="text-align: left">125.41 ± 0.90&lt;/td>
+&lt;td style="text-align: left">21.49 ± 0.03&lt;/td>
+&lt;td style="text-align: left">没有WSL2虚拟机的损耗&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>AMD平台可以使用Intel ICX编译并运行程序,且性能提升和Intel平台差不多(10%左右)&lt;/li>
+&lt;li>OneMKL似乎不支持AMD&lt;/li>
+&lt;li>无法使用&lt;code>-x${MARCH}&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="intel-icx依赖问题" >
+&lt;div>
+&lt;a href="#intel-icx%e4%be%9d%e8%b5%96%e9%97%ae%e9%a2%98">
+#
+&lt;/a>
+Intel ICX依赖问题
+&lt;/div>
+&lt;/h2>
+&lt;p>Intel ICX编译的llama.cpp会引用Intel自己的so,无法直接在普通ubuntu上运行&lt;br>
+最简单的方法是使用Intel提供的docker image&lt;/p>
+&lt;ul>
+&lt;li>编译环境: &lt;a href="https://hub.docker.com/r/intel/oneapi-toolkit">intel/oneapi-toolkit(下载3.4GB)&lt;/a>&lt;/li>
+&lt;li>运行环境: &lt;a href="https://hub.docker.com/r/intel/oneapi-runtime">intel/oneapi-runtime(下载2GB)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>得益于docker优秀的分层设计,只要&lt;code>oneapi-runtime&lt;/code>版本不变,llama.cpp更新时就不用重新下载几GB的image.&lt;/p>
+&lt;h2 id="编译llamacppserver的dockerfile" >
+&lt;div>
+&lt;a href="#%e7%bc%96%e8%af%91llamacppserver%e7%9a%84dockerfile">
+#
+&lt;/a>
+编译llama.cpp:server的Dockerfile
+&lt;/div>
+&lt;/h2>
+&lt;ul>
+&lt;li>目前oneapi-runtime还没有2026.1.0版本,如果有可以将final image替换为&lt;code>docker.io/intel/oneapi-runtime:2026.1.0-devel-ubuntu$UBUNTU_VERSION&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-dockerfile" data-lang="dockerfile">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">ARG&lt;/span> UBUNTU_VERSION&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#ae81ff">24&lt;/span>.04&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">ARG&lt;/span> MARCH&lt;span style="color:#f92672">=&lt;/span>alderlake
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">ARG&lt;/span> APP_VERSION&lt;span style="color:#f92672">=&lt;/span>b10156
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">FROM&lt;/span>&lt;span style="color:#e6db74"> docker.io/intel/oneapi-toolkit:2026.1.0-devel-ubuntu$UBUNTU_VERSION AS build&lt;/span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">ARG&lt;/span> MARCH&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">ARG&lt;/span> APP_VERSION&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">RUN&lt;/span> apt-get update &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> apt-get install -y gcc-14 g++-14 build-essential git cmake libssl-dev jq wget curl&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">ENV&lt;/span> CC&lt;span style="color:#f92672">=&lt;/span>gcc-14 CXX&lt;span style="color:#f92672">=&lt;/span>g++-14&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">WORKDIR&lt;/span>&lt;span style="color:#e6db74"> /app&lt;/span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">RUN&lt;/span> &lt;span style="color:#66d9ef">if&lt;/span> &lt;span style="color:#f92672">[&lt;/span> -n &lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>APP_VERSION&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#f92672">]&lt;/span>; &lt;span style="color:#66d9ef">then&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> TAG&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>APP_VERSION&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>; &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#66d9ef">else&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> TAG&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">$(&lt;/span>curl -s &lt;span style="color:#e6db74">&amp;#34;https://api.github.com/repos/ggml-org/llama.cpp/releases/latest&amp;#34;&lt;/span> | jq -r .tag_name&lt;span style="color:#66d9ef">)&lt;/span>; &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#66d9ef">fi&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> git clone https://github.com/ggml-org/llama.cpp.git . &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> git fetch --tags &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> git checkout &lt;span style="color:#e6db74">&amp;#34;tags/&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>TAG&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">RUN&lt;/span> cmake -S . -B build &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DCMAKE_C_COMPILER&lt;span style="color:#f92672">=&lt;/span>icx &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DCMAKE_CXX_COMPILER&lt;span style="color:#f92672">=&lt;/span>icpx &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DCMAKE_C_FLAGS&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;-O3 -march=&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>MARCH&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DCMAKE_CXX_FLAGS&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;-O3 -march=&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>MARCH&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DCMAKE_BUILD_TYPE&lt;span style="color:#f92672">=&lt;/span>Release &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DGGML_NATIVE&lt;span style="color:#f92672">=&lt;/span>OFF &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DGGML_LTO&lt;span style="color:#f92672">=&lt;/span>ON &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DLLAMA_BUILD_TESTS&lt;span style="color:#f92672">=&lt;/span>OFF &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DGGML_BACKEND_DL&lt;span style="color:#f92672">=&lt;/span>ON &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> -DGGML_CPU_ALL_VARIANTS&lt;span style="color:#f92672">=&lt;/span>OFF &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> cmake --build build -j &lt;span style="color:#66d9ef">$(&lt;/span>nproc&lt;span style="color:#66d9ef">)&lt;/span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">RUN&lt;/span> find /app -type f -name &lt;span style="color:#e6db74">&amp;#34;*.so*&amp;#34;&lt;/span> -exec strip --strip-unneeded &lt;span style="color:#f92672">{}&lt;/span> &lt;span style="color:#ae81ff">\;&lt;/span> 2&amp;gt;/dev/null &lt;span style="color:#f92672">||&lt;/span> true&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">RUN&lt;/span> mkdir -p /app/lib &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> find build -name &lt;span style="color:#e6db74">&amp;#34;*.so*&amp;#34;&lt;/span> -exec cp -P &lt;span style="color:#f92672">{}&lt;/span> /app/lib &lt;span style="color:#ae81ff">\;&lt;/span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">RUN&lt;/span> mkdir -p /app/full &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> cp build/bin/* /app/full &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> cp *.py /app/full &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> cp -r conversion /app/full &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> cp -r gguf-py /app/full &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> cp -r requirements /app/full &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> cp requirements.txt /app/full &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> cp .devops/tools.sh /app/full/tools.sh&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">FROM&lt;/span>&lt;span style="color:#e6db74"> docker.io/intel/oneapi-toolkit:2026.1.0-devel-ubuntu$UBUNTU_VERSION AS final&lt;/span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">RUN&lt;/span> apt-get update &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> apt-get install -y libgomp1 curl ffmpeg &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> apt autoremove -y &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> apt clean -y &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> rm -rf /tmp/* /var/tmp/* &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> find /var/cache/apt/archives /var/lib/apt/lists -not -name lock -type f -delete &lt;span style="color:#ae81ff">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ae81ff">&lt;/span> &lt;span style="color:#f92672">&amp;amp;&amp;amp;&lt;/span> find /var/cache -type f -delete&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">ENV&lt;/span> LLAMA_ARG_HOST&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#ae81ff">0&lt;/span>.0.0.0&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">COPY&lt;/span> --from&lt;span style="color:#f92672">=&lt;/span>build /app/lib/ /app&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">COPY&lt;/span> --from&lt;span style="color:#f92672">=&lt;/span>build /app/full/llama /app/full/llama-server /app&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">WORKDIR&lt;/span>&lt;span style="color:#e6db74"> /app&lt;/span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">HEALTHCHECK&lt;/span> CMD &lt;span style="color:#f92672">[&lt;/span> &lt;span style="color:#e6db74">&amp;#34;curl&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;-f&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;http://localhost:8080/health&amp;#34;&lt;/span> &lt;span style="color:#f92672">]&lt;/span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#960050;background-color:#1e0010">&lt;/span>&lt;span style="color:#66d9ef">ENTRYPOINT&lt;/span> [ &lt;span style="color:#e6db74">&amp;#34;/app/llama-server&amp;#34;&lt;/span> ]&lt;span style="color:#960050;background-color:#1e0010">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>AV1编码动漫教程</title><link>/posts/av1-anime-encode/</link><pubDate>Sun, 19 Jul 2026 00:00:00 +0000</pubDate><guid>/posts/av1-anime-encode/</guid><description>&lt;p>&lt;strong>本文所说动漫是指2010年及以后的电脑作画的动漫,由于画面干净,信息量少,编码难度比较低.上世纪的胶片/赛璐珞作画的动漫,不一定适用本文所给的参数&lt;/strong>&lt;/p>
+&lt;h1 id="0为什么av1可用" >
+&lt;div>
+&lt;a href="#0%e4%b8%ba%e4%bb%80%e4%b9%88av1%e5%8f%af%e7%94%a8">
+##
+&lt;/a>
+0.为什么AV1可用
+&lt;/div>
+&lt;/h1>
+&lt;ol>
+&lt;li>相同画质,压缩率最高:&lt;br>
+25分钟的动漫,只需300MB即可达成接近BD原盘无损的画质,体积只有原盘(H.264编码)的30%&lt;/li>
+&lt;li>编码速度极快:&lt;br>
+SVT-AV1 preset 3,在Ryzen7 5800x上编码速度超过30FPS, 且画质与preset 2/1差距极小.&lt;br>
+使用个人电脑几小时就能编码12集25分钟的动漫.&lt;/li>
+&lt;/ol>
+&lt;h1 id="1画质评价标准" >
+&lt;div>
+&lt;a href="#1%e7%94%bb%e8%b4%a8%e8%af%84%e4%bb%b7%e6%a0%87%e5%87%86">
+##
+&lt;/a>
+1.画质评价标准
+&lt;/div>
+&lt;/h1>
+&lt;p>参考:
+&lt;a href="https://iavoe.github.io/av1-web-tutorial/HTML/index.html#h2-15">AV1 编码教程 HTML 版&lt;/a>&lt;/p>
+&lt;h4 id="vmaf-1080p-中近距离桌面观看较-4k-更苛刻" >
+&lt;div>
+&lt;a href="#vmaf-1080p-%e4%b8%ad%e8%bf%91%e8%b7%9d%e7%a6%bb%e6%a1%8c%e9%9d%a2%e8%a7%82%e7%9c%8b%e8%be%83-4k-%e6%9b%b4%e8%8b%9b%e5%88%bb">
+###
+&lt;/a>
+VMAF 1080p (中近距离/桌面观看，较 4K 更苛刻)
+&lt;/div>
+&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">等级&lt;/th>
+&lt;th style="text-align: left">分值&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">&lt;strong>视觉无损&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">$\ge 95$&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">&lt;strong>优秀&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">$\ge 90$&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">&lt;strong>良好&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">$\ge 80$&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">&lt;strong>达标&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">$\ge 70$&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="压制组视频的vmaf分数参考" >
+&lt;div>
+&lt;a href="#%e5%8e%8b%e5%88%b6%e7%bb%84%e8%a7%86%e9%a2%91%e7%9a%84vmaf%e5%88%86%e6%95%b0%e5%8f%82%e8%80%83">
+###
+&lt;/a>
+压制组视频的VMAF分数参考
+&lt;/div>
+&lt;/h4>
+&lt;p>绝大部分在97-98分之间&lt;/p>
+&lt;h4 id="肉眼对比vmaf分数与画质" >
+&lt;div>
+&lt;a href="#%e8%82%89%e7%9c%bc%e5%af%b9%e6%af%94vmaf%e5%88%86%e6%95%b0%e4%b8%8e%e7%94%bb%e8%b4%a8">
+###
+&lt;/a>
+肉眼对比VMAF分数与画质
+&lt;/div>
+&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>VMAF分数&lt;/th>
+&lt;th>肉眼观感&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>90分&lt;/td>
+&lt;td>能看出明显差距,对画质有要求肯定无法接受&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>95分&lt;/td>
+&lt;td>很难看出差别&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>97分以上&lt;/td>
+&lt;td>无法看出差距&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="使用ffmetrics计算vmaf分数" >
+&lt;div>
+&lt;a href="#%e4%bd%bf%e7%94%a8ffmetrics%e8%ae%a1%e7%ae%97vmaf%e5%88%86%e6%95%b0">
+#
+&lt;/a>
+使用FFMetrics计算VMAF分数
+&lt;/div>
+&lt;/h2>
+&lt;p>首先要有原片:未经转码的BD视频.&lt;/p>
+&lt;h3 id="原片来源" >
+&lt;div>
+&lt;a href="#%e5%8e%9f%e7%89%87%e6%9d%a5%e6%ba%90">
+##
+&lt;/a>
+原片来源
+&lt;/div>
+&lt;/h3>
+&lt;ol>
+&lt;li>网上下载25GB/50GB的BD ISO&lt;/li>
+&lt;li>带BD / BluRay标签的资源 (BDRip = BD压制,BD=只经过剪辑,未重新编码视频)&lt;/li>
+&lt;li>自己买光碟&lt;/li>
+&lt;/ol>
+&lt;h3 id="软件" >
+&lt;div>
+&lt;a href="#%e8%bd%af%e4%bb%b6">
+##
+&lt;/a>
+软件
+&lt;/div>
+&lt;/h3>
+&lt;p>&lt;a href="https://github.com/fifonik/FFMetrics">fifonik/FFMetrics&lt;/a>&lt;br>
+&lt;a href="https://www.gyan.dev/ffmpeg/builds/">ffmpeg.exe&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>需要手动下载ffmpeg并放到FFMetrics目录下&lt;/li>
+&lt;li>仅支持CPU计算,速度很慢,无法使用任何GPU加速(VMAF据说可以使用CUDA加速,但FFMetrics目前不支持)&lt;/li>
+&lt;li>1.7.0版本在Intel 14代CPU上可能会被调度到小核&lt;/li>
+&lt;li>对比时必须使用时长和内容(包括不能有硬编码的字幕)完全相同的视频.&lt;/li>
+&lt;/ul>
+&lt;h1 id="2av1编码参数" >
+&lt;div>
+&lt;a href="#2av1%e7%bc%96%e7%a0%81%e5%8f%82%e6%95%b0">
+##
+&lt;/a>
+2.AV1编码参数
+&lt;/div>
+&lt;/h1>
+&lt;h2 id="软件-1" >
+&lt;div>
+&lt;a href="#%e8%bd%af%e4%bb%b6-1">
+#
+&lt;/a>
+软件
+&lt;/div>
+&lt;/h2>
+&lt;p>&lt;a href="https://www.gyan.dev/ffmpeg/builds/">ffmpeg.exe&lt;/a>&lt;/p>
+&lt;h2 id="针对动漫的参数" >
+&lt;div>
+&lt;a href="#%e9%92%88%e5%af%b9%e5%8a%a8%e6%bc%ab%e7%9a%84%e5%8f%82%e6%95%b0">
+#
+&lt;/a>
+针对动漫的参数
+&lt;/div>
+&lt;/h2>
+&lt;p>使用ffmpeg自带的SVT-AV1编码器即可达到比较优秀的画质和压缩率&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cmd" data-lang="cmd">&lt;span style="display:flex;">&lt;span>./ffmpeg.exe -y -i input.mkv -map 0 -c copy -c:V libsvtav1 -preset 3 -crf 28 -pix_fmt yuv420p10le -svtav1-params tune=0:keyint=240:enable-overlays=1:scd=1 -c:a libopus -b:a 192k -map_metadata 0 -map_chapters 0 output.mkv
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="3解码av1视频" >
+&lt;div>
+&lt;a href="#3%e8%a7%a3%e7%a0%81av1%e8%a7%86%e9%a2%91">
+##
+&lt;/a>
+3.解码AV1视频
+&lt;/div>
+&lt;/h1>
+&lt;h3 id="小科普" >
+&lt;div>
+&lt;a href="#%e5%b0%8f%e7%a7%91%e6%99%ae">
+##
+&lt;/a>
+小科普
+&lt;/div>
+&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>编码(encoding):&lt;br>
+CPU软件编码: 相同码率下画质最高,速度最慢&lt;br>
+GPU硬件编码: 以NVIDIA GPU举例, 硬件编码器NVENC是独立于CUDA计算单元的一部分ASIC电路,直接把用于编码视频的程序刻在芯片内,运行速度极快(AV1软件编码大约30FPS,NVENC可超过1000FPS)
+但由于完整的视频编码程序太复杂,刻在芯片里的电路会简化,导致相同码率下,编码的画质比CPU软件编码更低.
+因此硬件编码单元不应用于对画质有要求的场景,而是用于剪辑预览,直播等对延迟有要求的场景.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>解码(Decoding):&lt;br>
+CPU软件解码: 速度慢,功耗高&lt;br>
+GPU硬件解码: 也是GPU芯片里单独的ASIC电路,功耗极低速度极快&lt;br>
+不管是软解还是硬解,解码出的视频一定是每个像素都完全一样.所以只要支持硬解完全没必要用软解&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>(使用类似CUDA的计算单元进行视频编解码技术上不可行)&lt;/p>
+&lt;h2 id="硬件解码" >
+&lt;div>
+&lt;a href="#%e7%a1%ac%e4%bb%b6%e8%a7%a3%e7%a0%81">
+#
+&lt;/a>
+硬件解码
+&lt;/div>
+&lt;/h2>
+&lt;h3 id="pc-gpu-av1硬件解码支持" >
+&lt;div>
+&lt;a href="#pc-gpu-av1%e7%a1%ac%e4%bb%b6%e8%a7%a3%e7%a0%81%e6%94%af%e6%8c%81">
+##
+&lt;/a>
+PC GPU AV1硬件解码支持
+&lt;/div>
+&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;/th>
+&lt;th>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>NVIDIA&lt;/td>
+&lt;td>40系及以上&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>AMD&lt;/td>
+&lt;td>7000系(RDNA3)及以上&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Intel核显&lt;/td>
+&lt;td>酷睿11代(UHD700)及以上&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Intel独显&lt;/td>
+&lt;td>全部支持&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="移动设备av1硬件解码支持" >
+&lt;div>
+&lt;a href="#%e7%a7%bb%e5%8a%a8%e8%ae%be%e5%a4%87av1%e7%a1%ac%e4%bb%b6%e8%a7%a3%e7%a0%81%e6%94%af%e6%8c%81">
+##
+&lt;/a>
+移动设备AV1硬件解码支持
+&lt;/div>
+&lt;/h3>
+&lt;p>硬件解码单元(VPU)和计算单元(GPU)独立,无法根据GPU型号判断,需要根据SoC型号去官网查询&lt;/p>
+&lt;h2 id="软件解码" >
+&lt;div>
+&lt;a href="#%e8%bd%af%e4%bb%b6%e8%a7%a3%e7%a0%81">
+#
+&lt;/a>
+软件解码
+&lt;/div>
+&lt;/h2>
+&lt;p>1080p 4mbps及以下的AV1视频,CPU性能高于双核A76就可以流畅解码&lt;/p>
+&lt;h1 id="4其它" >
+&lt;div>
+&lt;a href="#4%e5%85%b6%e5%ae%83">
+##
+&lt;/a>
+4.其它
+&lt;/div>
+&lt;/h1>
+&lt;h3 id="性能" >
+&lt;div>
+&lt;a href="#%e6%80%a7%e8%83%bd">
+##
+&lt;/a>
+性能
+&lt;/div>
+&lt;/h3>
+&lt;ol>
+&lt;li>ffmpeg中视频编码的部分通过手写汇编进行极致的优化,编译器基本没有优化空间,使用官方最新版本ffmpeg即可&lt;/li>
+&lt;li>同时使用物理核心+超线程核心性能不会下降&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>超线程测试&lt;/p>&lt;/blockquote>
+&lt;p>Ryzen7 5800x&lt;br>
+SVT-AV1 preset=10 crf=28&lt;br>
+24分钟的BD原盘动漫&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;/th>
+&lt;th>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>无超线程&lt;/td>
+&lt;td>192s&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>有超线程&lt;/td>
+&lt;td>178s&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="potplayer的奇怪现象" >
+&lt;div>
+&lt;a href="#potplayer%e7%9a%84%e5%a5%87%e6%80%aa%e7%8e%b0%e8%b1%a1">
+##
+&lt;/a>
+PotPlayer的奇怪现象
+&lt;/div>
+&lt;/h3>
+&lt;blockquote>
+&lt;p>PotPlayer在不支持硬解AV1的设备上播放AV1视频时,可选H/W(硬解).&lt;/p>&lt;/blockquote>
+&lt;p>AI给出的合理解释:&lt;/p>
+&lt;ul>
+&lt;li>Potplayer尝试向Windows发起AV1硬件解码器的调用时,Windows发现硬件不支持,就自行用CPU解码后当作硬件解码的结果返回给Potplayer.实际上还是CPU软解,性能没有任何区别.&lt;/li>
+&lt;/ul>
+&lt;h3 id="gemini写的ffmpeg-av1编码工具" >
+&lt;div>
+&lt;a href="#gemini%e5%86%99%e7%9a%84ffmpeg-av1%e7%bc%96%e7%a0%81%e5%b7%a5%e5%85%b7">
+##
+&lt;/a>
+Gemini写的ffmpeg AV1编码工具
+&lt;/div>
+&lt;/h3>
+&lt;ul>
+&lt;li>需要当前目录下存在&lt;a href="https://www.gyan.dev/ffmpeg/builds/">ffmpeg.exe&lt;/a>和&lt;a href="https://mkvtoolnix.download/downloads.html">mkvmerge.exe&lt;/a>&lt;/li>
+&lt;li>由于ffmpeg对mkv容器支持不佳,使用mkvmerge打包输出的视频和音频&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> os
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> subprocess
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> concurrent.futures
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> queue
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> time
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>PRESET &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>CRF &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">28&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>OUTPUT_PREFIX &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;av1_opus_&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>FFMPEG_PATH &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;./ffmpeg.exe&amp;#34;&lt;/span> &lt;span style="color:#66d9ef">if&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>name &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#e6db74">&amp;#34;nt&amp;#34;&lt;/span> &lt;span style="color:#66d9ef">else&lt;/span> &lt;span style="color:#e6db74">&amp;#34;./ffmpeg&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>MKVMERGE_PATH &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;./mkvmerge.exe&amp;#34;&lt;/span> &lt;span style="color:#66d9ef">if&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>name &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#e6db74">&amp;#34;nt&amp;#34;&lt;/span> &lt;span style="color:#66d9ef">else&lt;/span> &lt;span style="color:#e6db74">&amp;#34;./mkvmerge&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">if&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>name &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#e6db74">&amp;#34;nt&amp;#34;&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> AFFINITY_GROUPS &lt;span style="color:#f92672">=&lt;/span> [
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> list(range(&lt;span style="color:#ae81ff">0&lt;/span>, &lt;span style="color:#ae81ff">16&lt;/span>)),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> list(range(&lt;span style="color:#ae81ff">16&lt;/span>, &lt;span style="color:#ae81ff">32&lt;/span>))
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">else&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> AFFINITY_GROUPS &lt;span style="color:#f92672">=&lt;/span> [
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> list(range(&lt;span style="color:#ae81ff">0&lt;/span>, &lt;span style="color:#ae81ff">8&lt;/span>)) &lt;span style="color:#f92672">+&lt;/span> list(range(&lt;span style="color:#ae81ff">16&lt;/span>, &lt;span style="color:#ae81ff">24&lt;/span>)),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> list(range(&lt;span style="color:#ae81ff">8&lt;/span>, &lt;span style="color:#ae81ff">16&lt;/span>)) &lt;span style="color:#f92672">+&lt;/span> list(range(&lt;span style="color:#ae81ff">24&lt;/span>, &lt;span style="color:#ae81ff">32&lt;/span>))
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>THREADS &lt;span style="color:#f92672">=&lt;/span> len(AFFINITY_GROUPS)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>task_queue &lt;span style="color:#f92672">=&lt;/span> queue&lt;span style="color:#f92672">.&lt;/span>Queue()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(THREADS):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> task_queue&lt;span style="color:#f92672">.&lt;/span>put(i)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">get_mask&lt;/span>(cores):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>name &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#e6db74">&amp;#34;nt&amp;#34;&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> mask &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">for&lt;/span> c &lt;span style="color:#f92672">in&lt;/span> cores:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> mask &lt;span style="color:#f92672">|=&lt;/span> (&lt;span style="color:#ae81ff">1&lt;/span> &lt;span style="color:#f92672">&amp;lt;&amp;lt;&lt;/span> c)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> hex(mask)[&lt;span style="color:#ae81ff">2&lt;/span>:]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">else&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#e6db74">&amp;#34;,&amp;#34;&lt;/span>&lt;span style="color:#f92672">.&lt;/span>join(map(str, cores))
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">process&lt;/span>(input_file):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> group_idx &lt;span style="color:#f92672">=&lt;/span> task_queue&lt;span style="color:#f92672">.&lt;/span>get()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cores &lt;span style="color:#f92672">=&lt;/span> AFFINITY_GROUPS[group_idx]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> mask_str &lt;span style="color:#f92672">=&lt;/span> get_mask(cores)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> out_file &lt;span style="color:#f92672">=&lt;/span> OUTPUT_PREFIX &lt;span style="color:#f92672">+&lt;/span> input_file
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tmp_all &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;tmp_&amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> out_file
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">Start: &amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> input_file &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#e6db74">&amp;#34; on group &amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> str(group_idx))
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ffmpeg_args &lt;span style="color:#f92672">=&lt;/span> [
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;-y&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;-i&amp;#34;&lt;/span>, input_file,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;-map&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;0&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;-c&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;copy&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;-c:V&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;libsvtav1&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;-preset&amp;#34;&lt;/span>, str(PRESET), &lt;span style="color:#e6db74">&amp;#34;-crf&amp;#34;&lt;/span>, str(CRF),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;-pix_fmt&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;yuv420p10le&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;-svtav1-params&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;tune=0:keyint=240:enable-overlays=1:scd=1&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;-c:a&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;libopus&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;-b:a&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;192k&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;-map_metadata&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;0&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;-map_chapters&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;0&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tmp_all
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>name &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#e6db74">&amp;#34;nt&amp;#34;&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cmd1 &lt;span style="color:#f92672">=&lt;/span> [&lt;span style="color:#e6db74">&amp;#34;cmd.exe&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;/c&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;start&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;/b&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;/wait&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;/affinity&amp;#34;&lt;/span>, mask_str, FFMPEG_PATH] &lt;span style="color:#f92672">+&lt;/span> ffmpeg_args
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">else&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cmd1 &lt;span style="color:#f92672">=&lt;/span> [&lt;span style="color:#e6db74">&amp;#34;taskset&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;-c&amp;#34;&lt;/span>, mask_str, FFMPEG_PATH] &lt;span style="color:#f92672">+&lt;/span> ffmpeg_args
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">&amp;#34;Executing FFmpeg: &amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#e6db74">&amp;#34; &amp;#34;&lt;/span>&lt;span style="color:#f92672">.&lt;/span>join(cmd1))
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> t0_ffmpeg &lt;span style="color:#f92672">=&lt;/span> time&lt;span style="color:#f92672">.&lt;/span>time()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> r1 &lt;span style="color:#f92672">=&lt;/span> subprocess&lt;span style="color:#f92672">.&lt;/span>run(cmd1, capture_output&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">True&lt;/span>, text&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">True&lt;/span>, errors&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;replace&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> t1_ffmpeg &lt;span style="color:#f92672">=&lt;/span> time&lt;span style="color:#f92672">.&lt;/span>time()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ffmpeg_time &lt;span style="color:#f92672">=&lt;/span> t1_ffmpeg &lt;span style="color:#f92672">-&lt;/span> t0_ffmpeg
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> r1&lt;span style="color:#f92672">.&lt;/span>returncode &lt;span style="color:#f92672">!=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>path&lt;span style="color:#f92672">.&lt;/span>exists(tmp_all): os&lt;span style="color:#f92672">.&lt;/span>remove(tmp_all)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> task_queue&lt;span style="color:#f92672">.&lt;/span>put(group_idx)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#e6db74">&amp;#34;FFmpeg Error: &amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> input_file &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> r1&lt;span style="color:#f92672">.&lt;/span>stderr
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cmd2 &lt;span style="color:#f92672">=&lt;/span> [MKVMERGE_PATH, &lt;span style="color:#e6db74">&amp;#34;-o&amp;#34;&lt;/span>, out_file, tmp_all]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">&amp;#34;Executing MKVMerge: &amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#e6db74">&amp;#34; &amp;#34;&lt;/span>&lt;span style="color:#f92672">.&lt;/span>join(cmd2))
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> t0_mkvmerge &lt;span style="color:#f92672">=&lt;/span> time&lt;span style="color:#f92672">.&lt;/span>time()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> r2 &lt;span style="color:#f92672">=&lt;/span> subprocess&lt;span style="color:#f92672">.&lt;/span>run(cmd2, capture_output&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">True&lt;/span>, text&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">True&lt;/span>, errors&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;replace&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> t1_mkvmerge &lt;span style="color:#f92672">=&lt;/span> time&lt;span style="color:#f92672">.&lt;/span>time()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> mkvmerge_time &lt;span style="color:#f92672">=&lt;/span> t1_mkvmerge &lt;span style="color:#f92672">-&lt;/span> t0_mkvmerge
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>path&lt;span style="color:#f92672">.&lt;/span>exists(tmp_all): os&lt;span style="color:#f92672">.&lt;/span>remove(tmp_all)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> task_queue&lt;span style="color:#f92672">.&lt;/span>put(group_idx)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> r2&lt;span style="color:#f92672">.&lt;/span>returncode &lt;span style="color:#f92672">not&lt;/span> &lt;span style="color:#f92672">in&lt;/span> (&lt;span style="color:#ae81ff">0&lt;/span>, &lt;span style="color:#ae81ff">1&lt;/span>):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>path&lt;span style="color:#f92672">.&lt;/span>exists(out_file): os&lt;span style="color:#f92672">.&lt;/span>remove(out_file)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#e6db74">&amp;#34;MKVMerge Error: &amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> input_file &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> r2&lt;span style="color:#f92672">.&lt;/span>stderr
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> total_task_time &lt;span style="color:#f92672">=&lt;/span> ffmpeg_time &lt;span style="color:#f92672">+&lt;/span> mkvmerge_time
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> (&lt;span style="color:#e6db74">f&lt;/span>&lt;span style="color:#e6db74">&amp;#34;Done: &lt;/span>&lt;span style="color:#e6db74">{&lt;/span>input_file&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74"> -&amp;gt; &lt;/span>&lt;span style="color:#e6db74">{&lt;/span>out_file&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">f&lt;/span>&lt;span style="color:#e6db74">&amp;#34; &amp;gt; FFmpeg time: &lt;/span>&lt;span style="color:#e6db74">{&lt;/span>ffmpeg_time&lt;span style="color:#e6db74">:&lt;/span>&lt;span style="color:#e6db74">.2f&lt;/span>&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">s&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">f&lt;/span>&lt;span style="color:#e6db74">&amp;#34; &amp;gt; MKVMerge time: &lt;/span>&lt;span style="color:#e6db74">{&lt;/span>mkvmerge_time&lt;span style="color:#e6db74">:&lt;/span>&lt;span style="color:#e6db74">.2f&lt;/span>&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">s&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">f&lt;/span>&lt;span style="color:#e6db74">&amp;#34; &amp;gt; Total task time: &lt;/span>&lt;span style="color:#e6db74">{&lt;/span>total_task_time&lt;span style="color:#e6db74">:&lt;/span>&lt;span style="color:#e6db74">.2f&lt;/span>&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">s&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">main&lt;/span>():
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> script_dir &lt;span style="color:#f92672">=&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>path&lt;span style="color:#f92672">.&lt;/span>dirname(os&lt;span style="color:#f92672">.&lt;/span>path&lt;span style="color:#f92672">.&lt;/span>abspath(__file__))
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> os&lt;span style="color:#f92672">.&lt;/span>chdir(script_dir)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> files &lt;span style="color:#f92672">=&lt;/span> [f &lt;span style="color:#66d9ef">for&lt;/span> f &lt;span style="color:#f92672">in&lt;/span> os&lt;span style="color:#f92672">.&lt;/span>listdir(&lt;span style="color:#e6db74">&amp;#39;.&amp;#39;&lt;/span>) &lt;span style="color:#66d9ef">if&lt;/span> f&lt;span style="color:#f92672">.&lt;/span>lower()&lt;span style="color:#f92672">.&lt;/span>endswith(&lt;span style="color:#e6db74">&amp;#39;.mkv&amp;#39;&lt;/span>) &lt;span style="color:#f92672">and&lt;/span> &lt;span style="color:#f92672">not&lt;/span> f&lt;span style="color:#f92672">.&lt;/span>startswith(OUTPUT_PREFIX)]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> &lt;span style="color:#f92672">not&lt;/span> files:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">&amp;#34;No files found to process.&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> input(&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">Press Enter to exit...&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> global_start &lt;span style="color:#f92672">=&lt;/span> time&lt;span style="color:#f92672">.&lt;/span>time()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">with&lt;/span> concurrent&lt;span style="color:#f92672">.&lt;/span>futures&lt;span style="color:#f92672">.&lt;/span>ThreadPoolExecutor(max_workers&lt;span style="color:#f92672">=&lt;/span>THREADS) &lt;span style="color:#66d9ef">as&lt;/span> executor:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> fs &lt;span style="color:#f92672">=&lt;/span> {executor&lt;span style="color:#f92672">.&lt;/span>submit(process, f): f &lt;span style="color:#66d9ef">for&lt;/span> f &lt;span style="color:#f92672">in&lt;/span> files}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">for&lt;/span> future &lt;span style="color:#f92672">in&lt;/span> concurrent&lt;span style="color:#f92672">.&lt;/span>futures&lt;span style="color:#f92672">.&lt;/span>as_completed(fs):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(future&lt;span style="color:#f92672">.&lt;/span>result())
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> global_end &lt;span style="color:#f92672">=&lt;/span> time&lt;span style="color:#f92672">.&lt;/span>time()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> total_elapsed &lt;span style="color:#f92672">=&lt;/span> global_end &lt;span style="color:#f92672">-&lt;/span> global_start
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> avg_elapsed &lt;span style="color:#f92672">=&lt;/span> total_elapsed &lt;span style="color:#f92672">/&lt;/span> len(files) &lt;span style="color:#66d9ef">if&lt;/span> files &lt;span style="color:#66d9ef">else&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">&amp;#34;-&amp;#34;&lt;/span> &lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#ae81ff">40&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">&amp;#34;All tasks completed!&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">f&lt;/span>&lt;span style="color:#e6db74">&amp;#34;Files processed: &lt;/span>&lt;span style="color:#e6db74">{&lt;/span>len(files)&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">f&lt;/span>&lt;span style="color:#e6db74">&amp;#34;Total time elapsed: &lt;/span>&lt;span style="color:#e6db74">{&lt;/span>total_elapsed&lt;span style="color:#e6db74">:&lt;/span>&lt;span style="color:#e6db74">.2f&lt;/span>&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">s&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">f&lt;/span>&lt;span style="color:#e6db74">&amp;#34;Average time per file: &lt;/span>&lt;span style="color:#e6db74">{&lt;/span>avg_elapsed&lt;span style="color:#e6db74">:&lt;/span>&lt;span style="color:#e6db74">.2f&lt;/span>&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">s&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> input(&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">Press Enter to exit...&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">if&lt;/span> __name__ &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#e6db74">&amp;#34;__main__&amp;#34;&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> main()
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>盘点Windows11的bug们</title><link>/posts/windows11-bugs/</link><pubDate>Wed, 01 Jul 2026 00:00:00 +0000</pubDate><guid>/posts/windows11-bugs/</guid><description>&lt;ul>
+&lt;li>从睡眠中唤醒后WIFI速度掉到10MB/s,断开再重新连接速度才能正常 (100%复现)&lt;/li>
+&lt;li>夜间模式(屏幕变黄),关闭后屏幕仍然是黄色,重启才正常 (x1)&lt;/li>
+&lt;li>Explorer后退太多次导致整个桌面崩溃 (老bug了)&lt;/li>
+&lt;/ul></description></item><item><title>Xiaomi AX6000刷OpenWRT</title><link>/posts/xiaomi-ax6000-openwrt/</link><pubDate>Tue, 30 Dec 2025 00:00:00 +0000</pubDate><guid>/posts/xiaomi-ax6000-openwrt/</guid><description>&lt;h1 id="已知问题" >
 &lt;div>
 &lt;a href="#%e5%b7%b2%e7%9f%a5%e9%97%ae%e9%a2%98">
 ##
@@ -214,7 +1438,7 @@ OpenWRT 25.12.0-rc1已知问题
 参考
 &lt;/div>
 &lt;/h1>
-&lt;p>&lt;a href="https://www.bilibili.com/opus/1079010971533443094">小米 AX6000 刷 OpenWrt&lt;/a>&lt;/p></description></item><item><title>给套Cloudflare CDN的节点开启ECH</title><link>/posts/xray-mihomo-enable-ech-for-cloudflare-nodes/</link><pubDate>Thu, 25 Dec 2025 00:00:00 +0000</pubDate><guid>/posts/xray-mihomo-enable-ech-for-cloudflare-nodes/</guid><description>&lt;h1 id="参考" >
+&lt;p>&lt;a href="https://www.bilibili.com/opus/1079010971533443094">小米 AX6000 刷 OpenWrt&lt;/a>&lt;/p></description></item><item><title>给套Cloudflare CDN的节点开启ECH</title><link>/posts/enable-ech-for-cloudflare-nodes/</link><pubDate>Thu, 25 Dec 2025 00:00:00 +0000</pubDate><guid>/posts/enable-ech-for-cloudflare-nodes/</guid><description>&lt;h1 id="参考" >
 &lt;div>
 &lt;a href="#%e5%8f%82%e8%80%83">
 ##
@@ -333,7 +1557,15 @@ Mihomo客户端
 &lt;p>一个Debian 13虚拟机&lt;br>
 能访问&lt;code>dns.google&lt;/code>&lt;/p>
 &lt;pre tabindex="0">&lt;code>sudo apt install dnsutils
-&lt;/code>&lt;/pre>&lt;blockquote>
+&lt;/code>&lt;/pre>&lt;h2 id="测试内容" >
+&lt;div>
+&lt;a href="#%e6%b5%8b%e8%af%95%e5%86%85%e5%ae%b9">
+#
+&lt;/a>
+测试内容
+&lt;/div>
+&lt;/h2>
+&lt;blockquote>
 &lt;p>使用ISP分配的默认DNS查询HTTPS解析&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>dig HTTPS cloudflare-ech.com
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
@@ -348,12 +1580,12 @@ Mihomo客户端
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
 &lt;p>使用&lt;code>dns.google&lt;/code>查询&lt;code>www.qbittorrent.org&lt;/code>的HTTPS解析&lt;/p>&lt;/blockquote>
 &lt;p>浏览器输入&lt;code>https://dns.google/query?name=www.qbittorrent.org&amp;amp;rr_type=https&amp;amp;ecs=&lt;/code>&lt;/p>
-&lt;h2 id="国内dns对ech的支持" >
+&lt;h2 id="国内dns对https65的支持" >
 &lt;div>
-&lt;a href="#%e5%9b%bd%e5%86%85dns%e5%af%b9ech%e7%9a%84%e6%94%af%e6%8c%81">
+&lt;a href="#%e5%9b%bd%e5%86%85dns%e5%af%b9https65%e7%9a%84%e6%94%af%e6%8c%81">
 #
 &lt;/a>
-国内DNS对ECH的支持?
+国内DNS对HTTPS(65)的支持?
 &lt;/div>
 &lt;/h2>
 &lt;table>
@@ -382,8 +1614,8 @@ Mihomo客户端
 &lt;/table>
 &lt;p>阿里DNS即使域名不支持ECH也立刻返回结果,不会超时,但ISP分配的默认DNS,所有HTTPS(65)请求都超时&lt;/p>
 &lt;ul>
-&lt;li>说明明文DNS也能查询到ECH Config&lt;/li>
-&lt;li>说明有些DNS屏蔽了全部HTTPS查询&lt;/li>
+&lt;li>说明明文DNS服务器也能查询到ECH Config&lt;/li>
+&lt;li>说明有些DNS服务器故意屏蔽了全部HTTPS查询&lt;/li>
 &lt;/ul>
 &lt;h2 id="哪些域名能查到coudflare分配的ech-config" >
 &lt;div>
@@ -397,8 +1629,8 @@ Mihomo客户端
 &lt;thead>
 &lt;tr>
 &lt;th>Domain&lt;/th>
-&lt;th>国内&lt;/th>
-&lt;th>国外&lt;/th>
+&lt;th>dns.alidns.com&lt;/th>
+&lt;th>dns.google&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
@@ -550,6 +1782,11 @@ Tips
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">proxy&lt;/span>:
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">url&lt;/span>: &lt;span style="color:#ae81ff">https://bing.com&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">rewriteHost&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">acl&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">inline&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> - &lt;span style="color:#ae81ff">reject(geoip:cn)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> - &lt;span style="color:#ae81ff">reject(geosite:cn)&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
 &lt;p>运行&amp;amp;开机自启动&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>docker run -d --name hysteria --pull always --restart always -p 443:443/udp -v ./hysteria/:/etc/hysteria/ tobyxdd/hysteria server -c /etc/hysteria/hysteria.yaml
@@ -971,50 +2208,50 @@ OpenWrt扩容
 &lt;li>自动设置在系统更新后保留这两个脚本(luci界面&lt;code>System -&amp;gt; Backup / Flash Firmware / Configuration&lt;/code>可查)&lt;/li>
 &lt;li>但没有将这两个脚本写入&lt;code>/etc/sysupgrade.conf&lt;/code>(这个文件甚至不存在).&lt;/li>
 &lt;/ol>
-&lt;p>所以默认自动更新后应该不会扩容&lt;/p></description></item><item><title>OpenWrt设置usb扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
+&lt;p>所以默认自动更新后应该不会扩容&lt;/p></description></item><item><title>OpenWrt设置USB扩容</title><link>/posts/openwrt-set-usb-overlay/</link><pubDate>Mon, 27 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-set-usb-overlay/</guid><description>&lt;h1 id="openwrt设置usb扩容" >
 &lt;div>
 &lt;a href="#openwrt%e8%ae%be%e7%bd%aeusb%e6%89%a9%e5%ae%b9">
 ##
 &lt;/a>
-OpenWrt设置usb扩容
+OpenWrt设置USB扩容
 &lt;/div>
 &lt;/h1>
-&lt;p>&lt;a href="https://openwrt.org/docs/guide-user/additional-software/extroot_configuration">原文&lt;/a>&lt;/p>
-&lt;h2 id="连接ssh" >
+&lt;p>&lt;a href="https://openwrt.org/docs/guide-user/additional-software/extroot_configuration">参考原文&lt;/a>&lt;/p>
+&lt;h2 id="1使用ssh连接路由器" >
 &lt;div>
-&lt;a href="#%e8%bf%9e%e6%8e%a5ssh">
+&lt;a href="#1%e4%bd%bf%e7%94%a8ssh%e8%bf%9e%e6%8e%a5%e8%b7%af%e7%94%b1%e5%99%a8">
 #
 &lt;/a>
-连接SSH
+1.使用SSH连接路由器
 &lt;/div>
 &lt;/h2>
-&lt;h2 id="安装软件包" >
+&lt;h2 id="2安装软件包" >
 &lt;div>
-&lt;a href="#%e5%ae%89%e8%a3%85%e8%bd%af%e4%bb%b6%e5%8c%85">
+&lt;a href="#2%e5%ae%89%e8%a3%85%e8%bd%af%e4%bb%b6%e5%8c%85">
 #
 &lt;/a>
-安装软件包
+2.安装软件包
 &lt;/div>
 &lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>opkg update
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>opkg install block-mount kmod-fs-ext4 e2fsprogs parted kmod-usb-storage
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="查看usb设备位置" >
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="3查看usb设备位置" >
 &lt;div>
-&lt;a href="#%e6%9f%a5%e7%9c%8busb%e8%ae%be%e5%a4%87%e4%bd%8d%e7%bd%ae">
+&lt;a href="#3%e6%9f%a5%e7%9c%8busb%e8%ae%be%e5%a4%87%e4%bd%8d%e7%bd%ae">
 #
 &lt;/a>
-查看USB设备位置
+3.查看USB设备位置
 &lt;/div>
 &lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ls -l /sys/block
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>如果是无线路由器只有一个外接存储，大概率是&lt;code>sda&lt;/code>&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>lrwxrwxrwx &lt;span style="color:#ae81ff">1&lt;/span> root root &lt;span style="color:#ae81ff">0&lt;/span> xxx xx xx:xx sda -&amp;gt; ../devices/xxx/block/sda
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="在usb上创建分区格式化设置exroot并自动挂载" >
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="4在usb上创建分区格式化设置exroot并自动挂载" >
 &lt;div>
-&lt;a href="#%e5%9c%a8usb%e4%b8%8a%e5%88%9b%e5%bb%ba%e5%88%86%e5%8c%ba%e6%a0%bc%e5%bc%8f%e5%8c%96%e8%ae%be%e7%bd%aeexroot%e5%b9%b6%e8%87%aa%e5%8a%a8%e6%8c%82%e8%bd%bd">
+&lt;a href="#4%e5%9c%a8usb%e4%b8%8a%e5%88%9b%e5%bb%ba%e5%88%86%e5%8c%ba%e6%a0%bc%e5%bc%8f%e5%8c%96%e8%ae%be%e7%bd%aeexroot%e5%b9%b6%e8%87%aa%e5%8a%a8%e6%8c%82%e8%bd%bd">
 #
 &lt;/a>
-在USB上创建分区，格式化，设置exroot并自动挂载
+4.在USB上创建分区，格式化，设置exroot并自动挂载
 &lt;/div>
 &lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#Partitioning and formatting&lt;/span>
@@ -1039,22 +2276,121 @@ OpenWrt设置usb扩容
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci set fstab.rwm.device&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>ORIG&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci set fstab.rwm.target&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;/rwm&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci commit fstab
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>按y，一路回车&lt;/p>
-&lt;h2 id="复制内置闪存的文件" >
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>按行复制,按y，一路回车&lt;/p>
+&lt;h2 id="5复制内置闪存的文件" >
 &lt;div>
-&lt;a href="#%e5%a4%8d%e5%88%b6%e5%86%85%e7%bd%ae%e9%97%aa%e5%ad%98%e7%9a%84%e6%96%87%e4%bb%b6">
+&lt;a href="#5%e5%a4%8d%e5%88%b6%e5%86%85%e7%bd%ae%e9%97%aa%e5%ad%98%e7%9a%84%e6%96%87%e4%bb%b6">
 #
 &lt;/a>
-复制内置闪存的文件
+5.复制内置闪存的文件
 &lt;/div>
 &lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>mount &lt;span style="color:#e6db74">${&lt;/span>DEVICE&lt;span style="color:#e6db74">}&lt;/span> /mnt
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>tar -C &lt;span style="color:#e6db74">${&lt;/span>MOUNT&lt;span style="color:#e6db74">}&lt;/span> -cvf - . | tar -C /mnt -xf -
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>此时检查software的可用容量应该是U盘的容量了&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="6重启" >
+&lt;div>
+&lt;a href="#6%e9%87%8d%e5%90%af">
+#
+&lt;/a>
+6.重启
+&lt;/div>
+&lt;/h2>
+&lt;p>检查software的可用容量应该是U盘的容量了&lt;/p>
 &lt;ul>
-&lt;li>实测直接拔掉U盘重启就会自动使用内置的闪存启动,不需要任何配置&lt;/li>
-&lt;li>安装系统更新不确定会发生什么,最好不要这么做&lt;/li>
-&lt;/ul></description></item><item><title>HTTP3(quic) 直连黑名单域名测试</title><link>/posts/quic-bypass-gfw-test/</link><pubDate>Sun, 17 Aug 2025 00:00:00 +0000</pubDate><guid>/posts/quic-bypass-gfw-test/</guid><description>&lt;h1 id="http3quic-直连黑名单域名测试" >
+&lt;li>&lt;strong>更新系统会导致USB Overlay失效,不要更新!!!&lt;/strong> &lt;del>安装系统更新不确定会发生什么,最好不要这么做&lt;/del>&lt;/li>
+&lt;li>实测直接拔掉U盘重启会自动使用内置的闪存启动,不需要任何配置&lt;/li>
+&lt;/ul>
+&lt;h1 id="更新系统会发生什么" >
+&lt;div>
+&lt;a href="#%e6%9b%b4%e6%96%b0%e7%b3%bb%e7%bb%9f%e4%bc%9a%e5%8f%91%e7%94%9f%e4%bb%80%e4%b9%88">
+##
+&lt;/a>
+更新系统会发生什么?
+&lt;/div>
+&lt;/h1>
+&lt;p>实测即使安装小版本更新(Official OpenWRT24.10.5 -&amp;gt; 24.10.6),也会重置所有内置的软件,导致所有自行安装的软件丢失&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>kmod-usb-storage&lt;/code>没有默认安装导致OpenWRT无法识别USB存储设备&lt;/li>
+&lt;li>仅网络相关的配置(static ip / DNS / WIFI)会被保留,(WIFI和网口可用)&lt;/li>
+&lt;/ul>
+&lt;p>即使手动恢复了U盘的挂载,也会有各种软件兼容性问题&lt;/p>
+&lt;ul>
+&lt;li>OpenClash需要&lt;code>kmod-tun&lt;/code>这个内核模块,但24.10.5 -&amp;gt; 24.10.6内核版本改变导致原有的&lt;code>kmod-tun&lt;/code>因内核版本不匹配无法使用&lt;/li>
+&lt;li>OpenClash会将发所有DNS请求重定向到自身监听的&lt;code>127.0.0.1:xxxx&lt;/code>,导致OpenClash未启动时DNS故障,解决方法:Network -&amp;gt; DHCP and DNS -&amp;gt; Forwards 删除所有DNS Forwards中的&lt;code>127.0.0.1#xxxx&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="总结" >
+&lt;div>
+&lt;a href="#%e6%80%bb%e7%bb%93">
+#
+&lt;/a>
+总结
+&lt;/div>
+&lt;/h2>
+&lt;ol>
+&lt;li>使用sysupgrade.bin更新系统基本相当于全新安装,不如不保留配置全新安装,然后手动重新配置USB Overlay&lt;/li>
+&lt;li>建议选择OpenWRT上一个大版本的最后一个小版本,一年不更新,一年后全新安装下一个已停更的版本&lt;/li>
+&lt;li>在安装全新OpenWRT时需确认
+&lt;ul>
+&lt;li>OpenWRT默认不开启WIFI,需要用网线连接路由器&lt;/li>
+&lt;li>不翻墙时OpenWRT能正常安装软件&lt;/li>
+&lt;li>不翻墙时有能力装好翻墙软件(提前下载ipk和内核)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>用以下命令可在OpenWRT上恢复原来的USB Overlay&lt;/p>&lt;/blockquote>
+&lt;ul>
+&lt;li>由于内核版本改变,原来安装在U盘的软件不一定能正常运行&lt;/li>
+&lt;li>仅用于备份U盘里的数据&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>opkg update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>opkg install block-mount kmod-fs-ext4 e2fsprogs parted kmod-usb-storage
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>DISK&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;/dev/sda&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>DEVICE&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>DISK&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>eval &lt;span style="color:#66d9ef">$(&lt;/span>block info &lt;span style="color:#e6db74">${&lt;/span>DEVICE&lt;span style="color:#e6db74">}&lt;/span> | grep -o -e &lt;span style="color:#e6db74">&amp;#39;UUID=&amp;#34;\S*&amp;#34;&amp;#39;&lt;/span>&lt;span style="color:#66d9ef">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>eval &lt;span style="color:#66d9ef">$(&lt;/span>block info | grep -o -e &lt;span style="color:#e6db74">&amp;#39;MOUNT=&amp;#34;\S*/overlay&amp;#34;&amp;#39;&lt;/span>&lt;span style="color:#66d9ef">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci -q delete fstab.extroot
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci set fstab.extroot&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;mount&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci set fstab.extroot.uuid&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>UUID&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci set fstab.extroot.target&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>MOUNT&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci commit fstab
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>ORIG&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#66d9ef">$(&lt;/span>block info | sed -n -e &lt;span style="color:#e6db74">&amp;#39;/MOUNT=&amp;#34;\S*\/overlay&amp;#34;/s/:\s.*$//p&amp;#39;&lt;/span>&lt;span style="color:#66d9ef">)&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci -q delete fstab.rwm
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci set fstab.rwm&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;mount&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci set fstab.rwm.device&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>ORIG&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci set fstab.rwm.target&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;/rwm&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>uci commit fstab
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>reboot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Ollama环境变量</title><link>/posts/ollama-env/</link><pubDate>Thu, 02 Oct 2025 00:00:00 +0000</pubDate><guid>/posts/ollama-env/</guid><description>&lt;p>&lt;a href="https://github.com/ollama/ollama/blob/main/cmd/cmd.go">cmd.go&lt;/a>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-golang" data-lang="golang">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">// 在1600行NewCLI(),所有可以设置的环境变量&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">switch&lt;/span> &lt;span style="color:#a6e22e">cmd&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#a6e22e">runCmd&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">appendEnvDocs&lt;/span>(&lt;span style="color:#a6e22e">cmd&lt;/span>, []&lt;span style="color:#a6e22e">envconfig&lt;/span>.&lt;span style="color:#a6e22e">EnvVar&lt;/span>{&lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_HOST&amp;#34;&lt;/span>], &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_NOHISTORY&amp;#34;&lt;/span>]})
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#a6e22e">serveCmd&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">appendEnvDocs&lt;/span>(&lt;span style="color:#a6e22e">cmd&lt;/span>, []&lt;span style="color:#a6e22e">envconfig&lt;/span>.&lt;span style="color:#a6e22e">EnvVar&lt;/span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_DEBUG&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_HOST&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_KEEP_ALIVE&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_MAX_LOADED_MODELS&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_MAX_QUEUE&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_MODELS&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_NUM_PARALLEL&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_NOPRUNE&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_ORIGINS&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_SCHED_SPREAD&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_FLASH_ATTENTION&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_KV_CACHE_TYPE&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_LLM_LIBRARY&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_GPU_OVERHEAD&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">envVars&lt;/span>[&lt;span style="color:#e6db74">&amp;#34;OLLAMA_LOAD_TIMEOUT&amp;#34;&lt;/span>],
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> })
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">...&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>HTTP3(quic) 直连黑名单域名测试</title><link>/posts/quic-bypass-gfw-test/</link><pubDate>Sun, 17 Aug 2025 00:00:00 +0000</pubDate><guid>/posts/quic-bypass-gfw-test/</guid><description>&lt;h1 id="http3quic-直连黑名单域名测试" >
 &lt;div>
 &lt;a href="#http3quic-%e7%9b%b4%e8%bf%9e%e9%bb%91%e5%90%8d%e5%8d%95%e5%9f%9f%e5%90%8d%e6%b5%8b%e8%af%95">
 ##
@@ -1536,8 +2872,33 @@ dom.push.enabled = false
 &lt;p>寻找被 ZFS 挂载而隐藏的目录&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># pwd是一个ZFS Pool/Dataset 挂载点&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo find . -type d -print0 | xargs -0 stat -c &lt;span style="color:#e6db74">&amp;#34;%d %n&amp;#34;&lt;/span> | sort -n | awk &lt;span style="color:#e6db74">&amp;#39;NR==1{p=$1;next} $1!=p{print &amp;#34;ZFS mount at&amp;#34;, $2} {p=$1}&amp;#39;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>LSI-3008更新固件</title><link>/posts/lsi-3008-update-firmware/</link><pubDate>Wed, 09 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/lsi-3008-update-firmware/</guid><description>&lt;p>&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/">LSI SAS 9300-xx更新固件教程&lt;/a>&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>LSI-3008更新固件</title><link>/posts/lsi-2308-3008-update-firmware/</link><pubDate>Wed, 09 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/lsi-2308-3008-update-firmware/</guid><description>&lt;h1 id="lsi-2308" >
+&lt;div>
+&lt;a href="#lsi-2308">
+##
+&lt;/a>
+LSI 2308
+&lt;/div>
+&lt;/h1>
+&lt;p>&lt;a href="https://www.broadcom.com/support/download-search?pg=Legacy+Products&amp;amp;pf=Legacy+Host+Bus+Adapters&amp;amp;pn=SAS+9207-8i+Host+Bus+Adapter&amp;amp;pa=&amp;amp;po=&amp;amp;dk=&amp;amp;pl=">博通官网下载地址&lt;/a>&lt;br>
+分别下载BIOS的第一个和Firmware的第一个,并解压&lt;/p>
+&lt;blockquote>
+&lt;p>刷写BIOS&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo sas2flash -o -f ./Firmware/HBA_9207_8i_IT/9207-8.bin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>刷写Firmware&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo sas2flash -c &lt;span style="color:#ae81ff">0&lt;/span> -b x64sas2.rom
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="lsi-3008" >
+&lt;div>
+&lt;a href="#lsi-3008">
+##
+&lt;/a>
+LSI 3008
+&lt;/div>
+&lt;/h1>
+&lt;p>&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/">LSI SAS 9300-xx更新固件教程&lt;/a>&lt;br>
 &lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/download">固件下载直链&lt;/a>&lt;br>
+&lt;a href="https://www.broadcom.com/support/download-search?pg=Legacy+Products&amp;amp;pf=Legacy+Host+Bus+Adapters&amp;amp;pn=SAS+9300-8i+Host+Bus+Adapter&amp;amp;pa=&amp;amp;po=&amp;amp;dk=&amp;amp;pl=">博通官网下载地址&lt;/a>&lt;br>
 TrueNAS自带该阵列卡更新固件的程序,直接在Shell更新,不用做MS-DOS的启动U盘&lt;/p>
 &lt;blockquote>
 &lt;p>刷写固件&lt;/p>&lt;/blockquote>
@@ -1896,7 +3257,7 @@ XHTTP的Cache Policy
 &lt;p>&lt;del>Cloudfront 上传按量收费，下载1TB以内免费，所以可以下行走Cloudfront上行走别的&lt;/del>&lt;br>
 实测不主动上传文件,总流量200GB以内一般不会收费(会产生0.0x美元的账单但不会从卡里扣钱)&lt;/p>
 &lt;/li>
-&lt;/ul></description></item><item><title>OpenWrt 修改Kernel Hash安装官方源kmod-ipk</title><link>/posts/openwrt-change-kernel-hash/</link><pubDate>Tue, 01 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-change-kernel-hash/</guid><description>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vi /usr/lib/opkg/status
+&lt;/ul></description></item><item><title>OpenWrt修改Kernel Hash安装官方源kmod-ipk</title><link>/posts/openwrt-change-kernel-hash/</link><pubDate>Tue, 01 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/openwrt-change-kernel-hash/</guid><description>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vi /usr/lib/opkg/status
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># replace hash_a by hash_b&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>:%s/hash_a/hash_b/g
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>hash_a 是 /usr/lib/opkg/status 里的hash值&lt;br>

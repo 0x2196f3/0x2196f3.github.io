@@ -1,0 +1,290 @@
+<!doctype html><html lang=zh-CN data-theme><head><meta charset=utf-8><meta name=HandheldFriendly content="True"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=referrer content="no-referrer-when-downgrade"><meta name=theme-name content="Anubis2"><title>AV1编码动漫教程 - 0x2196f3&rsquo;s blog</title><meta name=description content="本文所说动漫是指2010年及以后的电脑作画的动漫,由于画面干净,信息量少,编码难度比较低.上世纪的胶片/赛璐珞作画的动漫,不一定适用本文所给的参数
+
+
+    
+        ##
+    
+    0.为什么AV1可用
+
+
+
+相同画质,压缩率最高:
+25分钟的动漫,只需300MB即可达成接近BD原盘无损的画质,体积只有原盘(H.264编码)的30%
+编码速度极快:
+SVT-AV1 preset 3,在Ryzen7 5800x上编码速度超过30FPS, 且画质与preset 2/1差距极小.
+使用个人电脑几小时就能编码12集25分钟的动漫.
+
+
+
+    
+        ##
+    
+    1.画质评价标准
+
+
+参考:
+AV1 编码教程 HTML 版
+
+
+    
+        ###
+    
+    VMAF 1080p (中近距离/桌面观看，较 4K 更苛刻)
+
+
+
+  
+      
+          等级
+          分值
+      
+  
+  
+      
+          视觉无损
+          $\ge 95$
+      
+      
+          优秀
+          $\ge 90$
+      
+      
+          良好
+          $\ge 80$
+      
+      
+          达标
+          $\ge 70$
+      
+  
+
+
+
+    
+        ###
+    
+    压制组视频的VMAF分数参考
+
+
+绝大部分在97-98分之间
+
+
+    
+        ###
+    
+    肉眼对比VMAF分数与画质
+
+
+
+  
+      
+          VMAF分数
+          肉眼观感
+      
+  
+  
+      
+          90分
+          能看出明显差距,对画质有要求肯定无法接受
+      
+      
+          95分
+          很难看出差别
+      
+      
+          97分以上
+          无法看出差距
+      
+  
+
+
+
+    
+        #
+    
+    使用FFMetrics计算VMAF分数
+
+
+首先要有原片:未经转码的BD视频.
+
+
+    
+        ##
+    
+    原片来源
+
+
+
+网上下载25GB/50GB的BD ISO
+带BD / BluRay标签的资源 (BDRip = BD压制,BD=只经过剪辑,未重新编码视频)
+自己买光碟
+
+
+
+    
+        ##
+    
+    软件
+
+
+fifonik/FFMetrics
+ffmpeg.exe"><link rel=icon type=image/x-icon href=https://0x2196f3.github.io/favicon.ico><link rel=apple-touch-icon-precomposed href=https://0x2196f3.github.io/favicon.png><style>body{visibility:hidden;opacity:0}</style><noscript><style>body{visibility:visible;opacity:1}</style></noscript><link rel=stylesheet href=/css/style.min.ac9fbad24609bd533b00c98f0dfbd971989a71aca4b450e1e77ab6c33ee463c6.css integrity="sha256-rJ+60kYJvVM7AMmPDfvZcZiacayktFDh53q2wz7kY8Y="><link rel=stylesheet href=/css/style.min.c4c04b3ef88e3d619ad4c7ee5e03048422bc55c4fefdc1f07657c1133670aa22.css integrity="sha256-xMBLPviOPWGa1MfuXgMEhCK8VcT+/cHwdlfBEzZwqiI="><link rel=stylesheet href=/css/style.min.21c5d8fe0a79d623b0adc1ce4bd4f6dd2c05cd939c9aaaa966ba7186b1464f4d.css integrity="sha256-IcXY/gp51iOwrcHOS9T23SwFzZOcmqqpZrpxhrFGT00="><script src=/js/script.min.08f04d96386c73c9bf4d160333f8f448c05a6e01c06770542ee0e013954ce930.js type=text/javascript integrity="sha256-CPBNljhsc8m/TRYDM/j0SMBabgHAZ3BULuDgE5VM6TA="></script></head><body><a class=skip-main href=#main>Skip to main content</a><div class=container><header class=common-header><div class=header-top><div class=header-top-left><h1 class="site-title noselect"><a href=/>0x2196f3's blog</a></h1><div class=theme-switcher><span class=inline-svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-sun-high"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14.828 14.828A4 4 0 109.172 9.172a4 4 0 005.656 5.656z"/><path d="M6.343 17.657l-1.414 1.414"/><path d="M6.343 6.343 4.929 4.929"/><path d="M17.657 6.343l1.414-1.414"/><path d="M17.657 17.657l1.414 1.414"/><path d="M4 12H2"/><path d="M12 4V2"/><path d="M20 12h2"/><path d="M12 20v2"/></svg></span></div><script>const STORAGE_KEY="user-color-scheme",defaultTheme="auto";let currentTheme,switchButton,autoDefinedScheme=window.matchMedia("(prefers-color-scheme: dark)");function switchTheme(){currentTheme=currentTheme==="dark"?"light":"dark",localStorage&&localStorage.setItem(STORAGE_KEY,currentTheme),document.documentElement.setAttribute("data-theme",currentTheme),changeGiscusTheme(currentTheme),document.body.dispatchEvent(new CustomEvent(currentTheme+"-theme-set"))}const autoChangeScheme=e=>{currentTheme=e.matches?"dark":"light",document.documentElement.setAttribute("data-theme",currentTheme),changeGiscusTheme(currentTheme),document.body.dispatchEvent(new CustomEvent(currentTheme+"-theme-set"))};document.addEventListener("DOMContentLoaded",function(){switchButton=document.querySelector(".theme-switcher"),currentTheme=detectCurrentScheme(),currentTheme==="auto"?(autoChangeScheme(autoDefinedScheme),autoDefinedScheme.addListener(autoChangeScheme)):document.documentElement.setAttribute("data-theme",currentTheme),switchButton&&switchButton.addEventListener("click",switchTheme,!1),showContent()});function detectCurrentScheme(){return localStorage!==null&&localStorage.getItem(STORAGE_KEY)?localStorage.getItem(STORAGE_KEY):defaultTheme?defaultTheme:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}function showContent(){document.body.style.visibility="visible",document.body.style.opacity=1}function changeGiscusTheme(e){function t(e){const t=document.querySelector("iframe.giscus-frame");if(!t)return;t.contentWindow.postMessage({giscus:e},"https://giscus.app")}t({setConfig:{theme:e}})}</script><ul class="social-icons noselect"><li><a href=/index.xml title=RSS rel=me><span class=inline-svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-rss"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 19m-1 0a1 1 0 102 0 1 1 0 10-2 0"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg></span></a></li></ul></div><div class=header-top-right></div></div><nav class=noselect><a href=https://0x2196f3.github.io/ title>Home</a>
+<a href=https://0x2196f3.github.io/tags/ title>Tags</a>
+<a href=https://0x2196f3.github.io/posts/ title>Archive</a></nav></header><main id=main tabindex=-1><article class="post h-entry"><div class=post-header><header><h1 class="p-name post-title">AV1编码动漫教程</h1></header><div class="post-info noselect"><div class="post-date dt-published"><time datetime=2026-07-19>2026-07-19</time></div><a class="post-hidden-url u-url" href=/posts/av1-anime-encode/>/posts/av1-anime-encode/</a>
+<a href=https://0x2196f3.github.io/ class="p-name p-author post-hidden-author h-card" rel=me></a><div class=post-taxonomies><ul class=post-tags><li><a href=/tags/av1>#av1</a></li><li><a href=/tags/video-encode>#video encode</a></li></ul></div></div></div><details class="toc noselect"><summary>Table of Contents</summary><div class=inner><nav id=TableOfContents><ul><li><ul><li></li></ul></li><li><a href=#使用ffmetrics计算vmaf分数>使用FFMetrics计算VMAF分数</a><ul><li><a href=#原片来源>原片来源</a></li><li><a href=#软件>软件</a></li></ul></li></ul><ul><li><a href=#软件-1>软件</a></li><li><a href=#针对动漫的参数>针对动漫的参数</a></li></ul><ul><li><ul><li><a href=#小科普>小科普</a></li></ul></li><li><a href=#硬件解码>硬件解码</a><ul><li><a href=#pc-gpu-av1硬件解码支持>PC GPU AV1硬件解码支持</a></li><li><a href=#移动设备av1硬件解码支持>移动设备AV1硬件解码支持</a></li></ul></li><li><a href=#软件解码>软件解码</a></li></ul><ul><li><ul><li><a href=#性能>性能</a></li><li><a href=#potplayer的奇怪现象>PotPlayer的奇怪现象</a></li><li><a href=#gemini写的ffmpeg-av1编码工具>Gemini写的ffmpeg AV1编码工具</a></li></ul></li></ul></nav></div></details><script>var toc=document.querySelector(".toc");toc&&toc.addEventListener("click",function(){event.target.tagName!=="A"&&(event.preventDefault(),this.open?(this.open=!1,this.classList.remove("expanded")):(this.open=!0,this.classList.add("expanded")))})</script><div class="content e-content"><p><strong>本文所说动漫是指2010年及以后的电脑作画的动漫,由于画面干净,信息量少,编码难度比较低.上世纪的胶片/赛璐珞作画的动漫,不一定适用本文所给的参数</strong></p><h1 id=0为什么av1可用><div><a href=#0%e4%b8%ba%e4%bb%80%e4%b9%88av1%e5%8f%af%e7%94%a8>##
+</a>0.为什么AV1可用</div></h1><ol><li>相同画质,压缩率最高:<br>25分钟的动漫,只需300MB即可达成接近BD原盘无损的画质,体积只有原盘(H.264编码)的30%</li><li>编码速度极快:<br>SVT-AV1 preset 3,在Ryzen7 5800x上编码速度超过30FPS, 且画质与preset 2/1差距极小.<br>使用个人电脑几小时就能编码12集25分钟的动漫.</li></ol><h1 id=1画质评价标准><div><a href=#1%e7%94%bb%e8%b4%a8%e8%af%84%e4%bb%b7%e6%a0%87%e5%87%86>##
+</a>1.画质评价标准</div></h1><p>参考:
+<a href=https://iavoe.github.io/av1-web-tutorial/HTML/index.html#h2-15>AV1 编码教程 HTML 版</a></p><h4 id=vmaf-1080p-中近距离桌面观看较-4k-更苛刻><div><a href=#vmaf-1080p-%e4%b8%ad%e8%bf%91%e8%b7%9d%e7%a6%bb%e6%a1%8c%e9%9d%a2%e8%a7%82%e7%9c%8b%e8%be%83-4k-%e6%9b%b4%e8%8b%9b%e5%88%bb>###
+</a>VMAF 1080p (中近距离/桌面观看，较 4K 更苛刻)</div></h4><table><thead><tr><th style=text-align:left>等级</th><th style=text-align:left>分值</th></tr></thead><tbody><tr><td style=text-align:left><strong>视觉无损</strong></td><td style=text-align:left>$\ge 95$</td></tr><tr><td style=text-align:left><strong>优秀</strong></td><td style=text-align:left>$\ge 90$</td></tr><tr><td style=text-align:left><strong>良好</strong></td><td style=text-align:left>$\ge 80$</td></tr><tr><td style=text-align:left><strong>达标</strong></td><td style=text-align:left>$\ge 70$</td></tr></tbody></table><h4 id=压制组视频的vmaf分数参考><div><a href=#%e5%8e%8b%e5%88%b6%e7%bb%84%e8%a7%86%e9%a2%91%e7%9a%84vmaf%e5%88%86%e6%95%b0%e5%8f%82%e8%80%83>###
+</a>压制组视频的VMAF分数参考</div></h4><p>绝大部分在97-98分之间</p><h4 id=肉眼对比vmaf分数与画质><div><a href=#%e8%82%89%e7%9c%bc%e5%af%b9%e6%af%94vmaf%e5%88%86%e6%95%b0%e4%b8%8e%e7%94%bb%e8%b4%a8>###
+</a>肉眼对比VMAF分数与画质</div></h4><table><thead><tr><th>VMAF分数</th><th>肉眼观感</th></tr></thead><tbody><tr><td>90分</td><td>能看出明显差距,对画质有要求肯定无法接受</td></tr><tr><td>95分</td><td>很难看出差别</td></tr><tr><td>97分以上</td><td>无法看出差距</td></tr></tbody></table><h2 id=使用ffmetrics计算vmaf分数><div><a href=#%e4%bd%bf%e7%94%a8ffmetrics%e8%ae%a1%e7%ae%97vmaf%e5%88%86%e6%95%b0>#
+</a>使用FFMetrics计算VMAF分数</div></h2><p>首先要有原片:未经转码的BD视频.</p><h3 id=原片来源><div><a href=#%e5%8e%9f%e7%89%87%e6%9d%a5%e6%ba%90>##
+</a>原片来源</div></h3><ol><li>网上下载25GB/50GB的BD ISO</li><li>带BD / BluRay标签的资源 (BDRip = BD压制,BD=只经过剪辑,未重新编码视频)</li><li>自己买光碟</li></ol><h3 id=软件><div><a href=#%e8%bd%af%e4%bb%b6>##
+</a>软件</div></h3><p><a href=https://github.com/fifonik/FFMetrics>fifonik/FFMetrics</a><br><a href=https://www.gyan.dev/ffmpeg/builds/>ffmpeg.exe</a></p><ul><li>需要手动下载ffmpeg并放到FFMetrics目录下</li><li>仅支持CPU计算,速度很慢,无法使用任何GPU加速(VMAF据说可以使用CUDA加速,但FFMetrics目前不支持)</li><li>1.7.0版本在Intel 14代CPU上可能会被调度到小核</li><li>对比时必须使用时长和内容(包括不能有硬编码的字幕)完全相同的视频.</li></ul><h1 id=2av1编码参数><div><a href=#2av1%e7%bc%96%e7%a0%81%e5%8f%82%e6%95%b0>##
+</a>2.AV1编码参数</div></h1><h2 id=软件-1><div><a href=#%e8%bd%af%e4%bb%b6-1>#
+</a>软件</div></h2><p><a href=https://www.gyan.dev/ffmpeg/builds/>ffmpeg.exe</a></p><h2 id=针对动漫的参数><div><a href=#%e9%92%88%e5%af%b9%e5%8a%a8%e6%bc%ab%e7%9a%84%e5%8f%82%e6%95%b0>#
+</a>针对动漫的参数</div></h2><p>使用ffmpeg自带的SVT-AV1编码器即可达到比较优秀的画质和压缩率</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-cmd data-lang=cmd><span style=display:flex><span>./ffmpeg.exe -y -i input.mkv -map 0 -c copy -c:V libsvtav1 -preset 3 -crf 28 -pix_fmt yuv420p10le -svtav1-params tune=0:keyint=240:enable-overlays=1:scd=1 -c:a libopus -b:a 192k -map_metadata 0 -map_chapters 0 output.mkv
+</span></span></code></pre></div><h1 id=3解码av1视频><div><a href=#3%e8%a7%a3%e7%a0%81av1%e8%a7%86%e9%a2%91>##
+</a>3.解码AV1视频</div></h1><h3 id=小科普><div><a href=#%e5%b0%8f%e7%a7%91%e6%99%ae>##
+</a>小科普</div></h3><ul><li><p>编码(encoding):<br>CPU软件编码: 相同码率下画质最高,速度最慢<br>GPU硬件编码: 以NVIDIA GPU举例, 硬件编码器NVENC是独立于CUDA计算单元的一部分ASIC电路,直接把用于编码视频的程序刻在芯片内,运行速度极快(AV1软件编码大约30FPS,NVENC可超过1000FPS)
+但由于完整的视频编码程序太复杂,刻在芯片里的电路会简化,导致相同码率下,编码的画质比CPU软件编码更低.
+因此硬件编码单元不应用于对画质有要求的场景,而是用于剪辑预览,直播等对延迟有要求的场景.</p></li><li><p>解码(Decoding):<br>CPU软件解码: 速度慢,功耗高<br>GPU硬件解码: 也是GPU芯片里单独的ASIC电路,功耗极低速度极快<br>不管是软解还是硬解,解码出的视频一定是每个像素都完全一样.所以只要支持硬解完全没必要用软解</p></li></ul><p>(使用类似CUDA的计算单元进行视频编解码技术上不可行)</p><h2 id=硬件解码><div><a href=#%e7%a1%ac%e4%bb%b6%e8%a7%a3%e7%a0%81>#
+</a>硬件解码</div></h2><h3 id=pc-gpu-av1硬件解码支持><div><a href=#pc-gpu-av1%e7%a1%ac%e4%bb%b6%e8%a7%a3%e7%a0%81%e6%94%af%e6%8c%81>##
+</a>PC GPU AV1硬件解码支持</div></h3><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>NVIDIA</td><td>40系及以上</td></tr><tr><td>AMD</td><td>7000系(RDNA3)及以上</td></tr><tr><td>Intel核显</td><td>酷睿11代(UHD700)及以上</td></tr><tr><td>Intel独显</td><td>全部支持</td></tr></tbody></table><h3 id=移动设备av1硬件解码支持><div><a href=#%e7%a7%bb%e5%8a%a8%e8%ae%be%e5%a4%87av1%e7%a1%ac%e4%bb%b6%e8%a7%a3%e7%a0%81%e6%94%af%e6%8c%81>##
+</a>移动设备AV1硬件解码支持</div></h3><p>硬件解码单元(VPU)和计算单元(GPU)独立,无法根据GPU型号判断,需要根据SoC型号去官网查询</p><h2 id=软件解码><div><a href=#%e8%bd%af%e4%bb%b6%e8%a7%a3%e7%a0%81>#
+</a>软件解码</div></h2><p>1080p 4mbps及以下的AV1视频,CPU性能高于双核A76就可以流畅解码</p><h1 id=4其它><div><a href=#4%e5%85%b6%e5%ae%83>##
+</a>4.其它</div></h1><h3 id=性能><div><a href=#%e6%80%a7%e8%83%bd>##
+</a>性能</div></h3><ol><li>ffmpeg中视频编码的部分通过手写汇编进行极致的优化,编译器基本没有优化空间,使用官方最新版本ffmpeg即可</li><li>同时使用物理核心+超线程核心性能不会下降</li></ol><blockquote><p>超线程测试</p></blockquote><p>Ryzen7 5800x<br>SVT-AV1 preset=10 crf=28<br>24分钟的BD原盘动漫</p><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>无超线程</td><td>192s</td></tr><tr><td>有超线程</td><td>178s</td></tr></tbody></table><h3 id=potplayer的奇怪现象><div><a href=#potplayer%e7%9a%84%e5%a5%87%e6%80%aa%e7%8e%b0%e8%b1%a1>##
+</a>PotPlayer的奇怪现象</div></h3><blockquote><p>PotPlayer在不支持硬解AV1的设备上播放AV1视频时,可选H/W(硬解).</p></blockquote><p>AI给出的合理解释:</p><ul><li>Potplayer尝试向Windows发起AV1硬件解码器的调用时,Windows发现硬件不支持,就自行用CPU解码后当作硬件解码的结果返回给Potplayer.实际上还是CPU软解,性能没有任何区别.</li></ul><h3 id=gemini写的ffmpeg-av1编码工具><div><a href=#gemini%e5%86%99%e7%9a%84ffmpeg-av1%e7%bc%96%e7%a0%81%e5%b7%a5%e5%85%b7>##
+</a>Gemini写的ffmpeg AV1编码工具</div></h3><ul><li>需要当前目录下存在<a href=https://www.gyan.dev/ffmpeg/builds/>ffmpeg.exe</a>和<a href=https://mkvtoolnix.download/downloads.html>mkvmerge.exe</a></li><li>由于ffmpeg对mkv容器支持不佳,使用mkvmerge打包输出的视频和音频</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> subprocess
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> concurrent.futures
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> queue
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> time
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>PRESET <span style=color:#f92672>=</span> <span style=color:#ae81ff>3</span>
+</span></span><span style=display:flex><span>CRF <span style=color:#f92672>=</span> <span style=color:#ae81ff>28</span>
+</span></span><span style=display:flex><span>OUTPUT_PREFIX <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;av1_opus_&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>FFMPEG_PATH <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;./ffmpeg.exe&#34;</span> <span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>name <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;nt&#34;</span> <span style=color:#66d9ef>else</span> <span style=color:#e6db74>&#34;./ffmpeg&#34;</span>
+</span></span><span style=display:flex><span>MKVMERGE_PATH <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;./mkvmerge.exe&#34;</span> <span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>name <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;nt&#34;</span> <span style=color:#66d9ef>else</span> <span style=color:#e6db74>&#34;./mkvmerge&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>name <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;nt&#34;</span>:
+</span></span><span style=display:flex><span>    AFFINITY_GROUPS <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>        list(range(<span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>16</span>)),
+</span></span><span style=display:flex><span>        list(range(<span style=color:#ae81ff>16</span>, <span style=color:#ae81ff>32</span>))
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span><span style=color:#66d9ef>else</span>:
+</span></span><span style=display:flex><span>    AFFINITY_GROUPS <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>        list(range(<span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>8</span>)) <span style=color:#f92672>+</span> list(range(<span style=color:#ae81ff>16</span>, <span style=color:#ae81ff>24</span>)),
+</span></span><span style=display:flex><span>        list(range(<span style=color:#ae81ff>8</span>, <span style=color:#ae81ff>16</span>)) <span style=color:#f92672>+</span> list(range(<span style=color:#ae81ff>24</span>, <span style=color:#ae81ff>32</span>))
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>THREADS <span style=color:#f92672>=</span> len(AFFINITY_GROUPS)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>task_queue <span style=color:#f92672>=</span> queue<span style=color:#f92672>.</span>Queue()
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(THREADS):
+</span></span><span style=display:flex><span>    task_queue<span style=color:#f92672>.</span>put(i)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>get_mask</span>(cores):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>name <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;nt&#34;</span>:
+</span></span><span style=display:flex><span>        mask <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> c <span style=color:#f92672>in</span> cores:
+</span></span><span style=display:flex><span>            mask <span style=color:#f92672>|=</span> (<span style=color:#ae81ff>1</span> <span style=color:#f92672>&lt;&lt;</span> c)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> hex(mask)[<span style=color:#ae81ff>2</span>:]
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;,&#34;</span><span style=color:#f92672>.</span>join(map(str, cores))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>process</span>(input_file):
+</span></span><span style=display:flex><span>    group_idx <span style=color:#f92672>=</span> task_queue<span style=color:#f92672>.</span>get()
+</span></span><span style=display:flex><span>    cores <span style=color:#f92672>=</span> AFFINITY_GROUPS[group_idx]
+</span></span><span style=display:flex><span>    mask_str <span style=color:#f92672>=</span> get_mask(cores)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    out_file <span style=color:#f92672>=</span> OUTPUT_PREFIX <span style=color:#f92672>+</span> input_file
+</span></span><span style=display:flex><span>    tmp_all <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;tmp_&#34;</span> <span style=color:#f92672>+</span> out_file 
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>Start: &#34;</span> <span style=color:#f92672>+</span> input_file <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; on group &#34;</span> <span style=color:#f92672>+</span> str(group_idx))
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    ffmpeg_args <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;-y&#34;</span>, <span style=color:#e6db74>&#34;-i&#34;</span>, input_file,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;-map&#34;</span>, <span style=color:#e6db74>&#34;0&#34;</span>, 
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;-c&#34;</span>, <span style=color:#e6db74>&#34;copy&#34;</span>, 
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;-c:V&#34;</span>, <span style=color:#e6db74>&#34;libsvtav1&#34;</span>, <span style=color:#e6db74>&#34;-preset&#34;</span>, str(PRESET), <span style=color:#e6db74>&#34;-crf&#34;</span>, str(CRF),
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;-pix_fmt&#34;</span>, <span style=color:#e6db74>&#34;yuv420p10le&#34;</span>, <span style=color:#e6db74>&#34;-svtav1-params&#34;</span>, <span style=color:#e6db74>&#34;tune=0:keyint=240:enable-overlays=1:scd=1&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;-c:a&#34;</span>, <span style=color:#e6db74>&#34;libopus&#34;</span>, <span style=color:#e6db74>&#34;-b:a&#34;</span>, <span style=color:#e6db74>&#34;192k&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;-map_metadata&#34;</span>, <span style=color:#e6db74>&#34;0&#34;</span>, <span style=color:#e6db74>&#34;-map_chapters&#34;</span>, <span style=color:#e6db74>&#34;0&#34;</span>,
+</span></span><span style=display:flex><span>        tmp_all
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>name <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;nt&#34;</span>:
+</span></span><span style=display:flex><span>        cmd1 <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;cmd.exe&#34;</span>, <span style=color:#e6db74>&#34;/c&#34;</span>, <span style=color:#e6db74>&#34;start&#34;</span>, <span style=color:#e6db74>&#34;/b&#34;</span>, <span style=color:#e6db74>&#34;/wait&#34;</span>, <span style=color:#e6db74>&#34;/affinity&#34;</span>, mask_str, FFMPEG_PATH] <span style=color:#f92672>+</span> ffmpeg_args
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>:
+</span></span><span style=display:flex><span>        cmd1 <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;taskset&#34;</span>, <span style=color:#e6db74>&#34;-c&#34;</span>, mask_str, FFMPEG_PATH] <span style=color:#f92672>+</span> ffmpeg_args
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#34;Executing FFmpeg: &#34;</span> <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; &#34;</span><span style=color:#f92672>.</span>join(cmd1))
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    t0_ffmpeg <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>time()
+</span></span><span style=display:flex><span>    r1 <span style=color:#f92672>=</span> subprocess<span style=color:#f92672>.</span>run(cmd1, capture_output<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>, text<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>, errors<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;replace&#34;</span>)
+</span></span><span style=display:flex><span>    t1_ffmpeg <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>time()
+</span></span><span style=display:flex><span>    ffmpeg_time <span style=color:#f92672>=</span> t1_ffmpeg <span style=color:#f92672>-</span> t0_ffmpeg
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> r1<span style=color:#f92672>.</span>returncode <span style=color:#f92672>!=</span> <span style=color:#ae81ff>0</span>:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>exists(tmp_all): os<span style=color:#f92672>.</span>remove(tmp_all)
+</span></span><span style=display:flex><span>        task_queue<span style=color:#f92672>.</span>put(group_idx)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;FFmpeg Error: &#34;</span> <span style=color:#f92672>+</span> input_file <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>+</span> r1<span style=color:#f92672>.</span>stderr
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>    cmd2 <span style=color:#f92672>=</span> [MKVMERGE_PATH, <span style=color:#e6db74>&#34;-o&#34;</span>, out_file, tmp_all]
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#34;Executing MKVMerge: &#34;</span> <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; &#34;</span><span style=color:#f92672>.</span>join(cmd2))
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    t0_mkvmerge <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>time()
+</span></span><span style=display:flex><span>    r2 <span style=color:#f92672>=</span> subprocess<span style=color:#f92672>.</span>run(cmd2, capture_output<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>, text<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>, errors<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;replace&#34;</span>)
+</span></span><span style=display:flex><span>    t1_mkvmerge <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>time()
+</span></span><span style=display:flex><span>    mkvmerge_time <span style=color:#f92672>=</span> t1_mkvmerge <span style=color:#f92672>-</span> t0_mkvmerge
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>exists(tmp_all): os<span style=color:#f92672>.</span>remove(tmp_all)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    task_queue<span style=color:#f92672>.</span>put(group_idx)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> r2<span style=color:#f92672>.</span>returncode <span style=color:#f92672>not</span> <span style=color:#f92672>in</span> (<span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>1</span>):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>exists(out_file): os<span style=color:#f92672>.</span>remove(out_file)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;MKVMerge Error: &#34;</span> <span style=color:#f92672>+</span> input_file <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>+</span> r2<span style=color:#f92672>.</span>stderr
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>    total_task_time <span style=color:#f92672>=</span> ffmpeg_time <span style=color:#f92672>+</span> mkvmerge_time
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> (<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Done: </span><span style=color:#e6db74>{</span>input_file<span style=color:#e6db74>}</span><span style=color:#e6db74> -&gt; </span><span style=color:#e6db74>{</span>out_file<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  &gt; FFmpeg time: </span><span style=color:#e6db74>{</span>ffmpeg_time<span style=color:#e6db74>:</span><span style=color:#e6db74>.2f</span><span style=color:#e6db74>}</span><span style=color:#e6db74>s</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  &gt; MKVMerge time: </span><span style=color:#e6db74>{</span>mkvmerge_time<span style=color:#e6db74>:</span><span style=color:#e6db74>.2f</span><span style=color:#e6db74>}</span><span style=color:#e6db74>s</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  &gt; Total task time: </span><span style=color:#e6db74>{</span>total_task_time<span style=color:#e6db74>:</span><span style=color:#e6db74>.2f</span><span style=color:#e6db74>}</span><span style=color:#e6db74>s</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>main</span>():
+</span></span><span style=display:flex><span>    script_dir <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>dirname(os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>abspath(__file__))
+</span></span><span style=display:flex><span>    os<span style=color:#f92672>.</span>chdir(script_dir)
+</span></span><span style=display:flex><span>    files <span style=color:#f92672>=</span> [f <span style=color:#66d9ef>for</span> f <span style=color:#f92672>in</span> os<span style=color:#f92672>.</span>listdir(<span style=color:#e6db74>&#39;.&#39;</span>) <span style=color:#66d9ef>if</span> f<span style=color:#f92672>.</span>lower()<span style=color:#f92672>.</span>endswith(<span style=color:#e6db74>&#39;.mkv&#39;</span>) <span style=color:#f92672>and</span> <span style=color:#f92672>not</span> f<span style=color:#f92672>.</span>startswith(OUTPUT_PREFIX)]
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> files:
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>&#34;No files found to process.&#34;</span>)
+</span></span><span style=display:flex><span>        input(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>Press Enter to exit...&#34;</span>)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>    global_start <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>time()
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>with</span> concurrent<span style=color:#f92672>.</span>futures<span style=color:#f92672>.</span>ThreadPoolExecutor(max_workers<span style=color:#f92672>=</span>THREADS) <span style=color:#66d9ef>as</span> executor:
+</span></span><span style=display:flex><span>        fs <span style=color:#f92672>=</span> {executor<span style=color:#f92672>.</span>submit(process, f): f <span style=color:#66d9ef>for</span> f <span style=color:#f92672>in</span> files}
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> future <span style=color:#f92672>in</span> concurrent<span style=color:#f92672>.</span>futures<span style=color:#f92672>.</span>as_completed(fs):
+</span></span><span style=display:flex><span>            print(future<span style=color:#f92672>.</span>result())
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    global_end <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>time()
+</span></span><span style=display:flex><span>    total_elapsed <span style=color:#f92672>=</span> global_end <span style=color:#f92672>-</span> global_start
+</span></span><span style=display:flex><span>    avg_elapsed <span style=color:#f92672>=</span> total_elapsed <span style=color:#f92672>/</span> len(files) <span style=color:#66d9ef>if</span> files <span style=color:#66d9ef>else</span> <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#34;-&#34;</span> <span style=color:#f92672>*</span> <span style=color:#ae81ff>40</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#34;All tasks completed!&#34;</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Files processed: </span><span style=color:#e6db74>{</span>len(files)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Total time elapsed: </span><span style=color:#e6db74>{</span>total_elapsed<span style=color:#e6db74>:</span><span style=color:#e6db74>.2f</span><span style=color:#e6db74>}</span><span style=color:#e6db74>s&#34;</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Average time per file: </span><span style=color:#e6db74>{</span>avg_elapsed<span style=color:#e6db74>:</span><span style=color:#e6db74>.2f</span><span style=color:#e6db74>}</span><span style=color:#e6db74>s&#34;</span>)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    input(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>Press Enter to exit...&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> __name__ <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;__main__&#34;</span>:
+</span></span><span style=display:flex><span>    main()
+</span></span></code></pre></div></div></article><script>function detectCurrentScheme2(){const e="auto";return localStorage!==null&&localStorage.getItem("user-color-scheme")?localStorage.getItem("user-color-scheme"):e==="dark"||e==="light"?e:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}let giscusTheme=detectCurrentScheme2(),giscusAttributes={src:"https://giscus.app/client.js","data-repo":"0x2196f3/0x2196f3.github.io","data-repo-id":"R_kgDOPJtijw","data-category":"Announcements","data-category-id":"DIC_kwDOPJtij84Cs6CT","data-mapping":"pathname","data-strict":"0","data-reactions-enabled":"1","data-emit-metadata":"0","data-input-position":"bottom","data-theme":giscusTheme,"data-lang":"en",crossorigin:"anonymous",lazyload:"false",async:!0},main=document.querySelector("main"),giscusScript=document.createElement("script");Object.entries(giscusAttributes).forEach(([e,t])=>giscusScript.setAttribute(e,t)),main.appendChild(giscusScript)</script></main><footer class="common-footer noselect"><div class=common-footer-bottom><div style=display:flex;align-items:center;gap:8px>© 2026</div><div style=display:flex;align-items:center;gap:4px></div></div><p class="h-card vcard"><a href=https://0x2196f3.github.io/ class="p-name u-url url fn" rel=me></a></p></footer></div></body></html>

@@ -6,6 +6,37 @@
 &lt;p>寻找被 ZFS 挂载而隐藏的目录&lt;/p>&lt;/blockquote>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># pwd是一个ZFS Pool/Dataset 挂载点&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo find . -type d -print0 | xargs -0 stat -c &lt;span style="color:#e6db74">&amp;#34;%d %n&amp;#34;&lt;/span> | sort -n | awk &lt;span style="color:#e6db74">&amp;#39;NR==1{p=$1;next} $1!=p{print &amp;#34;ZFS mount at&amp;#34;, $2} {p=$1}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>LSI-3008更新固件</title><link>/posts/lsi-2308-3008-update-firmware/</link><pubDate>Wed, 09 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/lsi-2308-3008-update-firmware/</guid><description>&lt;h1 id="lsi-2308" >
+&lt;div>
+&lt;a href="#lsi-2308">
+##
+&lt;/a>
+LSI 2308
+&lt;/div>
+&lt;/h1>
+&lt;p>&lt;a href="https://www.broadcom.com/support/download-search?pg=Legacy+Products&amp;amp;pf=Legacy+Host+Bus+Adapters&amp;amp;pn=SAS+9207-8i+Host+Bus+Adapter&amp;amp;pa=&amp;amp;po=&amp;amp;dk=&amp;amp;pl=">博通官网下载地址&lt;/a>&lt;br>
+分别下载BIOS的第一个和Firmware的第一个,并解压&lt;/p>
+&lt;blockquote>
+&lt;p>刷写BIOS&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo sas2flash -o -f ./Firmware/HBA_9207_8i_IT/9207-8.bin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>刷写Firmware&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo sas2flash -c &lt;span style="color:#ae81ff">0&lt;/span> -b x64sas2.rom
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="lsi-3008" >
+&lt;div>
+&lt;a href="#lsi-3008">
+##
+&lt;/a>
+LSI 3008
+&lt;/div>
+&lt;/h1>
+&lt;p>&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/">LSI SAS 9300-xx更新固件教程&lt;/a>&lt;br>
+&lt;a href="https://www.truenas.com/community/resources/lsi-9300-xx-firmware-update.145/download">固件下载直链&lt;/a>&lt;br>
+&lt;a href="https://www.broadcom.com/support/download-search?pg=Legacy+Products&amp;amp;pf=Legacy+Host+Bus+Adapters&amp;amp;pn=SAS+9300-8i+Host+Bus+Adapter&amp;amp;pa=&amp;amp;po=&amp;amp;dk=&amp;amp;pl=">博通官网下载地址&lt;/a>&lt;br>
+TrueNAS自带该阵列卡更新固件的程序,直接在Shell更新,不用做MS-DOS的启动U盘&lt;/p>
+&lt;blockquote>
+&lt;p>刷写固件&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo sas3flash -o -f SAS9300_xx_IT.bin
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>ZFS 强制删除dataset</title><link>/posts/zfs-destroy-dataset/</link><pubDate>Tue, 08 Jul 2025 00:00:00 +0000</pubDate><guid>/posts/zfs-destroy-dataset/</guid><description>&lt;p>TrueNAS删除dataset时经常遇到&lt;code>dataset is busy&lt;/code>, -f没用也不说是什么进程占用这个dataset,解决方法是先改名再删除&lt;/p>
 &lt;blockquote>
 &lt;p>rename dataset&lt;/p>&lt;/blockquote>
